@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>NeuroBuilder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Bootstrap + Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body class="bg-dark text-light">
+    <div class="container py-3">
+      <h3 class="mb-3"><i class="bi bi-diagram-3"></i> NeuroBuilder</h3>
+
+      <div class="row g-3">
+        <!-- Palette -->
+        <div class="col-md-3">
+          <div class="nb-card p-3 mb-3">
+            <h6 class="mb-2"><i class="bi bi-grid"></i> Palette</h6>
+            <p class="small-muted mb-3">
+              Trascina i blocchi qui sotto nell'architettura 👉
+            </p>
+
+            <div class="palette-item mb-2" draggable="true" data-type="input">
+              <i class="bi bi-box-arrow-in-right text-warning"></i> Input
+            </div>
+            <div class="palette-item mb-2" draggable="true" data-type="hidden">
+              <i class="bi bi-diagram-3 text-info"></i> Layer nascosto
+            </div>
+            <div class="palette-item mb-2" draggable="true" data-type="output">
+              <i class="bi bi-box-arrow-right text-success"></i> Output
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+              <button class="btn btn-sm btn-secondary" id="btnClear">
+                <i class="bi bi-trash"></i> Pulisci
+              </button>
+              <button class="btn btn-sm btn-primary" id="btnAddHidden">
+                <i class="bi bi-plus-circle"></i> Layer nascosto
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Architettura -->
+        <div class="col-md-4">
+          <div class="nb-card p-3 mb-3">
+            <h6 class="mb-3"><i class="bi bi-diagram-3"></i> Architettura</h6>
+            <div id="architecture" class="drop-area"></div>
+          </div>
+        </div>
+
+        <!-- Training -->
+        <div class="col-md-5">
+          <div class="nb-card p-3 mb-3">
+            <h6 class="mb-3"><i class="bi bi-cpu"></i> Training</h6>
+            <div class="row g-2">
+              <div class="col-4">
+                <label class="form-label"
+                  >Learning rate: <span id="lrVal">0.1</span></label
+                >
+                <input
+                  type="range"
+                  id="lr"
+                  min="0.01"
+                  max="1"
+                  step="0.01"
+                  value="0.1"
+                  class="form-range"
+                />
+              </div>
+              <div class="col-4">
+                <label class="form-label"
+                  >Epoche: <span id="epochsVal">50</span></label
+                >
+                <input
+                  type="range"
+                  id="epochs"
+                  min="1"
+                  max="200"
+                  value="50"
+                  class="form-range"
+                />
+              </div>
+              <div class="col-4">
+                <label class="form-label"
+                  >Batch: <span id="batchVal">4</span></label
+                >
+                <input
+                  type="range"
+                  id="batch"
+                  min="1"
+                  max="64"
+                  value="4"
+                  class="form-range"
+                />
+              </div>
+            </div>
+
+            <div class="mt-2 d-flex flex-wrap gap-2">
+              <button class="btn btn-primary" id="btnTrain">
+                <i class="bi bi-play-fill"></i> Allena
+              </button>
+              <button class="btn btn-danger" id="btnStop" disabled>
+                <i class="bi bi-stop-fill"></i> Stop
+              </button>
+              <button class="btn btn-warning" id="btnQuickStart">
+                <i class="bi bi-lightning"></i> Quick Start (XOR)
+              </button>
+            </div>
+
+            <div class="mt-3">
+              <canvas id="lossChart" height="150"></canvas>
+              <div class="d-flex justify-content-between small mt-2">
+                <span>Loss: <span id="lossNow">-</span></span>
+                <span>Accuracy: <span id="accNow">-</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISUALIZZAZIONE + TEST affiancati -->
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="nb-card p-3 mb-3">
+            <div class="d-flex align-items-center justify-content-between">
+              <h6 class="mb-0">
+                <i class="bi bi-eye me-2"></i>Visualizzazione rete
+              </h6>
+              <span class="small-muted"
+                >spessore/colore archi = peso; colore nodi = attivazione</span
+              >
+            </div>
+            <div class="mt-2 nn-vis-wrap">
+              <svg
+                id="nnVis"
+                viewBox="0 0 800 360"
+                width="100%"
+                height="360"
+                preserveAspectRatio="xMidYMid meet"
+              ></svg>
+            </div>
+          </div>
+
+          <!-- Legenda -->
+          <div class="nb-card p-2 mb-3">
+            <div
+              class="d-flex align-items-center gap-4 justify-content-center flex-wrap"
+            >
+              <div class="d-flex align-items-center gap-2">
+                <svg width="40" height="8">
+                  <line
+                    x1="0"
+                    y1="4"
+                    x2="40"
+                    y2="4"
+                    stroke="#22c55e"
+                    stroke-width="3"
+                  />
+                </svg>
+                <span class="small-muted">Peso positivo</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <svg width="40" height="8">
+                  <line
+                    x1="0"
+                    y1="4"
+                    x2="40"
+                    y2="4"
+                    stroke="#ef4444"
+                    stroke-width="3"
+                  />
+                </svg>
+                <span class="small-muted">Peso negativo</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <svg width="40" height="8">
+                  <line
+                    x1="0"
+                    y1="4"
+                    x2="40"
+                    y2="4"
+                    stroke="#60a5fa"
+                    stroke-width="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="4"
+                    x2="40"
+                    y2="4"
+                    stroke="#60a5fa"
+                    stroke-width="4"
+                    opacity="0.4"
+                  />
+                </svg>
+                <span class="small-muted">Spessore = intensità</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Test predizione a destra -->
+        <div class="col-lg-4">
+          <div class="nb-card p-3 mb-3">
+            <h6 class="mb-3">
+              <i class="bi bi-lightning-charge"></i> Test Predizione
+            </h6>
+            <div class="row g-2" id="testInputs"></div>
+            <div class="mt-3 d-flex gap-2">
+              <button class="btn btn-primary" id="btnPredict">
+                <i class="bi bi-lightning-charge"></i> Predici
+              </button>
+              <div class="align-self-center">
+                Output: <span id="predictOut">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dataset -->
+          <div class="nb-card p-3 mb-3">
+            <h6 class="mb-3">
+              <i class="bi bi-file-earmark-spreadsheet"></i> Dataset
+            </h6>
+            <div class="d-flex gap-2 mb-2">
+              <select id="presetDataset" class="form-select">
+                <option value="none">-- Scegli preset --</option>
+                <option value="xor">XOR</option>
+                <option value="linsep">Lineare</option>
+              </select>
+              <button class="btn btn-secondary" id="btnLoadPreset">
+                Carica
+              </button>
+            </div>
+            <div id="csvDrop" class="drop-zone mb-2">
+              Trascina qui un CSV o usa il file input
+            </div>
+            <input
+              type="file"
+              id="csvFile"
+              accept=".csv"
+              class="form-control mb-2"
+            />
+            <div class="small-muted" id="csvInfo">Nessun dataset caricato</div>
+          </div>
+
+          <!-- JSON -->
+          <div class="nb-card p-3 mb-3">
+            <h6 class="mb-3"><i class="bi bi-braces"></i> JSON</h6>
+            <textarea
+              id="jsonArea"
+              class="form-control mb-2"
+              rows="6"
+              readonly
+            ></textarea>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-secondary" id="btnExport">
+                Esporta Architettura
+              </button>
+              <button class="btn btn-secondary" id="btnDownloadJSON">
+                Scarica Pesi
+              </button>
+              <button class="btn btn-secondary" id="btnCopyJSON">Copia</button>
+              <input
+                type="file"
+                id="importJSON"
+                class="form-control form-control-sm"
+                accept=".json"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

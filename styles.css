@@ -1,0 +1,149 @@
+:root {
+  --nb-bg: #0f172a;
+  --nb-card: #111827;
+  --nb-ink: #e5e7eb;
+  --nb-accent: #60a5fa;
+}
+
+/* --- Base --- */
+body {
+  background: var(--nb-bg);
+  color: var(--nb-ink);
+  min-height: 100vh;
+}
+
+.nb-card {
+  background: var(--nb-card);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.small-muted {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+/* --- Palette: blocchi chiaramente trascinabili --- */
+.palette-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  cursor: grab;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  user-select: none;
+}
+.palette-item::before {
+  content: "⋮⋮";
+  font-size: 1rem;
+  color: #9ca3af;
+  margin-right: 4px;
+  line-height: 1;
+}
+.palette-item:hover {
+  background: rgba(96, 165, 250, 0.15); /* azzurro tenue */
+  border-color: var(--nb-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+.palette-item::after {
+  content: "⇅";
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 0.9rem;
+  color: var(--nb-accent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.palette-item:hover::after {
+  opacity: 1;
+}
+.palette-item:active {
+  cursor: grabbing;
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) inset;
+}
+
+/* --- Area drop & card layer --- */
+.drop-area {
+  min-height: 110px;
+  padding: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.drop-area.drop-hint {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--nb-accent);
+}
+
+.layer-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 10px;
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+.layer-card.ghost {
+  opacity: 0.5;
+}
+.layer-card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transform: translateY(-1px);
+}
+
+/* --- Slider manopole --- */
+.form-range::-webkit-slider-thumb,
+.form-range::-moz-range-thumb {
+  background: var(--nb-accent);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  appearance: none;
+}
+
+/* --- Visualizzazione rete --- */
+.nn-vis-wrap {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+}
+.nn-node circle {
+  fill: #0b1220;
+  stroke: rgba(255, 255, 255, 0.95);
+  stroke-width: 1.6;
+}
+.nn-node text {
+  fill: #e5e7eb;
+  font-weight: 600;
+}
+.nn-edge {
+  opacity: 0.95;
+}
+
+/* --- Chart loss --- */
+#lossChart {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+/* --- Drop CSV --- */
+.drop-zone {
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.drop-zone.dragover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--nb-accent);
+}
