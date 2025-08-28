@@ -413,6 +413,7 @@ function addLayer(type) {
   }
   renderArchitecture();
   buildNetwork();
+  updateJSON();
 }
 
 // Drop di nuovi layer nell'area architettura
@@ -443,6 +444,7 @@ $("#btnClear").addEventListener("click", () => {
   arch = [];
   renderArchitecture();
   buildNetwork();
+  updateJSON();
 });
 
 // ========= Build Network =========
@@ -630,23 +632,36 @@ function loadPreset(name) {
   renderTestInputs();
 }
 function ensureIOInArch() {
-  if (!arch.some((l) => l.type === "input"))
-    arch.unshift({
-      id: crypto.randomUUID(),
-      type: "input",
-      neurons: inputSize,
-    });
-  if (!arch.some((l) => l.type === "output"))
-    arch.push({
+  // INPUT: crea o aggiorna la dimensione
+  let inL = arch.find((l) => l.type === "input");
+  if (!inL) {
+    inL = { id: crypto.randomUUID(), type: "input", neurons: inputSize };
+    arch.unshift(inL);
+  } else {
+    inL.neurons = inputSize; // 👈 sincronizza
+  }
+
+  // OUTPUT: crea o aggiorna la dimensione
+  let outL = arch.find((l) => l.type === "output");
+  if (!outL) {
+    outL = {
       id: crypto.randomUUID(),
       type: "output",
       neurons: outputSize,
       activation: "sigmoid",
       bias: true,
-    });
+    };
+    arch.push(outL);
+  } else {
+    outL.neurons = outputSize; // 👈 sincronizza
+    if (!outL.activation) outL.activation = "sigmoid";
+  }
+
   renderArchitecture();
-  buildNetwork();
+  buildNetwork(); // buildNetwork chiama già updateJSON()
+  updateJSON(); // ridondante ma rende l’update immediato
 }
+
 $("#btnLoadPreset").addEventListener("click", () => {
   const v = $("#presetDataset").value;
   if (v !== "none") loadPreset(v);
@@ -711,10 +726,14 @@ function accuracyBinary(pred, y) {
   return ok / pred.length;
 }
 function updateJSON() {
-  // Esporta con label "hidden" per coerenza
   const j = {
-    layers: net.layers.map((l) => ({
-      type: "hidden",
+    architecture: arch.map((l) => ({
+      type: l.type,
+      neurons: l.neurons,
+      activation: l.activation || null,
+      bias: l.bias ?? null,
+    })),
+    weights: net.layers.map((l) => ({
       in: l.in,
       out: l.out,
       activation: l.activation,
@@ -988,6 +1007,7 @@ $("#btnQuickStart").addEventListener("click", () => {
   renderArchitecture();
   buildNetwork();
   loadPreset("xor");
+  updateJSON();
 });
 
 // ========= Init =========
