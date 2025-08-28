@@ -909,51 +909,122 @@ $("#btnDownloadJSON").addEventListener("click", () => {
   a.download = "neurobuilder-weights.json";
   a.click();
 });
+
 $("#importJSON").addEventListener("change", (e) => {
-  const file = e.target.files[0];
+  const input = e.target;
+  const file = input.files && input.files[0];
   if (!file) return;
+
   const fr = new FileReader();
   fr.onload = () => {
     try {
       const o = JSON.parse(fr.result);
-      net = new Network();
-      arch = [
-        {
+
+      // Caso A: formato "pesi" (vecchio) → { layers: [...] }
+      if (Array.isArray(o.layers)) {
+        if (!o.layers.length) throw new Error("layers vuoto");
+
+        // Ricostruisci arch dall’header dei layer (input = in del primo; output = out dell’ultimo)
+        inputSize = o.layers[0].in ?? inputSize;
+        outputSize = o.layers[o.layers.length - 1].out ?? outputSize;
+
+        arch = [
+          { id: crypto.randomUUID(), type: "input", neurons: inputSize },
+          ...o.layers.slice(0, -1).map((L) => ({
+            id: crypto.randomUUID(),
+            type: "hidden",
+            neurons: L.out,
+            activation: L.activation,
+            bias: L.useBias,
+          })),
+          {
+            id: crypto.randomUUID(),
+            type: "output",
+            neurons: outputSize,
+            activation: o.layers.at(-1).activation || "sigmoid",
+            bias: o.layers.at(-1).useBias ?? true,
+          },
+        ];
+
+        // Ricostruisci i layer con i pesi
+        net = new Network();
+        let lastSize = inputSize;
+        net.layers = o.layers.map((L) => {
+          const d = new DenseLayer(
+            lastSize,
+            L.out,
+            L.activation,
+            L.useBias,
+            Math.random
+          );
+          d.W = L.W;
+          d.b = L.b;
+          lastSize = L.out;
+          return d;
+        });
+
+        renderArchitecture();
+        renderTestInputs();
+        renderNNVis();
+        updateJSON();
+        alert("✅ Import riuscito (formato pesi).");
+
+        // Caso B: formato “architettura + (opzionale) weights”
+      } else if (o.architecture || o.weights) {
+        if (!Array.isArray(o.architecture))
+          throw new Error('manca "architecture"');
+
+        // Importa architettura umana
+        arch = o.architecture.map((L) => ({
           id: crypto.randomUUID(),
-          type: "input",
-          neurons: o.layers[0]?.in || inputSize,
-        },
-        ...o.layers.map((L) => ({
-          id: crypto.randomUUID(),
-          type: "hidden",
-          neurons: L.out,
+          type: L.type,
+          neurons: Number(L.neurons),
           activation: L.activation,
-          bias: L.useBias,
-        })),
-      ];
-      inputSize = o.layers[0]?.in || inputSize;
-      outputSize = o.layers.at(-1)?.out || outputSize;
-      // ricostruisco i layer con i pesi importati
-      let lastSize = inputSize;
-      net.layers = o.layers.map((L) => {
-        const d = new DenseLayer(
-          lastSize,
-          L.out,
-          L.activation,
-          L.useBias,
-          Math.random
+          bias: L.bias,
+        }));
+
+        // Allinea input/output
+        const inL = arch.find((l) => l.type === "input");
+        const outL = arch.find((l) => l.type === "output");
+        if (inL) inputSize = Number(inL.neurons);
+        if (outL) outputSize = Number(outL.neurons);
+
+        // Ricostruisci rete “da zero”
+        buildNetwork(); // crea net.layers nuovi (random)
+
+        // Se ci sono anche i pesi, applicali sopra
+        if (
+          Array.isArray(o.weights) &&
+          o.weights.length === net.layers.length
+        ) {
+          for (let i = 0; i < net.layers.length; i++) {
+            if (o.weights[i].W && o.weights[i].b) {
+              net.layers[i].W = o.weights[i].W;
+              net.layers[i].b = o.weights[i].b;
+            }
+          }
+        }
+
+        renderArchitecture();
+        renderTestInputs();
+        renderNNVis();
+        updateJSON();
+        alert(
+          "✅ Import riuscito (architettura" +
+            (o.weights ? " + pesi" : "") +
+            ")."
         );
-        d.W = L.W;
-        d.b = L.b;
-        lastSize = L.out;
-        return d;
-      });
-      renderArchitecture();
-      renderTestInputs();
-      renderNNVis();
-      updateJSON();
+      } else {
+        throw new Error(
+          "Formato non riconosciuto. Attesi: {layers:[...]} oppure {architecture:[...], weights?:[...]}."
+        );
+      }
     } catch (err) {
-      alert("JSON non valido");
+      console.error(err);
+      alert("❌ JSON non valido: " + err.message);
+    } finally {
+      // Permette di riselezionare lo stesso file e rilanciare change
+      input.value = "";
     }
   };
   fr.readAsText(file);
