@@ -73,8 +73,7 @@ Sviluppata in **HTML / CSS (Bootstrap) / JavaScript** + **Chart.js** per i grafi
 
 ## 📄 Licenza
 
-Distribuito con licenza MIT.
-Puoi usare, modificare e condividere liberamente questo progetto.
+Distribuito con licenza [GNU GENERAL PUBLIC LICENSE, Version 3](https://github.com/micheleminno/neural-network-playground?tab=GPL-3.0-1-ov-file#readme).
 
 ---
 
