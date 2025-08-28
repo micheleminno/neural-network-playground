@@ -19,7 +19,7 @@ function shuffleInPlace(arr, rand) {
   }
 }
 
-// ========= Neural Net Core =========
+// ========= NN Core =========
 const Activations = {
   relu: { f: (x) => Math.max(0, x), df: (y) => (y > 0 ? 1 : 0) },
   sigmoid: { f: (x) => 1 / (1 + Math.exp(-x)), df: (y) => y * (1 - y) },
@@ -147,20 +147,18 @@ class DenseLayer {
     for (let i = 0; i < this.W.length; i++)
       for (let j = 0; j < this.W[0].length; j++)
         this.W[i][j] -= (lr * dW[i][j]) / r;
-    if (this.useBias) {
+    if (this.useBias)
       for (let j = 0; j < this.b[0].length; j++)
         this.b[0][j] -= (lr * dB[0][j]) / r;
-    }
     return dX;
   }
 }
-
 class Network {
   constructor() {
     this.layers = [];
   }
-  add(layer) {
-    this.layers.push(layer);
+  add(L) {
+    this.layers.push(L);
   }
   forward(X) {
     let A = X;
@@ -179,92 +177,85 @@ let arch = []; // [{id,type:'input'|'hidden'|'output', neurons, activation, bias
 let inputSize = 2,
   outputSize = 1;
 let dataset = { X: [], y: [] };
-let chart;
-let stopFlag = false;
-let lastNodeColors = null;
+let chart,
+  stopFlag = false;
+let lastNodeColors = null; // {byLayer:[], raw:[]}
 
-// ========= Colors =========
-function clamp01(v) {
-  return Math.max(0, Math.min(1, v));
-}
-function lerp(a, b, t) {
-  return a + (b - a) * t;
-}
+// ========= Colors & Node Coloring =========
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const hiddenColor = (v) =>
+  `hsl(210 80% ${Math.round(lerp(12, 60, clamp01(v)))}%)`;
+const outputColor = (v) => `hsl(${Math.round(120 * clamp01(v))} 85% 50%)`;
 
-/* Hidden: blu scuro → azzurro chiaro (solo luminosità, va benissimo per gli hidden) */
-function hiddenColor(v) {
-  const t = clamp01(v);
-  return `hsl(210 80% ${Math.round(lerp(12, 60, t))}%)`;
-}
-
-/* Output: GRADIENTE VERO rosso→giallo→verde in base a t∈[0,1] */
-function outputColor(v) {
-  const t = clamp01(v);
-  // hue 0° (rosso) → 120° (verde); saturazione alta, lightness media
-  const hue = Math.round(120 * t);
-  return `hsl(${hue} 85% 50%)`;
-}
-
-function hiddenColor(v) {
-  const t = clamp01(v);
-  return `hsl(210 80% ${Math.round(lerp(12, 60, t))}%)`;
-}
 function computeNodeColorsForInput(xvec) {
   if (!xvec) return;
   net.forward([xvec]);
-
-  lastNodeColors = { byLayer: [], raw: [] }; // raw = attivazioni reali
+  lastNodeColors = { byLayer: [], raw: [] };
 
   net.layers.forEach((L, k) => {
     const vals = L.A && L.A[0] ? L.A[0].slice() : [];
     lastNodeColors.raw[k + 1] = vals.slice();
-
     if (vals.length === 0) {
       lastNodeColors.byLayer[k + 1] = [];
       return;
     }
-
-    // Caso speciale: layer con 1 solo neurone → usa direttamente il valore (già ~[0,1] se sigmoid)
     if (vals.length === 1) {
-      lastNodeColors.byLayer[k + 1] = [Math.max(0, Math.min(1, vals[0]))];
+      lastNodeColors.byLayer[k + 1] = [clamp01(vals[0])];
       return;
     }
-
-    // Normalizzazione per-layer su [0,1] (valori multipli)
     let min = Infinity,
       max = -Infinity;
     for (const v of vals) {
       if (v < min) min = v;
       if (v > max) max = v;
     }
-    const den = max - min || 1; // qui non capita più 0 perché length>1
+    const den = max - min || 1;
     lastNodeColors.byLayer[k + 1] = vals.map((v) => (v - min) / den);
   });
 }
 
-// ========= Architettura (drag & drop) =========
-const archEl = $("#architecture");
+// ========= Test Inputs UI =========
+function renderTestInputs() {
+  const container = $("#testInputs");
+  if (!container) return;
+  const prev = Array.from(container.querySelectorAll("[data-ti]")).map((inp) =>
+    Number(inp.value)
+  );
+  container.innerHTML = "";
+  for (let i = 0; i < inputSize; i++) {
+    const col = document.createElement("div");
+    col.className = "col-6";
+    const val = Number.isFinite(prev[i]) ? prev[i] : 0;
+    col.innerHTML = `<label class="form-label">x${i + 1}</label>
+                   <input type="number" step="any" class="form-control" data-ti="${i}" value="${val}">`;
+    container.appendChild(col);
+  }
+}
 
+// ========= Architettura (render & DnD) =========
 function renderArchitecture() {
+  const archEl = $("#architecture");
+  if (!archEl) return;
   archEl.innerHTML = "";
   if (arch.length === 0) {
     archEl.innerHTML =
       '<div class="text-center small-muted py-4">Trascina qui i layer dalla palette…</div>';
     return;
   }
+
   arch.forEach((L, idx) => {
     const card = document.createElement("div");
     card.className = "layer-card mb-2";
     card.dataset.id = L.id;
     card.draggable = true;
-
-    const displayIcon =
+    const icon =
       L.type === "input"
         ? "bi-box-arrow-in-right text-warning"
         : L.type === "output"
         ? "bi-box-arrow-right text-success"
         : "bi-diagram-3 text-info";
-    const displayName =
+    const name =
       L.type === "input"
         ? "INPUT"
         : L.type === "output"
@@ -274,8 +265,8 @@ function renderArchitecture() {
     card.innerHTML = `
       <div class="d-flex align-items-center justify-content-between mb-2">
         <div class="d-flex align-items-center gap-2">
-          <i class="bi ${displayIcon}"></i>
-          <strong>${displayName}</strong>
+          <i class="bi ${icon}"></i>
+          <strong>${name}</strong>
           <span class="badge rounded-pill bg-secondary">#${idx + 1}</span>
         </div>
         <button class="btn btn-sm btn-danger remove-layer" type="button" title="Rimuovi">
@@ -286,56 +277,61 @@ function renderArchitecture() {
         ${
           L.type !== "input"
             ? `<div class="col-6">
-          <label class="form-label">Neuroni: <span class="small" id="neuronsVal-${L.id}">${L.neurons}</span></label>
-          <input type="range" min="1" max="64" step="1" value="${L.neurons}" class="form-range" data-field="neurons" data-id="${L.id}">
-        </div>`
+            <label class="form-label">Neuroni: <span class="small" id="neuronsVal-${L.id}">${L.neurons}</span></label>
+            <input type="range" min="1" max="64" step="1" value="${L.neurons}" class="form-range" data-field="neurons" data-id="${L.id}">
+          </div>`
             : ""
         }
         ${
           L.type === "input"
             ? `<div class="col-6">
-          <label class="form-label">Dimensione input</label>
-          <input type="number" min="1" max="64" value="${L.neurons}" class="form-control" data-field="neurons" data-id="${L.id}">
-        </div>`
+            <label class="form-label">Dimensione input</label>
+            <input type="number" min="1" max="64" value="${L.neurons}" class="form-control" data-field="neurons" data-id="${L.id}">
+          </div>`
             : ""
         }
         ${
           L.type !== "input"
             ? `<div class="col-6">
-          <label class="form-label">Attivazione</label>
-          <select class="form-select" data-field="activation" data-id="${L.id}">
-            ${["relu", "sigmoid", "tanh", "linear"]
-              .map(
-                (a) =>
-                  `<option value="${a}" ${
-                    L.activation === a ? "selected" : ""
-                  }>${a}</option>`
-              )
-              .join("")}
-          </select>
-        </div>`
+            <label class="form-label">Attivazione</label>
+            <select class="form-select" data-field="activation" data-id="${
+              L.id
+            }">
+              ${["relu", "sigmoid", "tanh", "linear"]
+                .map(
+                  (a) =>
+                    `<option value="${a}" ${
+                      L.activation === a ? "selected" : ""
+                    }>${a}</option>`
+                )
+                .join("")}
+            </select>
+          </div>`
             : ""
         }
         ${
           L.type !== "input"
             ? `<div class="col-6 form-check form-switch ms-3">
-          <input class="form-check-input" type="checkbox" data-field="bias" data-id="${
-            L.id
-          }" ${L.bias ? "checked" : ""}>
-          <label class="form-check-label">Bias</label>
-        </div>`
+            <input class="form-check-input" type="checkbox" data-field="bias" data-id="${
+              L.id
+            }" ${L.bias ? "checked" : ""}>
+            <label class="form-check-label">Bias</label>
+          </div>`
             : ""
         }
       </div>`;
 
+    // remove
     card.querySelector(".remove-layer").addEventListener("click", (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
       arch = arch.filter((x) => x.id !== L.id);
       renderArchitecture();
       buildNetwork();
+      updateJSON();
     });
 
+    // controls
     card.querySelectorAll("[data-field]").forEach((ctrl) => {
       ctrl.addEventListener("input", (e) => {
         const id = e.target.dataset.id;
@@ -346,20 +342,16 @@ function renderArchitecture() {
           obj.neurons = Number(e.target.value);
           const sp = $(`#neuronsVal-${id}`);
           if (sp) sp.textContent = obj.neurons;
-          if (obj.type === "input") {
-            inputSize = obj.neurons;
-          }
+          if (obj.type === "input") inputSize = obj.neurons;
         }
-        if (fld === "activation") {
-          obj.activation = e.target.value;
-        }
-        if (fld === "bias") {
-          obj.bias = e.target.checked;
-        }
+        if (fld === "activation") obj.activation = e.target.value;
+        if (fld === "bias") obj.bias = e.target.checked;
         buildNetwork();
+        updateJSON();
       });
     });
 
+    // reorder via drag
     card.addEventListener("dragstart", (ev) => {
       ev.dataTransfer.setData("text/plain", L.id);
       card.classList.add("ghost");
@@ -376,24 +368,48 @@ function renderArchitecture() {
       ev.preventDefault();
       card.classList.remove("drop-hint");
       const id = ev.dataTransfer.getData("text/plain");
-      const fromI = arch.findIndex((x) => x.id === id);
-      const toI = arch.findIndex((x) => x.id === L.id);
+      const fromI = arch.findIndex((x) => x.id === id),
+        toI = arch.findIndex((x) => x.id === L.id);
       if (fromI < 0 || toI < 0 || fromI === toI) return;
       const [moved] = arch.splice(fromI, 1);
       arch.splice(toI, 0, moved);
       renderArchitecture();
       buildNetwork();
+      updateJSON();
     });
 
     archEl.appendChild(card);
   });
 }
 
+function attachArchDnD() {
+  const el = $("#architecture");
+  if (!el) {
+    console.warn("#architecture non trovato");
+    return;
+  }
+  const clone = el.cloneNode(true);
+  el.parentNode.replaceChild(clone, el);
+  const zone = $("#architecture");
+
+  zone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    zone.classList.add("drop-hint");
+  });
+  zone.addEventListener("dragleave", (_) => zone.classList.remove("drop-hint"));
+  zone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    zone.classList.remove("drop-hint");
+    const type = e.dataTransfer.getData("text/plain");
+    addLayer(type || "hidden");
+    updateJSON();
+  });
+}
+
 function addLayer(type) {
   const id = crypto.randomUUID();
-  if (type === "input") {
-    arch.push({ id, type: "input", neurons: inputSize });
-  } else if (type === "output") {
+  if (type === "input") arch.push({ id, type: "input", neurons: inputSize });
+  else if (type === "output")
     arch.push({
       id,
       type: "output",
@@ -401,8 +417,7 @@ function addLayer(type) {
       activation: "sigmoid",
       bias: true,
     });
-  } else {
-    // 'hidden'
+  else
     arch.push({
       id,
       type: "hidden",
@@ -410,42 +425,110 @@ function addLayer(type) {
       activation: "relu",
       bias: true,
     });
-  }
   renderArchitecture();
   buildNetwork();
   updateJSON();
 }
 
-// Drop di nuovi layer nell'area architettura
-archEl.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  archEl.classList.add("drop-hint");
-});
-archEl.addEventListener("dragleave", (_) =>
-  archEl.classList.remove("drop-hint")
-);
-archEl.addEventListener("drop", (e) => {
-  e.preventDefault();
-  archEl.classList.remove("drop-hint");
-  const type = e.dataTransfer.getData("text/plain"); // palette → 'input' | 'hidden' | 'output'
-  addLayer(type || "hidden");
-});
+// ========= Visualization (SVG) =========
+function renderNNVis() {
+  const svg = $("#nnVis");
+  if (!svg) return;
+  const W = 800,
+    H = 360;
+  const sizes = [inputSize, ...net.layers.map((L) => L.out)];
+  const L = sizes.length;
+  if (L < 1) {
+    svg.innerHTML = "";
+    return;
+  }
 
-// Dragstart sui blocchi palette → passiamo il tipo come text/plain
-$$(".palette-item").forEach((el) => {
-  el.addEventListener("dragstart", (ev) => {
-    ev.dataTransfer.setData("text/plain", el.dataset.type); // 'hidden' al posto di 'dense'
+  const xPad = 80,
+    yPad = 30;
+  const colW = (W - 2 * xPad) / (L - 1 || 1);
+  const nodeR = 13;
+
+  const pos = [];
+  for (let li = 0; li < L; li++) {
+    const n = sizes[li],
+      totalH = H - 2 * yPad,
+      gap = totalH / (n + 1),
+      x = xPad + li * colW;
+    for (let ni = 0; ni < n; ni++) {
+      const y = yPad + (ni + 1) * gap;
+      pos.push({ li, ni, x, y });
+    }
+  }
+  const nodeIndex = (li, ni) =>
+    sizes.slice(0, li).reduce((s, v) => s + v, 0) + ni;
+
+  let maxAbs = 1e-6;
+  net.layers.forEach((L) => {
+    L.W.forEach((r) =>
+      r.forEach((v) => {
+        const a = Math.abs(v);
+        if (a > maxAbs) maxAbs = a;
+      })
+    );
   });
-});
 
-// Pulsanti
-$("#btnAddHidden").addEventListener("click", () => addLayer("hidden"));
-$("#btnClear").addEventListener("click", () => {
-  arch = [];
-  renderArchitecture();
-  buildNetwork();
-  updateJSON();
-});
+  const defs = `<defs>
+    <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>`;
+
+  let edges = "";
+  net.layers.forEach((Lyr, li) => {
+    for (let i = 0; i < Lyr.W.length; i++) {
+      for (let j = 0; j < Lyr.W[0].length; j++) {
+        const from = pos[nodeIndex(li, i)],
+          to = pos[nodeIndex(li + 1, j)];
+        const w = Lyr.W[i][j],
+          sw = 1 + 5 * (Math.abs(w) / maxAbs),
+          stroke = w >= 0 ? "#22c55e" : "#ef4444";
+        const cx = (from.x + to.x) / 2,
+          cy = from.y + (to.y - from.y) * 0.1;
+        edges += `<path d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
+                  stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round"
+                  fill="none" opacity="0.95" filter="url(#edgeGlow)"/>`;
+      }
+    }
+  });
+
+  let nodes = "";
+  for (let li = 0; li < L; li++) {
+    for (let ni = 0; ni < sizes[li]; ni++) {
+      const p = pos[nodeIndex(li, ni)];
+      const isInput = li === 0,
+        isOutput = li === L - 1;
+      const vNorm = lastNodeColors?.byLayer?.[li]?.[ni];
+      const vRaw = lastNodeColors?.raw?.[li]?.[ni];
+      let fill = "#0b1220";
+      if (!isInput && vNorm != null) {
+        const t = Math.min(1, Math.max(0, vNorm + 0.15));
+        fill = isOutput ? outputColor(t) : hiddenColor(t);
+      }
+      const label = isInput ? "x" + (ni + 1) : isOutput ? "y" + (ni + 1) : "h";
+      const badge =
+        !isInput && vRaw != null
+          ? `<text x="${p.x}" y="${p.y - (nodeR + 7)}" text-anchor="middle"
+                 style="fill:#e5e7eb;font-size:10px;font-weight:600">${vRaw.toFixed(
+                   2
+                 )}</text>`
+          : "";
+      nodes += `<g class="nn-node">
+                  <circle cx="${p.x}" cy="${p.y}" r="${nodeR}" fill="${fill}"
+                          stroke="rgba(255,255,255,0.95)" stroke-width="1.6"/>
+                  <text x="${p.x}" y="${p.y + 3}" text-anchor="middle"
+                        style="fill:#e5e7eb;font-weight:600">${label}</text>
+                  ${badge}
+                </g>`;
+    }
+  }
+  svg.innerHTML = defs + `<g>${edges}</g><g>${nodes}</g>`;
+}
 
 // ========= Build Network =========
 function buildNetwork() {
@@ -462,140 +545,10 @@ function buildNetwork() {
     }
   });
   outputSize = lastSize;
-
-  lastNodeColors = null; // reset colori nodi
+  lastNodeColors = null;
   renderTestInputs();
   renderNNVis();
   updateJSON();
-}
-
-// ========= Visualization (SVG) =========
-function renderNNVis() {
-  const svg = document.getElementById("nnVis");
-  if (!svg) return;
-
-  const W = 800,
-    H = 360;
-  const sizes = [inputSize, ...net.layers.map((L) => L.out)];
-  const L = sizes.length;
-  if (L < 1) {
-    svg.innerHTML = "";
-    return;
-  }
-
-  const xPad = 80,
-    yPad = 30;
-  const colW = (W - 2 * xPad) / (L - 1 || 1);
-  const nodeR = 13;
-
-  // --- Posizioni nodi ---
-  const pos = [];
-  for (let li = 0; li < L; li++) {
-    const n = sizes[li];
-    const totalH = H - 2 * yPad;
-    const gap = totalH / (n + 1);
-    const x = xPad + li * colW;
-    for (let ni = 0; ni < n; ni++) {
-      const y = yPad + (ni + 1) * gap;
-      pos.push({ li, ni, x, y });
-    }
-  }
-  const nodeIndex = (li, ni) =>
-    sizes.slice(0, li).reduce((s, v) => s + v, 0) + ni;
-
-  // --- Scala pesi per spessori ---
-  let maxAbs = 1e-6;
-  net.layers.forEach((L) => {
-    L.W.forEach((r) =>
-      r.forEach((v) => {
-        const a = Math.abs(v);
-        if (a > maxAbs) maxAbs = a;
-      })
-    );
-  });
-
-  // --- Defs: glow archi ---
-  const defs = `
-    <defs>
-      <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="1.2" result="blur"/>
-        <feMerge>
-          <feMergeNode in="blur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-    </defs>`;
-
-  // --- Archi (colori ± e spessori dinamici) ---
-  let edges = "";
-  net.layers.forEach((Lyr, li) => {
-    for (let i = 0; i < Lyr.W.length; i++) {
-      for (let j = 0; j < Lyr.W[0].length; j++) {
-        const from = pos[nodeIndex(li, i)];
-        const to = pos[nodeIndex(li + 1, j)];
-        const w = Lyr.W[i][j];
-        const sw = 1.0 + 5.0 * (Math.abs(w) / maxAbs); // escursione più evidente
-        const stroke = w >= 0 ? "#22c55e" : "#ef4444";
-        const cx = (from.x + to.x) / 2;
-        const cy = from.y + (to.y - from.y) * 0.1; // lieve curvatura
-
-        edges += `<path d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
-                    stroke="${stroke}"
-                    stroke-width="${sw}"
-                    stroke-linecap="round"
-                    fill="none"
-                    opacity="0.95"
-                    filter="url(#edgeGlow)"/>`;
-      }
-    }
-  });
-
-  // --- Nodi (colorati in base alle attivazioni normalizzate per layer) ---
-  let nodes = "";
-  for (let li = 0; li < L; li++) {
-    for (let ni = 0; ni < sizes[li]; ni++) {
-      const p = pos[nodeIndex(li, ni)];
-      const isInput = li === 0;
-      const isOutput = li === L - 1;
-
-      // vNorm = per colore (0..1 normalizzato); vRaw = valore reale dell'attivazione
-      const vNorm = lastNodeColors?.byLayer?.[li]?.[ni];
-      const vRawArr = lastNodeColors?.raw?.[li];
-      const vRaw = vRawArr && vRawArr[ni] != null ? vRawArr[ni] : null;
-
-      // Colore: se non input e abbiamo un valore normalizzato, usa palette con un piccolo boost
-      let fill = "#0b1220";
-      if (!isInput && vNorm != null) {
-        const t = Math.min(1, Math.max(0, vNorm + 0.15)); // boost visivo
-        fill = isOutput ? outputColor(t) : hiddenColor(t);
-      }
-
-      // Etichetta numerica: sugli output mostra SEMPRE il valore reale; sugli hidden se disponibile
-      let valueBadge = "";
-      if (!isInput && vRaw != null) {
-        valueBadge = `<text x="${p.x}" y="${
-          p.y - (nodeR + 7)
-        }" text-anchor="middle"
-                        style="fill:#e5e7eb;font-size:10px;font-weight:600">${vRaw.toFixed(
-                          2
-                        )}</text>`;
-      }
-
-      const label = isInput ? "x" + (ni + 1) : isOutput ? "y" + (ni + 1) : "h";
-
-      nodes += `<g class="nn-node">
-                  <circle cx="${p.x}" cy="${p.y}" r="${nodeR}"
-                          fill="${fill}"
-                          stroke="rgba(255,255,255,0.95)"
-                          stroke-width="1.6"/>
-                  <text x="${p.x}" y="${p.y + 3}" text-anchor="middle"
-                        style="fill:#e5e7eb;font-weight:600">${label}</text>
-                  ${valueBadge}
-                </g>`;
-    }
-  }
-
-  svg.innerHTML = defs + `<g>${edges}</g><g>${nodes}</g>`;
 }
 
 // ========= Dataset Preset & CSV =========
@@ -614,8 +567,8 @@ function loadPreset(name) {
     $("#csvInfo").textContent = "Caricato preset XOR (4 esempi)";
   } else if (name === "linsep") {
     const X = [],
-      y = [];
-    const r = rng(7);
+      y = [],
+      r = rng(7);
     for (let i = 0; i < 200; i++) {
       const a = r(),
         b = r();
@@ -632,16 +585,13 @@ function loadPreset(name) {
   renderTestInputs();
 }
 function ensureIOInArch() {
-  // INPUT: crea o aggiorna la dimensione
   let inL = arch.find((l) => l.type === "input");
   if (!inL) {
     inL = { id: crypto.randomUUID(), type: "input", neurons: inputSize };
     arch.unshift(inL);
   } else {
-    inL.neurons = inputSize; // 👈 sincronizza
+    inL.neurons = inputSize;
   }
-
-  // OUTPUT: crea o aggiorna la dimensione
   let outL = arch.find((l) => l.type === "output");
   if (!outL) {
     outL = {
@@ -653,35 +603,15 @@ function ensureIOInArch() {
     };
     arch.push(outL);
   } else {
-    outL.neurons = outputSize; // 👈 sincronizza
+    outL.neurons = outputSize;
     if (!outL.activation) outL.activation = "sigmoid";
   }
 
   renderArchitecture();
-  buildNetwork(); // buildNetwork chiama già updateJSON()
-  updateJSON(); // ridondante ma rende l’update immediato
+  buildNetwork();
+  updateJSON();
 }
 
-$("#btnLoadPreset").addEventListener("click", () => {
-  const v = $("#presetDataset").value;
-  if (v !== "none") loadPreset(v);
-});
-const csvDrop = $("#csvDrop");
-csvDrop.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  csvDrop.classList.add("dragover");
-});
-csvDrop.addEventListener("dragleave", (_) =>
-  csvDrop.classList.remove("dragover")
-);
-csvDrop.addEventListener("drop", (e) => {
-  e.preventDefault();
-  csvDrop.classList.remove("dragover");
-  handleCSVFile(e.dataTransfer.files[0]);
-});
-$("#csvFile").addEventListener("change", (e) => {
-  handleCSVFile(e.target.files[0]);
-});
 function handleCSVFile(file) {
   if (!file) return;
   const fr = new FileReader();
@@ -690,6 +620,7 @@ function handleCSVFile(file) {
       .split(/\r?\n/)
       .map((l) => l.trim())
       .filter(Boolean);
+    if (/[a-zA-Z]/.test(lines[0])) lines.shift(); // ignora header semplice
     const data = lines.map((l) => l.split(",").map(Number));
     const cols = data[0].length;
     inputSize = cols - 1;
@@ -704,8 +635,25 @@ function handleCSVFile(file) {
   };
   fr.readAsText(file);
 }
+function attachCsvDnD() {
+  const dz = $("#csvDrop");
+  if (!dz) return;
+  const clone = dz.cloneNode(true);
+  dz.parentNode.replaceChild(clone, dz);
+  const el = $("#csvDrop");
+  el.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    el.classList.add("dragover");
+  });
+  el.addEventListener("dragleave", (_) => el.classList.remove("dragover"));
+  el.addEventListener("drop", (e) => {
+    e.preventDefault();
+    el.classList.remove("dragover");
+    handleCSVFile(e.dataTransfer.files?.[0]);
+  });
+}
 
-// ========= Training =========
+// ========= Training / Metrics =========
 function getBatches(X, y, batch, rand) {
   const idx = X.map((_, i) => i);
   shuffleInPlace(idx, rand);
@@ -725,45 +673,11 @@ function accuracyBinary(pred, y) {
   }
   return ok / pred.length;
 }
-function updateJSON() {
-  const j = {
-    architecture: arch.map((l) => ({
-      type: l.type,
-      neurons: l.neurons,
-      activation: l.activation || null,
-      bias: l.bias ?? null,
-    })),
-    weights: net.layers.map((l) => ({
-      in: l.in,
-      out: l.out,
-      activation: l.activation,
-      useBias: l.useBias,
-      W: l.W,
-      b: l.b,
-    })),
-  };
-  $("#jsonArea").value = JSON.stringify(j, null, 2);
-}
 
-// ========= Test inputs UI =========
-function renderTestInputs() {
-  const c = $("#testInputs");
-  if (!c) return;
-  c.innerHTML = "";
-  for (let i = 0; i < inputSize; i++) {
-    const el = document.createElement("div");
-    el.className = "col-6";
-    el.innerHTML = `<label class="form-label">x${
-      i + 1
-    }</label><input type="number" step="any" class="form-control" data-ti="${i}" value="0">`;
-    c.appendChild(el);
-  }
-}
-
-// ========= Chart (loss) =========
+// Chart.js
 function ensureChart() {
   if (chart) return chart;
-  const ctx = document.getElementById("lossChart");
+  const ctx = $("#lossChart");
   chart = new Chart(ctx, {
     type: "line",
     data: {
@@ -833,7 +747,7 @@ async function trainLoop() {
     dataset.X && dataset.X.length > 0
       ? dataset.X[0].slice()
       : Array.from({ length: inputSize }, () => 0);
-  const LIVE_VIS_EVERY = 1; // ogni epoca
+  const LIVE_VIS_EVERY = 1;
 
   for (let ep = 1; ep <= epochs; ep++) {
     const batches = getBatches(X, y, batch, rand);
@@ -845,19 +759,18 @@ async function trainLoop() {
     const fullPred = net.forward(X);
     const [L, _g] = mse(fullPred, y);
     const acc = accuracyBinary(fullPred, y);
+
     $("#lossNow").textContent = L.toFixed(4);
     $("#accNow").textContent = (acc * 100).toFixed(1) + "%";
     ch.data.labels.push(ep);
     ch.data.datasets[0].data.push(L);
     ch.update();
 
-    // Live: aggiorna archi (pesi) + nodi (attivazioni sul probe)
     if (ep % LIVE_VIS_EVERY === 0) {
       computeNodeColorsForInput(probe);
       renderNNVis();
       await new Promise((r) => setTimeout(r, 0));
     }
-
     if (stopFlag) break;
   }
 
@@ -866,7 +779,7 @@ async function trainLoop() {
   updateJSON();
 }
 
-// ========= Predictions =========
+// ========= Predict =========
 function predictOnce() {
   const vals = $$("#testInputs [data-ti]").map((i) => Number(i.value));
   if (vals.length !== inputSize) {
@@ -874,25 +787,23 @@ function predictOnce() {
     return;
   }
   const out = net.forward([vals]);
-  computeNodeColorsForInput(vals); // colori hidden + output per l’input
+  computeNodeColorsForInput(vals);
   $("#predictOut").textContent = JSON.stringify(
     out[0].map((v) => Number(v.toFixed(5)))
   );
-  renderNNVis(); // aggiorna subito la visualizzazione
+  renderNNVis();
 }
 
-// ========= Export/Import =========
-$("#btnExport").addEventListener("click", () => {
-  const blob = new Blob([$("#jsonArea").value], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "neurobuilder-arch.json";
-  a.click();
-});
-$("#btnDownloadJSON").addEventListener("click", () => {
+// ========= JSON Export/Import & sync =========
+function updateJSON() {
   const j = {
-    layers: net.layers.map((l) => ({
-      type: "hidden",
+    architecture: arch.map((l) => ({
+      type: l.type,
+      neurons: l.neurons,
+      activation: l.activation || null,
+      bias: l.bias ?? null,
+    })),
+    weights: net.layers.map((l) => ({
       in: l.in,
       out: l.out,
       activation: l.activation,
@@ -901,42 +812,38 @@ $("#btnDownloadJSON").addEventListener("click", () => {
       b: l.b,
     })),
   };
-  const blob = new Blob([JSON.stringify(j, null, 2)], {
-    type: "application/json",
-  });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "neurobuilder-weights.json";
-  a.click();
-});
+  const ta = $("#jsonArea");
+  if (!ta) return;
+  ta.value = JSON.stringify(j, null, 2);
+}
 
-$("#importJSON").addEventListener("change", (e) => {
+// Import JSON (file input nascosto #importJSON)
+$("#importJSON")?.addEventListener("change", (e) => {
   const input = e.target;
-  const file = input.files && input.files[0];
+  const file = input.files?.[0];
   if (!file) return;
-
   const fr = new FileReader();
   fr.onload = () => {
     try {
       const o = JSON.parse(fr.result);
 
-      // Caso A: formato "pesi" (vecchio) → { layers: [...] }
       if (Array.isArray(o.layers)) {
+        // formato pesi
         if (!o.layers.length) throw new Error("layers vuoto");
-
-        // Ricostruisci arch dall’header dei layer (input = in del primo; output = out dell’ultimo)
         inputSize = o.layers[0].in ?? inputSize;
-        outputSize = o.layers[o.layers.length - 1].out ?? outputSize;
+        outputSize = o.layers.at(-1).out ?? outputSize;
 
         arch = [
           { id: crypto.randomUUID(), type: "input", neurons: inputSize },
-          ...o.layers.slice(0, -1).map((L) => ({
-            id: crypto.randomUUID(),
-            type: "hidden",
-            neurons: L.out,
-            activation: L.activation,
-            bias: L.useBias,
-          })),
+          ...o.layers
+            .slice(0, -1)
+            .map((L) => ({
+              id: crypto.randomUUID(),
+              type: "hidden",
+              neurons: L.out,
+              activation: L.activation,
+              bias: L.useBias,
+            })),
           {
             id: crypto.randomUUID(),
             type: "output",
@@ -946,12 +853,11 @@ $("#importJSON").addEventListener("change", (e) => {
           },
         ];
 
-        // Ricostruisci i layer con i pesi
         net = new Network();
-        let lastSize = inputSize;
+        let last = inputSize;
         net.layers = o.layers.map((L) => {
           const d = new DenseLayer(
-            lastSize,
+            last,
             L.out,
             L.activation,
             L.useBias,
@@ -959,7 +865,7 @@ $("#importJSON").addEventListener("change", (e) => {
           );
           d.W = L.W;
           d.b = L.b;
-          lastSize = L.out;
+          last = L.out;
           return d;
         });
 
@@ -968,13 +874,10 @@ $("#importJSON").addEventListener("change", (e) => {
         renderNNVis();
         updateJSON();
         alert("✅ Import riuscito (formato pesi).");
-
-        // Caso B: formato “architettura + (opzionale) weights”
       } else if (o.architecture || o.weights) {
+        // formato architettura (+ opz pesi)
         if (!Array.isArray(o.architecture))
           throw new Error('manca "architecture"');
-
-        // Importa architettura umana
         arch = o.architecture.map((L) => ({
           id: crypto.randomUUID(),
           type: L.type,
@@ -982,17 +885,12 @@ $("#importJSON").addEventListener("change", (e) => {
           activation: L.activation,
           bias: L.bias,
         }));
-
-        // Allinea input/output
         const inL = arch.find((l) => l.type === "input");
         const outL = arch.find((l) => l.type === "output");
         if (inL) inputSize = Number(inL.neurons);
         if (outL) outputSize = Number(outL.neurons);
 
-        // Ricostruisci rete “da zero”
-        buildNetwork(); // crea net.layers nuovi (random)
-
-        // Se ci sono anche i pesi, applicali sopra
+        buildNetwork(); // pesi random coerenti
         if (
           Array.isArray(o.weights) &&
           o.weights.length === net.layers.length
@@ -1016,73 +914,268 @@ $("#importJSON").addEventListener("change", (e) => {
         );
       } else {
         throw new Error(
-          "Formato non riconosciuto. Attesi: {layers:[...]} oppure {architecture:[...], weights?:[...]}."
+          "Formato non riconosciuto. Attesi: {layers:[...]} oppure {architecture:[...], weights?:[...]}"
         );
       }
     } catch (err) {
       console.error(err);
       alert("❌ JSON non valido: " + err.message);
     } finally {
-      // Permette di riselezionare lo stesso file e rilanciare change
       input.value = "";
     }
   };
   fr.readAsText(file);
 });
 
-$("#btnCopyJSON").addEventListener("click", async () => {
-  await navigator.clipboard.writeText($("#jsonArea").value);
-  const b = $("#btnCopyJSON");
-  const txt = b.innerHTML;
-  b.innerHTML = '<i class="bi bi-clipboard-check"></i> Copiato!';
-  setTimeout(() => (b.innerHTML = txt), 1200);
-});
-
-// ========= Controls Bind =========
-$("#btnTrain").addEventListener("click", trainLoop);
-$("#btnStop").addEventListener("click", () => (stopFlag = true));
-$("#btnPredict").addEventListener("click", predictOnce);
-
-$("#lr").addEventListener(
-  "input",
-  (e) => ($("#lrVal").textContent = e.target.value)
-);
-$("#epochs").addEventListener(
-  "input",
-  (e) => ($("#epochsVal").textContent = e.target.value)
-);
-$("#batch").addEventListener(
-  "input",
-  (e) => ($("#batchVal").textContent = e.target.value)
+// CSV file chooser
+$("#csvFile")?.addEventListener("change", (e) =>
+  handleCSVFile(e.target.files?.[0])
 );
 
-$("#btnQuickStart").addEventListener("click", () => {
-  arch = [];
-  inputSize = 2;
-  outputSize = 1;
-  arch.push({ id: crypto.randomUUID(), type: "input", neurons: 2 });
-  arch.push({
-    id: crypto.randomUUID(),
-    type: "hidden",
-    neurons: 4,
-    activation: "tanh",
-    bias: true,
+// ========= Export helpers =========
+function exportArchitecture() {
+  const j = {
+    architecture: arch.map((l) => ({
+      type: l.type,
+      neurons: l.neurons,
+      activation: l.activation || null,
+      bias: l.bias ?? null,
+    })),
+  };
+  const blob = new Blob([JSON.stringify(j, null, 2)], {
+    type: "application/json",
   });
-  arch.push({
-    id: crypto.randomUUID(),
-    type: "output",
-    neurons: 1,
-    activation: "sigmoid",
-    bias: true,
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "neurobuilder-arch.json";
+  a.click();
+}
+function downloadWeights() {
+  const j = {
+    layers: net.layers.map((l) => ({
+      in: l.in,
+      out: l.out,
+      activation: l.activation,
+      useBias: l.useBias,
+      W: l.W,
+      b: l.b,
+    })),
+  };
+  const blob = new Blob([JSON.stringify(j, null, 2)], {
+    type: "application/json",
   });
-  renderArchitecture();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "neurobuilder-weights.json";
+  a.click();
+}
+
+// ========= Popover CSV (safe) =========
+function initCsvInfoSafe() {
+  try {
+    const btn = document.getElementById("csvInfoBtn");
+    if (!btn || !window.bootstrap || !bootstrap.Popover) return;
+    const html = `
+      <div style="text-align:left">
+        <b>• Senza intestazioni</b><br>
+        • Separatore: virgola (<code>,</code>)<br>
+        • Tutto numerico (niente NaN)<br>
+        • <b>Ultima colonna = target</b> (0/1)<br>
+        • Esempio:<br>
+        <code>0,0,0<br>0,1,1<br>1,0,1<br>1,1,0</code>
+      </div>`;
+    const existing = bootstrap.Popover.getInstance(btn);
+    if (existing) existing.dispose();
+    const pop = new bootstrap.Popover(btn, {
+      html: true,
+      container: "body",
+      placement: "right",
+      title: "Formato CSV richiesto",
+      content: html,
+      trigger: "manual",
+    });
+    btn.addEventListener("mouseenter", () => pop.show());
+    btn.addEventListener("mouseleave", () => pop.hide());
+    btn.addEventListener("focus", () => pop.show());
+    btn.addEventListener("blur", () => pop.hide());
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = btn.getAttribute("aria-describedby");
+      const open =
+        id && document.getElementById(id)?.classList.contains("show");
+      open ? pop.hide() : pop.show();
+    });
+  } catch (e) {
+    console.warn("Popover CSV non inizializzato:", e);
+  }
+}
+
+// ========= Binder unico di tutti i bottoni =========
+function bindUIControls() {
+  // helper per bind sicuro
+  const on = (id, ev, handler) => {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.warn("[UI] manca #" + id);
+      return null;
+    }
+    const clone = el.cloneNode(true);
+    el.parentNode.replaceChild(clone, el);
+    clone.addEventListener(ev, (e) => {
+      e.preventDefault();
+      handler(e);
+    });
+    return clone;
+  };
+
+  // TRAIN / STOP
+  on("btnTrain", "click", () => {
+    const t = $("#btnTrain"),
+      s = $("#btnStop");
+    if (t) t.disabled = true;
+    if (s) s.disabled = false;
+    trainLoop();
+  });
+  on("btnStop", "click", () => {
+    stopFlag = true;
+  });
+
+  // PREDICT
+  on("btnPredict", "click", () => {
+    const ti = document.querySelectorAll("#testInputs [data-ti]");
+    if (ti.length !== inputSize) renderTestInputs();
+    predictOnce();
+  });
+
+  // QUICK START
+  on("btnQuickStart", "click", () => {
+    arch = [];
+    inputSize = 2;
+    outputSize = 1;
+    arch.push({ id: crypto.randomUUID(), type: "input", neurons: 2 });
+    arch.push({
+      id: crypto.randomUUID(),
+      type: "hidden",
+      neurons: 4,
+      activation: "tanh",
+      bias: true,
+    });
+    arch.push({
+      id: crypto.randomUUID(),
+      type: "output",
+      neurons: 1,
+      activation: "sigmoid",
+      bias: true,
+    });
+    renderArchitecture();
+    buildNetwork();
+    loadPreset("xor");
+  });
+
+  // PRESET (usa select #presetDataset)
+  on("btnLoadPreset", "click", () => {
+    const sel = document.getElementById("presetDataset");
+    const v = sel?.value || "none";
+    if (v !== "none") loadPreset(v);
+  });
+
+  // PALETTE
+  on("btnAddHidden", "click", () => addLayer("hidden"));
+  on("btnClear", "click", () => {
+    arch = [];
+    renderArchitecture();
+    buildNetwork();
+    updateJSON();
+  });
+
+  // EXPORT / IMPORT JSON
+  on("btnExport", "click", () => exportArchitecture());
+  on("btnDownloadJSON", "click", () => downloadWeights());
+  on("btnCopyJSON", "click", async () => {
+    await navigator.clipboard.writeText(
+      document.getElementById("jsonArea")?.value || ""
+    );
+    const b = document.getElementById("btnCopyJSON");
+    if (!b) return;
+    const txt = b.innerHTML;
+    b.innerHTML = '<i class="bi bi-clipboard-check"></i> Copiato!';
+    setTimeout(() => (b.innerHTML = txt), 1200);
+  });
+
+  // FILE PICKER (se usi bottoni visibili che aprono gli <input type="file">)
+  on("btnChooseCSV", "click", () =>
+    document.getElementById("csvFile")?.click()
+  );
+  on("btnImportJSON", "click", () =>
+    document.getElementById("importJSON")?.click()
+  );
+
+  // slider label live
+  const lb = (idIn, idOut) =>
+    document
+      .getElementById(idIn)
+      ?.addEventListener(
+        "input",
+        (e) => (document.getElementById(idOut).textContent = e.target.value)
+      );
+  lb("lr", "lrVal");
+  lb("epochs", "epochsVal");
+  lb("batch", "batchVal");
+
+  // palette DnD
+  document.querySelectorAll(".palette-item").forEach((el) => {
+    el.addEventListener("dragstart", (ev) =>
+      ev.dataTransfer.setData("text/plain", el.dataset.type)
+    );
+  });
+}
+
+// ========= Sanity check opzionale (console) =========
+function sanityCheckButtons() {
+  const ids = [
+    "btnTrain",
+    "btnStop",
+    "btnPredict",
+    "btnQuickStart",
+    "btnLoadPreset",
+    "btnAddHidden",
+    "btnClear",
+    "btnExport",
+    "btnDownloadJSON",
+    "btnCopyJSON",
+    "btnChooseCSV",
+    "btnImportJSON",
+    "csvFile",
+    "importJSON",
+    "presetDataset",
+    "csvInfoBtn",
+  ];
+  console.group(
+    "%c[NeuroBuilder] Check bottoni",
+    "color:#0ea5e9;font-weight:700"
+  );
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    console[el ? "log" : "warn"](
+      `${el ? "✓" : "✗"} ${id} ${el ? "trovato" : "MANCANTE"}`
+    );
+  });
+  console.groupEnd();
+}
+
+// ========= Init DOM pronto =========
+document.addEventListener("DOMContentLoaded", () => {
+  sanityCheckButtons(); // opzionale: puoi rimuoverlo
+  attachArchDnD();
+  attachCsvDnD();
+
+  // rete di default
+  addLayer("input");
+  addLayer("hidden");
+  addLayer("output");
   buildNetwork();
-  loadPreset("xor");
-  updateJSON();
-});
 
-// ========= Init =========
-addLayer("input");
-addLayer("hidden");
-addLayer("output");
-buildNetwork();
+  // bind bottoni e popover
+  bindUIControls();
+  initCsvInfoSafe();
+});
