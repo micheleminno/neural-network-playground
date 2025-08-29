@@ -835,15 +835,13 @@ $("#importJSON")?.addEventListener("change", (e) => {
 
         arch = [
           { id: crypto.randomUUID(), type: "input", neurons: inputSize },
-          ...o.layers
-            .slice(0, -1)
-            .map((L) => ({
-              id: crypto.randomUUID(),
-              type: "hidden",
-              neurons: L.out,
-              activation: L.activation,
-              bias: L.useBias,
-            })),
+          ...o.layers.slice(0, -1).map((L) => ({
+            id: crypto.randomUUID(),
+            type: "hidden",
+            neurons: L.out,
+            activation: L.activation,
+            bias: L.useBias,
+          })),
           {
             id: crypto.randomUUID(),
             type: "output",
@@ -970,12 +968,65 @@ function downloadWeights() {
   a.click();
 }
 
-// ========= Popover CSV (safe) =========
+// ========= Popover CSV (robusto) =========
 function initCsvInfoSafe() {
   try {
     const btn = document.getElementById("csvInfoBtn");
-    if (!btn || !window.bootstrap || !bootstrap.Popover) return;
-    const html = `
+    if (!btn) return;
+
+    // Rendi l'elemento sempre "focusable" e cliccabile
+    btn.setAttribute("type", "button");
+    btn.setAttribute("tabindex", "0");
+    btn.setAttribute("aria-label", "Informazioni formato CSV");
+    btn.setAttribute("data-bs-toggle", "popover");
+
+    // Se Bootstrap/Popover non è caricato, fallback a tooltip semplice
+    if (!window.bootstrap || !bootstrap.Popover) {
+      console.warn(
+        "[CSV Info] Bootstrap.Popover non disponibile: uso fallback"
+      );
+      const msg = `
+        • Senza intestazioni<br>
+        • Separatore: virgola (<code>,</code>)<br>
+        • Tutto numerico (niente NaN)<br>
+        • <b>Ultima colonna = target</b> (0/1)<br>
+        • Esempio:<br>
+        <code>0,0,0<br>0,1,1<br>1,0,1<br>1,1,0</code>
+      `;
+      const showFallback = () => {
+        let tip = document.getElementById("csv-info-fallback");
+        if (!tip) {
+          tip = document.createElement("div");
+          tip.id = "csv-info-fallback";
+          tip.style.cssText =
+            "position:fixed; z-index: 2147483647; max-width: 280px; background:#0f172a; color:#e5e7eb; border:1px solid rgba(255,255,255,.15); border-radius:10px; padding:10px 12px; box-shadow:0 6px 30px rgba(0,0,0,.35)";
+          document.body.appendChild(tip);
+        }
+        tip.innerHTML = `<div style="font-weight:700;margin-bottom:6px">Formato CSV richiesto</div><div>${msg}</div>`;
+        const r = btn.getBoundingClientRect();
+        tip.style.left =
+          Math.min(window.innerWidth - 300, Math.max(12, r.right + 8)) + "px";
+        tip.style.top =
+          Math.min(window.innerHeight - 12, Math.max(12, r.top)) + "px";
+        tip.classList.add("show");
+      };
+      const hideFallback = () =>
+        document.getElementById("csv-info-fallback")?.classList.remove("show");
+
+      btn.addEventListener("mouseenter", showFallback);
+      btn.addEventListener("mouseleave", hideFallback);
+      btn.addEventListener("focus", showFallback);
+      btn.addEventListener("blur", hideFallback);
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        showFallback();
+      });
+
+      return;
+    }
+
+    // Contenuto HTML (disabilita sanitizer per mantenere <code> ecc.)
+    const contentHtml = `
       <div style="text-align:left">
         <b>• Senza intestazioni</b><br>
         • Separatore: virgola (<code>,</code>)<br>
@@ -984,20 +1035,30 @@ function initCsvInfoSafe() {
         • Esempio:<br>
         <code>0,0,0<br>0,1,1<br>1,0,1<br>1,1,0</code>
       </div>`;
-    const existing = bootstrap.Popover.getInstance(btn);
-    if (existing) existing.dispose();
+
+    // Rimuovi istanza precedente e tooltip orfani
+    const prev = bootstrap.Popover.getInstance(btn);
+    if (prev) prev.dispose();
+    document.querySelectorAll(".popover").forEach((p) => p.remove());
+
     const pop = new bootstrap.Popover(btn, {
       html: true,
-      container: "body",
-      placement: "right",
+      sanitize: false, // << permette <code> e HTML custom
+      container: "body", // << evita problemi di overflow/z-index
+      boundary: "viewport",
+      placement: "auto",
       title: "Formato CSV richiesto",
-      content: html,
-      trigger: "manual",
+      content: contentHtml,
+      trigger: "manual", // gestiamo noi gli eventi
     });
+
+    // Hover & focus
     btn.addEventListener("mouseenter", () => pop.show());
     btn.addEventListener("mouseleave", () => pop.hide());
     btn.addEventListener("focus", () => pop.show());
     btn.addEventListener("blur", () => pop.hide());
+
+    // Click = toggle (utile anche su touch)
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       const id = btn.getAttribute("aria-describedby");
@@ -1143,10 +1204,8 @@ function sanityCheckButtons() {
     "btnExport",
     "btnDownloadJSON",
     "btnCopyJSON",
-    "btnChooseCSV",
     "btnImportJSON",
     "csvFile",
-    "importJSON",
     "presetDataset",
     "csvInfoBtn",
   ];
