@@ -147,6 +147,56 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--nb-accent);
 }
+
+/* --- Popup --- */
+
 .popover {
   z-index: 2000;
+}
+
+.popover-dark {
+  /* colori & aspetto */
+  --bs-popover-bg: #0f172a; /* sfondo */
+  --bs-popover-border-color: rgba(255, 255, 255, 0.3);
+  --bs-popover-body-color: #ffffff; /* testo corpo */
+  --bs-popover-header-bg: #0f172a; /* header */
+  --bs-popover-header-color: #ffffff; /* testo header */
+  --bs-popover-arrow-border: #0f172a; /* freccia/bordo */
+  --bs-popover-arrow-color: #0f172a;
+
+  --bs-popover-border-radius: 10px;
+  --bs-popover-box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  max-width: 300px;
+}
+/* --- Fix header popover dark --- */
+.popover.popover-dark {
+  /* rinforzo colori base */
+  --bs-popover-bg: #0f172a;
+  --bs-popover-border-color: rgba(255, 255, 255, 0.3);
+  --bs-popover-body-color: #ffffff;
+
+  /* header ben contrastato */
+  --bs-popover-header-bg: #0b1220; /* più scuro dell'area body */
+  --bs-popover-header-color: #ffffff;
+  --bs-popover-header-border-color: rgba(255, 255, 255, 0.3);
+
+  /* freccia dello stesso colore dello sfondo */
+  --bs-popover-arrow-color: #0f172a;
+  --bs-popover-arrow-border: #0f172a;
+}
+
+/* stile dell'header (se alcune versioni di Bootstrap ignorano le vars) */
+.popover-dark .popover-header {
+  background: #0b1220 !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* facoltativo: rendi il titolo un po' più leggibile anche su retina */
+.popover-dark .popover-header,
+.popover-dark .popover-body {
+  text-shadow: 0 0 0.01px rgba(255, 255, 255, 0.5);
 }
