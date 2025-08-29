@@ -154,6 +154,7 @@ body {
   z-index: 2000;
 }
 
+/* Popover dark leggibile (Bootstrap 5.3+) */
 .popover-dark {
   /* colori & aspetto */
   --bs-popover-bg: #0f172a; /* sfondo */

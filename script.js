@@ -613,28 +613,151 @@ function ensureIOInArch() {
 }
 
 function handleCSVFile(file) {
-  if (!file) return;
-  const fr = new FileReader();
-  fr.onload = () => {
-    const lines = fr.result
+  if (!file) {
+    alert("Nessun file selezionato.");
+    return;
+  }
+  console.log("[CSV] lettura file:", file.name, file.type, file.size, "bytes");
+
+  const infoEl = document.getElementById("csvInfo");
+  const setInfo = (msg) => {
+    if (infoEl) infoEl.textContent = msg;
+  };
+
+  const sniffDelimiter = (text) => {
+    const counts = {
+      ",": (text.match(/,/g) || []).length,
+      ";": (text.match(/;/g) || []).length,
+      "\t": (text.match(/\t/g) || []).length,
+    };
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0] || ",";
+  };
+
+  const toNumber = (token) => {
+    const t = token.trim().replace(",", ".");
+    const v = Number(t);
+    return Number.isFinite(v) ? v : NaN;
+  };
+
+  const parse = (text) => {
+    let lines = text
       .split(/\r?\n/)
       .map((l) => l.trim())
       .filter(Boolean);
-    if (/[a-zA-Z]/.test(lines[0])) lines.shift(); // ignora header semplice
-    const data = lines.map((l) => l.split(",").map(Number));
-    const cols = data[0].length;
-    inputSize = cols - 1;
-    outputSize = 1;
-    dataset.X = data.map((r) => r.slice(0, cols - 1));
-    dataset.y = data.map((r) => [r[cols - 1]]);
-    $(
-      "#csvInfo"
-    ).textContent = `CSV: ${dataset.X.length} esempi, ${inputSize} feature`;
-    ensureIOInArch();
-    renderTestInputs();
+    if (lines.length === 0) throw new Error("Il file sembra vuoto.");
+
+    const delim = sniffDelimiter(lines.slice(0, 50).join("\n"));
+    if (/[a-zA-Z]/.test(lines[0])) lines.shift(); // header
+
+    const rows = lines.map((l) => l.split(delim));
+    const cols = rows[0].length;
+    if (cols < 2)
+      throw new Error("Servono almeno 2 colonne (feature + target).");
+
+    const data = rows.map((r, ri) => {
+      const nums = r.map(toNumber);
+      if (nums.some((x) => Number.isNaN(x))) {
+        throw new Error(`Valori non numerici alla riga ${ri + 1}.`);
+      }
+      return nums;
+    });
+
+    const inputSizeNew = cols - 1;
+    const X = data.map((r) => r.slice(0, inputSizeNew));
+    const y = data.map((r) => [r[cols - 1]]);
+    return { X, y, inputSizeNew, delimiter: delim };
+  };
+
+  const fr = new FileReader();
+  fr.onload = () => {
+    try {
+      const text = fr.result;
+      const { X, y, inputSizeNew, delimiter } = parse(text);
+
+      dataset.X = X;
+      dataset.y = y;
+      inputSize = inputSizeNew;
+      outputSize = 1;
+
+      ensureIOInArch();
+      renderTestInputs();
+
+      setInfo(
+        `CSV "${file.name}" caricato: ${
+          X.length
+        } esempi, ${inputSize} feature (delimitatore "${
+          delimiter === "\t" ? "TAB" : delimiter
+        }")`
+      );
+
+      console.log("[CSV] OK. Prime righe:", X.slice(0, 3), y.slice(0, 3));
+    } catch (err) {
+      console.error("[CSV] Errore parsing:", err);
+      setInfo("Nessun dataset caricato");
+      alert("❌ Errore CSV: " + err.message);
+    }
+  };
+  fr.onerror = () => {
+    console.error("[CSV] FileReader error:", fr.error);
+    setInfo("Nessun dataset caricato");
+    alert("❌ Impossibile leggere il file CSV.");
   };
   fr.readAsText(file);
 }
+
+// ========= WIRING ROBUSTO CSV (file + drop) =========
+function wireCsvInputs() {
+  // --- file input ---
+  const fi = document.getElementById("csvFile");
+  if (fi) {
+    // se è già stato "wired", salta
+    if (!fi._wiredCsv) {
+      // rimuovo eventuali listener clonando
+      const clone = fi.cloneNode(true);
+      fi.parentNode.replaceChild(clone, fi);
+      clone._wiredCsv = true;
+      clone.addEventListener("change", (e) => {
+        const f = e.target.files && e.target.files[0];
+        console.log("[CSV] change →", f?.name || "(no file)");
+        handleCSVFile(f);
+      });
+      console.log("[CSV] #csvFile wired");
+    }
+  } else {
+    console.warn("[CSV] #csvFile NON trovato");
+  }
+
+  // --- drop zone ---
+  const dz = document.getElementById("csvDrop");
+  if (dz && !dz._wiredDrop) {
+    dz._wiredDrop = true;
+    dz.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dz.classList.add("dragover");
+    });
+    dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+    dz.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dz.classList.remove("dragover");
+      const file = e.dataTransfer?.files?.[0];
+      console.log("[CSV] drop →", file?.name || "(no file)");
+      handleCSVFile(file);
+    });
+    console.log("[CSV] #csvDrop wired");
+  }
+}
+
+// Ri-aggancia automaticamente se l’input viene ricreato nel DOM
+(function observeCsvInputs() {
+  const obs = new MutationObserver(() => {
+    const fi = document.getElementById("csvFile");
+    if (fi && !fi._wiredCsv) {
+      wireCsvInputs();
+    }
+  });
+  obs.observe(document.documentElement, { childList: true, subtree: true });
+})();
+
 function attachCsvDnD() {
   const dz = $("#csvDrop");
   if (!dz) return;
@@ -1209,5 +1332,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // bind bottoni e popover
   bindUIControls();
+  wireCsvInputs();
   initCsvInfoSafe();
 });
