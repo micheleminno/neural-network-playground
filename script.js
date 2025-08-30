@@ -185,8 +185,8 @@ let lastNodeColors = null; // {byLayer:[], raw:[]}
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const lerp = (a, b, t) => a + (b - a) * t;
 const hiddenColor = (v) =>
-  `hsl(210 80% ${Math.round(lerp(12, 60, clamp01(v)))}%)`;
-const outputColor = (v) => `hsl(${Math.round(120 * clamp01(v))} 85% 50%)`;
+  `hsl(210, 80%, ${Math.round(lerp(12, 60, clamp01(v)))}%)`;
+const outputColor = (v) => `hsl(${Math.round(120 * clamp01(v))}, 85%, 50%)`;
 
 function computeNodeColorsForInput(xvec) {
   if (!xvec) return;
@@ -383,26 +383,35 @@ function renderArchitecture() {
 }
 
 function attachArchDnD() {
-  const el = $("#architecture");
+  const el = document.getElementById("architecture");
   if (!el) {
     console.warn("#architecture non trovato");
     return;
   }
+
   const clone = el.cloneNode(true);
   el.parentNode.replaceChild(clone, el);
-  const zone = $("#architecture");
+  const zone = document.getElementById("architecture");
 
   zone.addEventListener("dragover", (e) => {
     e.preventDefault();
     zone.classList.add("drop-hint");
   });
-  zone.addEventListener("dragleave", (_) => zone.classList.remove("drop-hint"));
+  zone.addEventListener("dragleave", () => zone.classList.remove("drop-hint"));
+
   zone.addEventListener("drop", (e) => {
     e.preventDefault();
     zone.classList.remove("drop-hint");
-    const type = e.dataTransfer.getData("text/plain");
-    addLayer(type || "hidden");
-    updateJSON();
+
+    const payload = e.dataTransfer.getData("text/plain");
+
+    // ✅ accetta solo drag dalla PALLETTE
+    if (payload === "input" || payload === "hidden" || payload === "output") {
+      addLayer(payload);
+      updateJSON();
+    }
+    // ❌ se è un id di card esistente (reorder), NON fare nulla:
+    // il riordino lo gestisce il drop handler sulla card stessa.
   });
 }
 
@@ -519,12 +528,12 @@ function renderNNVis() {
                  )}</text>`
           : "";
       nodes += `<g class="nn-node">
-                  <circle cx="${p.x}" cy="${p.y}" r="${nodeR}" fill="${fill}"
-                          stroke="rgba(255,255,255,0.95)" stroke-width="1.6"/>
-                  <text x="${p.x}" y="${p.y + 3}" text-anchor="middle"
-                        style="fill:#e5e7eb;font-weight:600">${label}</text>
-                  ${badge}
-                </g>`;
+          <circle cx="${p.x}" cy="${p.y}" r="${nodeR}"
+                  style="fill:${fill} !important; stroke:rgba(255,255,255,0.95); stroke-width:1.6"/>
+          <text x="${p.x}" y="${p.y + 3}" text-anchor="middle"
+                style="fill:#e5e7eb;font-weight:600">${label}</text>
+          ${badge}
+        </g>`;
     }
   }
   svg.innerHTML = defs + `<g>${edges}</g><g>${nodes}</g>`;
@@ -845,9 +854,9 @@ function ensureChart() {
 }
 
 async function trainLoop() {
-  const lr = Number($("#lr").value);
-  const epochs = Number($("#epochs").value);
-  const batch = Number($("#batch").value);
+  const lr = Number(document.getElementById("lr").value);
+  const epochs = Number(document.getElementById("epochs").value);
+  const batch = Number(document.getElementById("batch").value);
   const rand = rng(42);
 
   if (dataset.X.length === 0) {
@@ -859,46 +868,53 @@ async function trainLoop() {
   ch.data.labels = [];
   ch.data.datasets[0].data = [];
   ch.update();
+
   stopFlag = false;
-  $("#btnStop").disabled = false;
-  $("#btnTrain").disabled = true;
+  document.getElementById("btnStop").disabled = false;
+  document.getElementById("btnTrain").disabled = true;
 
   const X = dataset.X.map((r) => r.slice());
   const y = dataset.y.map((r) => r.slice());
 
-  const probe =
-    dataset.X && dataset.X.length > 0
-      ? dataset.X[0].slice()
-      : Array.from({ length: inputSize }, () => 0);
-  const LIVE_VIS_EVERY = 1;
+  let step = 0;
+  const VIS_EVERY_STEPS = 2; // aggiorna la rete ogni 2 batch (regola liberamente)
 
   for (let ep = 1; ep <= epochs; ep++) {
     const batches = getBatches(X, y, batch, rand);
+
     for (const b of batches) {
+      // forward/backward sul batch
       const ypred = net.forward(b.X);
       const [_, dLdy] = mse(ypred, b.y);
       net.backward(dLdy, lr);
+
+      // 🎨 colori live usando il primo esempio del batch
+      step++;
+      if (step % VIS_EVERY_STEPS === 0 && b.X.length > 0) {
+        computeNodeColorsForInput(b.X[0]);
+        renderNNVis();
+        await new Promise((r) => setTimeout(r, 0)); // yield UI
+      }
     }
+
+    // metriche su tutto il dataset (fine epoca)
     const fullPred = net.forward(X);
     const [L, _g] = mse(fullPred, y);
     const acc = accuracyBinary(fullPred, y);
 
-    $("#lossNow").textContent = L.toFixed(4);
-    $("#accNow").textContent = (acc * 100).toFixed(1) + "%";
+    document.getElementById("lossNow").textContent = L.toFixed(4);
+    document.getElementById("accNow").textContent =
+      (acc * 100).toFixed(1) + "%";
+
     ch.data.labels.push(ep);
     ch.data.datasets[0].data.push(L);
     ch.update();
 
-    if (ep % LIVE_VIS_EVERY === 0) {
-      computeNodeColorsForInput(probe);
-      renderNNVis();
-      await new Promise((r) => setTimeout(r, 0));
-    }
     if (stopFlag) break;
   }
 
-  $("#btnStop").disabled = true;
-  $("#btnTrain").disabled = false;
+  document.getElementById("btnStop").disabled = true;
+  document.getElementById("btnTrain").disabled = false;
   updateJSON();
 }
 
