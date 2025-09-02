@@ -3,6 +3,7 @@
 Un’app web interattiva per **costruire, allenare e testare reti neurali** direttamente nel browser.
 Sviluppata in **HTML / CSS (Bootstrap) / JavaScript** + **Chart.js** per i grafici.
 
+Provala [qui](https://6mjnpy.csb.app/)!
 ![demo](screenshot.png)
 
 ---
