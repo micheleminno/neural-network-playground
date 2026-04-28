@@ -1,5 +1,3 @@
----
-
 # 🇬🇧 README – NeuroBuilder (Scroll down for the Italian version)
 
 ## 🧠 What is NeuroBuilder
