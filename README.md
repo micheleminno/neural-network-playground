@@ -1,81 +1,282 @@
-# 🧠 NeuroBuilder
+# 🇮🇹 README – NeuroBuilder
 
-Un’app web interattiva per **costruire, allenare e testare reti neurali** direttamente nel browser.
-Sviluppata in **HTML / CSS (Bootstrap) / JavaScript** + **Chart.js** per i grafici.
+## 🧠 Cos’è NeuroBuilder
 
-Provala [qui](https://6mjnpy.csb.app/)!
-![demo](screenshot.png)
+**NeuroBuilder** è un’app web interattiva per costruire, addestrare e visualizzare **reti neurali artificiali** in modo semplice e intuitivo.
+
+È pensata per:
+
+* studenti delle superiori
+* introduzione all’AI
+* attività laboratoriali di informatica
 
 ---
 
-## ✨ Funzionalità
+## 🚀 Funzionalità principali
 
-* 📦 **Palette drag & drop** per aggiungere:
+### 🔧 Costruzione rete (Drag & Drop)
+
+* Trascina:
 
   * Input
-  * Layer nascosti
+  * Hidden layer
   * Output
-* 🖱️ **Interfaccia intuitiva** con:
+* Modifica:
 
-  * Slider per numero neuroni
-  * Attivazioni (ReLU, Sigmoid, Tanh, Linear)
-  * Toggle per Bias
-* 🎨 **Visualizzazione grafica**:
-
-  * Nodi colorati in base all’attivazione
-  * Archi verdi (peso positivo) / rossi (peso negativo)
-  * Spessore proporzionale al peso
-* 📊 **Training**:
-
-  * Learning rate, epoche e batch configurabili
-  * Grafico interattivo della loss
-* ⚡ **Predizione**:
-
-  * Inserisci input e visualizza subito output e colori dei nodi
-* 📂 **Dataset**:
-
-  * Preset XOR e Lineare
-  * Caricamento CSV drag & drop
-* 💾 **JSON Export/Import**:
-
-  * Architettura
-  * Pesi della rete
+  * numero di neuroni
+  * funzione di attivazione
+  * bias
 
 ---
 
-## 🚀 Come usarlo
+### 🏋️ Training
 
-1. **Clona il repo**
-
-   ```bash
-   git clone https://github.com/<tuo-utente>/neurobuilder.git
-   cd neurobuilder
-   ```
-
-2. **Apri `index.html`** in un browser moderno (Chrome / Firefox / Edge).
-   Non serve nessun server o backend, funziona tutto in locale.
-
-3. **Trascina i layer** dalla palette per costruire la tua rete.
-
-4. **Carica un dataset** (preset o CSV).
-
-5. **Clicca Allena** → osserva in tempo reale loss, pesi e attivazioni.
+* Learning rate regolabile
+* Numero di epoche
+* Batch size
+* Grafico della loss in tempo reale
 
 ---
 
-## 🛠️ Tecnologie
+### 👁️ Visualizzazione
 
-* [Bootstrap 5](https://getbootstrap.com/) → interfaccia responsive
-* [Chart.js](https://www.chartjs.org/) → grafico della loss
-* **Vanilla JS** → motore rete neurale e training
-* **SVG** → visualizzazione grafica della rete
+* Rete disegnata in SVG
+* Colori:
 
----
-
-## 📄 Licenza
-
-Distribuito con licenza [GNU GENERAL PUBLIC LICENSE, Version 3](https://github.com/micheleminno/neural-network-playground?tab=GPL-3.0-1-ov-file#readme).
+  * nodi → attivazione
+  * archi → peso
+* Spessore archi = intensità
 
 ---
 
-👨‍💻 Progetto realizzato da [Michele Minno](https://github.com/<tuo-utente>) + ChatGPT
+### ⚡ Test predizione
+
+* Inserisci input manualmente
+* Ottieni output della rete
+* Visualizzazione aggiornata live
+
+---
+
+### 📊 Dataset
+
+Puoi usare:
+
+#### ✅ Preset
+
+* XOR
+* Lineare (x + y > 1)
+
+#### 📂 CSV
+
+Formato richiesto:
+
+```
+0,0,0
+0,1,1
+1,0,1
+1,1,0
+```
+
+Regole:
+
+* solo numeri
+* ultima colonna = output
+* niente intestazioni
+
+---
+
+### 💾 JSON
+
+* Esporta architettura
+* Esporta pesi
+* Importa modelli
+
+---
+
+### 🌍 Lingua
+
+* Italiano 🇮🇹
+* Inglese 🇬🇧
+* Toggle con pulsante
+
+---
+
+## 🛠️ Tecnologie usate
+
+* HTML5
+* CSS (Bootstrap 5)
+* JavaScript vanilla
+* Chart.js
+* SVG
+
+---
+
+## ▶️ Come usare
+
+1. Apri `index.html`
+2. Costruisci la rete
+3. Carica dataset o usa preset
+4. Premi **Allena**
+5. Testa con **Predici**
+
+---
+
+## 🎓 Uso didattico
+
+Perfetto per spiegare:
+
+* neuroni artificiali
+* forward pass
+* backpropagation
+* overfitting / underfitting
+* classificazione binaria
+
+---
+
+## 👨‍🏫 Autori
+
+**Michele Minno**
+
+* ChatGPT
+
+---
+
+# 🇬🇧 README – NeuroBuilder
+
+## 🧠 What is NeuroBuilder
+
+**NeuroBuilder** is an interactive web app to build, train, and visualize **neural networks** in a simple and intuitive way.
+
+Designed for:
+
+* high school students
+* AI introduction
+* classroom activities
+
+---
+
+## 🚀 Main Features
+
+### 🔧 Network Builder (Drag & Drop)
+
+* Drag:
+
+  * Input
+  * Hidden layer
+  * Output
+* Configure:
+
+  * neurons
+  * activation function
+  * bias
+
+---
+
+### 🏋️ Training
+
+* Adjustable learning rate
+* Epochs
+* Batch size
+* Real-time loss chart
+
+---
+
+### 👁️ Visualization
+
+* SVG network rendering
+* Colors:
+
+  * nodes → activation
+  * edges → weight
+* Edge thickness = weight intensity
+
+---
+
+### ⚡ Prediction Test
+
+* Insert custom inputs
+* Get network output
+* Live visualization update
+
+---
+
+### 📊 Dataset
+
+#### ✅ Presets
+
+* XOR
+* Linear (x + y > 1)
+
+#### 📂 CSV
+
+Required format:
+
+```
+0,0,0
+0,1,1
+1,0,1
+1,1,0
+```
+
+Rules:
+
+* numeric only
+* last column = target
+* no headers
+
+---
+
+### 💾 JSON
+
+* Export architecture
+* Export weights
+* Import models
+
+---
+
+### 🌍 Language
+
+* Italian 🇮🇹
+* English 🇬🇧
+* Toggle button
+
+---
+
+## 🛠️ Tech Stack
+
+* HTML5
+* CSS (Bootstrap 5)
+* Vanilla JavaScript
+* Chart.js
+* SVG
+
+---
+
+## ▶️ How to use
+
+1. Open `index.html`
+2. Build the network
+3. Load dataset or preset
+4. Click **Train**
+5. Test with **Predict**
+
+---
+
+## 🎓 Educational Use
+
+Great for teaching:
+
+* neural networks basics
+* forward propagation
+* backpropagation
+* classification
+* training dynamics
+
+---
+
+## 👨‍🏫 Authors
+
+**Michele Minno**
+
+* ChatGPT
+
