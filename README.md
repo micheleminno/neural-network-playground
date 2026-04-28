@@ -1,3 +1,148 @@
+---
+
+# 🇬🇧 README – NeuroBuilder (Scroll down for the Italian version)
+
+## 🧠 What is NeuroBuilder
+
+**NeuroBuilder** is an interactive web app to build, train, and visualize **neural networks** in a simple and intuitive way.
+
+Designed for:
+
+* high school students
+* AI introduction
+* classroom activities
+
+---
+
+## 🚀 Main Features
+
+### 🔧 Network Builder (Drag & Drop)
+
+* Drag:
+
+  * Input
+  * Hidden layer
+  * Output
+* Configure:
+
+  * neurons
+  * activation function
+  * bias
+
+---
+
+### 🏋️ Training
+
+* Adjustable learning rate
+* Epochs
+* Batch size
+* Real-time loss chart
+
+---
+
+### 👁️ Visualization
+
+* SVG network rendering
+* Colors:
+
+  * nodes → activation
+  * edges → weight
+* Edge thickness = weight intensity
+
+---
+
+### ⚡ Prediction Test
+
+* Insert custom inputs
+* Get network output
+* Live visualization update
+
+---
+
+### 📊 Dataset
+
+#### ✅ Presets
+
+* XOR
+* Linear (x + y > 1)
+
+#### 📂 CSV
+
+Required format:
+
+```
+0,0,0
+0,1,1
+1,0,1
+1,1,0
+```
+
+Rules:
+
+* numeric only
+* last column = target
+* no headers
+
+---
+
+### 💾 JSON
+
+* Export architecture
+* Export weights
+* Import models
+
+---
+
+### 🌍 Language
+
+* Italian 🇮🇹
+* English 🇬🇧
+* Toggle button
+
+---
+
+## 🛠️ Tech Stack
+
+* HTML5
+* CSS (Bootstrap 5)
+* Vanilla JavaScript
+* Chart.js
+* SVG
+
+---
+
+## ▶️ How to use
+
+1. Open `index.html`
+2. Build the network
+3. Load dataset or preset
+4. Click **Train**
+5. Test with **Predict**
+
+---
+
+## 🎓 Educational Use
+
+Great for teaching:
+
+* neural networks basics
+* forward propagation
+* backpropagation
+* classification
+* training dynamics
+
+---
+
+## 👨‍🏫 Authors
+
+**Michele Minno**
+
+* ChatGPT
+
+
+---
+
+
 # 🇮🇹 README – NeuroBuilder
 
 ## 🧠 Cos’è NeuroBuilder
@@ -134,147 +279,6 @@ Perfetto per spiegare:
 ---
 
 ## 👨‍🏫 Autori
-
-**Michele Minno**
-
-* ChatGPT
-
----
-
-# 🇬🇧 README – NeuroBuilder
-
-## 🧠 What is NeuroBuilder
-
-**NeuroBuilder** is an interactive web app to build, train, and visualize **neural networks** in a simple and intuitive way.
-
-Designed for:
-
-* high school students
-* AI introduction
-* classroom activities
-
----
-
-## 🚀 Main Features
-
-### 🔧 Network Builder (Drag & Drop)
-
-* Drag:
-
-  * Input
-  * Hidden layer
-  * Output
-* Configure:
-
-  * neurons
-  * activation function
-  * bias
-
----
-
-### 🏋️ Training
-
-* Adjustable learning rate
-* Epochs
-* Batch size
-* Real-time loss chart
-
----
-
-### 👁️ Visualization
-
-* SVG network rendering
-* Colors:
-
-  * nodes → activation
-  * edges → weight
-* Edge thickness = weight intensity
-
----
-
-### ⚡ Prediction Test
-
-* Insert custom inputs
-* Get network output
-* Live visualization update
-
----
-
-### 📊 Dataset
-
-#### ✅ Presets
-
-* XOR
-* Linear (x + y > 1)
-
-#### 📂 CSV
-
-Required format:
-
-```
-0,0,0
-0,1,1
-1,0,1
-1,1,0
-```
-
-Rules:
-
-* numeric only
-* last column = target
-* no headers
-
----
-
-### 💾 JSON
-
-* Export architecture
-* Export weights
-* Import models
-
----
-
-### 🌍 Language
-
-* Italian 🇮🇹
-* English 🇬🇧
-* Toggle button
-
----
-
-## 🛠️ Tech Stack
-
-* HTML5
-* CSS (Bootstrap 5)
-* Vanilla JavaScript
-* Chart.js
-* SVG
-
----
-
-## ▶️ How to use
-
-1. Open `index.html`
-2. Build the network
-3. Load dataset or preset
-4. Click **Train**
-5. Test with **Predict**
-
----
-
-## 🎓 Educational Use
-
-Great for teaching:
-
-* neural networks basics
-* forward propagation
-* backpropagation
-* classification
-* training dynamics
-
----
-
-## 👨‍🏫 Authors
 
 **Michele Minno**
 
