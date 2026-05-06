@@ -152,40 +152,41 @@ const I18N = {
 function applyI18n() {
   const lang = getLang();
 
-  // Testi HTML
   $$("[data-i18n]").forEach((el) => {
     const key = el.dataset.i18n;
 
-    if (I18N_HTML[lang] && I18N_HTML[lang][key] !== undefined) {
-      el.innerHTML = I18N_HTML[lang][key];
+    if (I18N_HTML[lang]?.[key] !== undefined) {
+
+      if (el.tagName === "OPTION") {
+        el.textContent = I18N_HTML[lang][key];
+      } else {
+        el.innerHTML = I18N_HTML[lang][key];
+      }
+
     }
   });
 
-  // Placeholder
   $$("[data-i18n-placeholder]").forEach((el) => {
     const key = el.dataset.i18nPlaceholder;
 
-    if (I18N_HTML[lang] && I18N_HTML[lang][key] !== undefined) {
+    if (I18N_HTML[lang]?.[key] !== undefined) {
       el.placeholder = I18N_HTML[lang][key];
     }
   });
 
-  // Aria-label
   $$("[data-i18n-aria]").forEach((el) => {
     const key = el.dataset.i18nAria;
 
-    if (I18N_HTML[lang] && I18N_HTML[lang][key] !== undefined) {
+    if (I18N_HTML[lang]?.[key] !== undefined) {
       el.setAttribute("aria-label", I18N_HTML[lang][key]);
     }
   });
 
-  // Bottone lingua
   const btn = document.getElementById("btnLangToggle");
   if (btn) {
     btn.textContent = t("langButton");
   }
 
-  // CSV info dinamico
   const csvInfo = document.getElementById("csvInfo");
 
   if (csvInfo && (!dataset.X.length || csvInfo.dataset.auto === "empty")) {
@@ -200,6 +201,15 @@ const I18N_HTML = {
   it: {
     palette: "Palette",
     dragHere: "Trascina i blocchi qui sotto 👉",
+
+    input: "Input",
+    output: "Output",
+    hiddenLayer: "Layer nascosto",
+    neurons: "Neuroni",
+    inputSize: "Dimensione input",
+    activation: "Attivazione",
+    bias: "Bias",
+
     clear: "Pulisci",
     architecture: "Architettura",
     training: "Training",
@@ -222,12 +232,23 @@ const I18N_HTML = {
     json: "JSON",
     export: "Export",
     download: "Download",
-    copy: "Copy"
+    copy: "Copy",
+
+    linearPreset: "Lineare"
   },
 
   en: {
     palette: "Palette",
     dragHere: "Drag the blocks below 👉",
+
+    input: "Input",
+    output: "Output",
+    hiddenLayer: "Hidden layer",
+    neurons: "Neurons",
+    inputSize: "Input size",
+    activation: "Activation",
+    bias: "Bias",
+
     clear: "Clear",
     architecture: "Architecture",
     training: "Training",
@@ -250,7 +271,9 @@ const I18N_HTML = {
     json: "JSON",
     export: "Export",
     download: "Download",
-    copy: "Copy"
+    copy: "Copy",
+
+    linearPreset: "Linear"
   }
 };
 
