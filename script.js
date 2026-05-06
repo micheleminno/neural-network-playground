@@ -56,14 +56,7 @@ const I18N = {
   it: {
     langButton: "EN",
     emptyArchitecture: "Trascina qui i layer dalla palette…",
-    input: "INPUT",
-    output: "OUTPUT",
-    hiddenLayer: "LAYER NASCOSTO",
     remove: "Rimuovi",
-    neurons: "Neuroni",
-    inputSize: "Dimensione input",
-    activation: "Attivazione",
-    bias: "Bias",
     csvNoFile: "Nessun file selezionato.",
     csvEmpty: "Il file sembra vuoto.",
     csvNeedCols: "Servono almeno 2 colonne (feature + target).",
@@ -103,14 +96,7 @@ const I18N = {
   en: {
     langButton: "IT",
     emptyArchitecture: "Drag layers here from the palette…",
-    input: "INPUT",
-    output: "OUTPUT",
-    hiddenLayer: "HIDDEN LAYER",
     remove: "Remove",
-    neurons: "Neurons",
-    inputSize: "Input size",
-    activation: "Activation",
-    bias: "Bias",
     csvNoFile: "No file selected.",
     csvEmpty: "The file seems empty.",
     csvNeedCols: "At least 2 columns are required (features + target).",
@@ -152,27 +138,42 @@ const I18N = {
 function applyI18n() {
   const lang = getLang();
 
-  // Funziona se nell'HTML unico hai messo data-i18n="chiave" sugli elementi testuali.
+  // Testi HTML
   $$("[data-i18n]").forEach((el) => {
     const key = el.dataset.i18n;
-    if (I18N_HTML[lang]?.[key] != null) el.innerHTML = I18N_HTML[lang][key];
+
+    if (I18N_HTML[lang] && I18N_HTML[lang][key] !== undefined) {
+      el.innerHTML = I18N_HTML[lang][key];
+    }
   });
 
+  // Placeholder
   $$("[data-i18n-placeholder]").forEach((el) => {
     const key = el.dataset.i18nPlaceholder;
-    if (I18N_HTML[lang]?.[key] != null) el.placeholder = I18N_HTML[lang][key];
+
+    if (I18N_HTML[lang] && I18N_HTML[lang][key] !== undefined) {
+      el.placeholder = I18N_HTML[lang][key];
+    }
   });
 
+  // Aria-label
   $$("[data-i18n-aria]").forEach((el) => {
     const key = el.dataset.i18nAria;
-    if (I18N_HTML[lang]?.[key] != null)
+
+    if (I18N_HTML[lang] && I18N_HTML[lang][key] !== undefined) {
       el.setAttribute("aria-label", I18N_HTML[lang][key]);
+    }
   });
 
+  // Bottone lingua
   const btn = document.getElementById("btnLangToggle");
-  if (btn) btn.textContent = t("langButton");
+  if (btn) {
+    btn.textContent = t("langButton");
+  }
 
+  // CSV info dinamico
   const csvInfo = document.getElementById("csvInfo");
+
   if (csvInfo && (!dataset.X.length || csvInfo.dataset.auto === "empty")) {
     csvInfo.textContent = t("csvNoDataset");
     csvInfo.dataset.auto = "empty";
