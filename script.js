@@ -907,7 +907,8 @@ function renderNNVis() {
               )}</text>`
           : "";
 
-      nodes += `<g class="nn-node">
+      nodes += `<g class="nn-node"
+  data-activation="${vRaw ?? ""}">
         <circle cx="${p.x}" cy="${p.y}" r="${nodeR}"
           style="fill:${fill} !important; stroke:rgba(255,255,255,0.95); stroke-width:1.6"/>
         <text x="${p.x}" y="${p.y + 3}" text-anchor="middle"
@@ -952,6 +953,26 @@ function renderNNVis() {
     });
 
     g.addEventListener("mouseleave", () => {
+      tooltip.style.opacity = "0";
+      tooltip.style.transform = "translateY(4px)";
+    });
+  });
+  svg.querySelectorAll(".nn-node").forEach((node) => {
+    const value = node.dataset.activation;
+
+    if (value === undefined) return;
+
+    node.addEventListener("mousemove", (e) => {
+      tooltip.innerHTML = `<b>${t("activation")}</b>: ${Number(value).toFixed(4)}`;
+
+      tooltip.style.left = e.clientX + 16 + "px";
+      tooltip.style.top = e.clientY + 16 + "px";
+
+      tooltip.style.opacity = "1";
+      tooltip.style.transform = "translateY(0)";
+    });
+
+    node.addEventListener("mouseleave", () => {
       tooltip.style.opacity = "0";
       tooltip.style.transform = "translateY(4px)";
     });
