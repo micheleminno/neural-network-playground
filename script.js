@@ -206,7 +206,6 @@ const I18N_HTML = {
   it: {
     palette: "Palette",
     dragHere: "Trascina i blocchi qui sotto 👉",
-
     input: "Input",
     output: "Output",
     hiddenLayer: "Layer nascosto",
@@ -218,6 +217,7 @@ const I18N_HTML = {
     legendNegative: "Rosso = peso negativo",
     legendThickness: "Spessore = intensità del peso",
     legendHover: "Passa col mouse sui collegamenti per vedere il peso numerico",
+    legendNodeColor: "Colore nodo = livello di attivazione del neurone",
     clear: "Pulisci",
     architecture: "Architettura",
     training: "Training",
@@ -260,6 +260,7 @@ const I18N_HTML = {
     legendNegative: "Red = negative weight",
     legendThickness: "Thickness = weight strength",
     legendHover: "Hover over the connections to see the numeric weight",
+    legendNodeColor: "Node color = neuron activation level",
     clear: "Clear",
     architecture: "Architecture",
     training: "Training",
