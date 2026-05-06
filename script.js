@@ -850,7 +850,9 @@ function renderNNVis() {
         const cx = (from.x + to.x) / 2;
         const cy = from.y + (to.y - from.y) * 0.1;
 
-        edges += `
+        edges += `<g>
+  <title>${t("weight")}: ${w.toFixed(4)}</title>
+
   <path
     d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
     stroke="${stroke}"
@@ -859,10 +861,8 @@ function renderNNVis() {
     fill="none"
     opacity="0.95"
     filter="url(#edgeGlow)"
-  >
-    <title>${t("weight")}: ${w.toFixed(4)}</title>
-  </path>
-`;
+  />
+</g>`;
       }
     }
   });
