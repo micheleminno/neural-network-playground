@@ -852,18 +852,20 @@ function renderNNVis() {
         const cx = (from.x + to.x) / 2;
         const cy = from.y + (to.y - from.y) * 0.1;
 
-        edges += `<g>
-  <title>${t("weight")}: ${w.toFixed(4)}</title>
+        edges += `
+<g class="edge-group"
+   data-weight="${w.toFixed(4)}">
 
-  <!-- linea invisibile più larga per hover -->
+  <!-- hover area -->
   <path
+    class="edge-hitbox"
     d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
     stroke="transparent"
-    stroke-width="${Math.max(sw + 10, 14)}"
+    stroke-width="${Math.max(sw + 12, 16)}"
     fill="none"
   />
 
-  <!-- linea visibile -->
+  <!-- visible edge -->
   <path
     d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
     stroke="${stroke}"
@@ -913,6 +915,26 @@ function renderNNVis() {
   }
 
   svg.innerHTML = defs + `<g>${edges}</g><g>${nodes}</g>`;
+  const tooltip = document.getElementById("edgeTooltip");
+
+  svg.querySelectorAll(".edge-group").forEach((g) => {
+    g.addEventListener("mousemove", (e) => {
+      const weight = g.dataset.weight;
+
+      tooltip.innerHTML = `<b>${t("weight")}</b>: ${weight}`;
+
+      tooltip.style.left = e.clientX + 16 + "px";
+      tooltip.style.top = e.clientY + 16 + "px";
+
+      tooltip.style.opacity = "1";
+      tooltip.style.transform = "translateY(0)";
+    });
+
+    g.addEventListener("mouseleave", () => {
+      tooltip.style.opacity = "0";
+      tooltip.style.transform = "translateY(4px)";
+    });
+  });
 }
 
 // ========= Build Network =========
