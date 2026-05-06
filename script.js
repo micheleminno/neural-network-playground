@@ -215,6 +215,7 @@ const I18N_HTML = {
     legendPositive: "Verde = peso positivo",
     legendNegative: "Rosso = peso negativo",
     legendThickness: "Spessore = intensità del peso",
+    legendHover: "Passa col mouse sui collegamenti per vedere il peso numerico",
     clear: "Pulisci",
     architecture: "Architettura",
     training: "Training",
@@ -256,6 +257,7 @@ const I18N_HTML = {
     legendPositive: "Green = positive weight",
     legendNegative: "Red = negative weight",
     legendThickness: "Thickness = weight strength",
+    legendHover: "Hover over the connections to see the numeric weight",
     clear: "Clear",
     architecture: "Architecture",
     training: "Training",
@@ -853,6 +855,15 @@ function renderNNVis() {
         edges += `<g>
   <title>${t("weight")}: ${w.toFixed(4)}</title>
 
+  <!-- linea invisibile più larga per hover -->
+  <path
+    d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
+    stroke="transparent"
+    stroke-width="${Math.max(sw + 10, 14)}"
+    fill="none"
+  />
+
+  <!-- linea visibile -->
   <path
     d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
     stroke="${stroke}"
