@@ -14,10 +14,15 @@ function getLang() {
 
 function setLang(lang) {
   const safeLang = lang === "en" ? "en" : "it";
+
   document.body.dataset.lang = safeLang;
   document.documentElement.lang = safeLang;
+
   localStorage.setItem("neurobuilder-lang", safeLang);
+
   applyI18n();
+
+  // forza rebuild UI
   renderArchitecture();
   renderTestInputs();
   renderNNVis();
@@ -578,12 +583,13 @@ function renderArchitecture() {
         ? "bi-box-arrow-right text-success"
         : "bi-diagram-3 text-info";
 
-    const name =
-      L.type === "input"
-        ? t("input")
-        : L.type === "output"
-        ? t("output")
-        : t("hiddenLayer");
+    const layerNames = {
+      input: t("input"),
+      output: t("output"),
+      hidden: t("hiddenLayer"),
+    };
+
+    const name = layerNames[L.type] || L.type;
 
     card.innerHTML = `
       <div class="d-flex align-items-center justify-content-between mb-2">
