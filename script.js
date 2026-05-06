@@ -214,7 +214,9 @@ const I18N_HTML = {
     inputSize: "Dimensione input",
     activation: "Attivazione",
     bias: "Bias",
-
+    legendPositive: "Verde = peso positivo",
+    legendNegative: "Rosso = peso negativo",
+    legendThickness: "Spessore = intensità del peso",
     clear: "Pulisci",
     architecture: "Architettura",
     training: "Training",
@@ -253,7 +255,9 @@ const I18N_HTML = {
     inputSize: "Input size",
     activation: "Activation",
     bias: "Bias",
-
+    legendPositive: "Green = positive weight",
+    legendNegative: "Red = negative weight",
+    legendThickness: "Thickness = weight strength",
     clear: "Clear",
     architecture: "Architecture",
     training: "Training",
