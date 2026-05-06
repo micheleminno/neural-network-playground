@@ -54,6 +54,13 @@ function clamp(x, min, max) {
 // ========= Dizionario UI =========
 const I18N = {
   it: {
+    input: "Input",
+    output: "Output",
+    hiddenLayer: "Layer nascosto",
+    neurons: "Neuroni",
+    inputSize: "Dimensione input",
+    activation: "Attivazione",
+    bias: "Bias",
     langButton: "EN",
     emptyArchitecture: "Trascina qui i layer dalla palette…",
     remove: "Rimuovi",
@@ -94,6 +101,13 @@ const I18N = {
       </div>`,
   },
   en: {
+    input: "Input",
+    output: "Output",
+    hiddenLayer: "Hidden layer",
+    neurons: "Neurons",
+    inputSize: "Input size",
+    activation: "Activation",
+    bias: "Bias",
     langButton: "IT",
     emptyArchitecture: "Drag layers here from the palette…",
     remove: "Remove",
