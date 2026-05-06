@@ -69,6 +69,7 @@ const I18N = {
     langButton: "EN",
     emptyArchitecture: "Trascina qui i layer dalla palette…",
     remove: "Rimuovi",
+    weight: "Peso",
     csvNoFile: "Nessun file selezionato.",
     csvEmpty: "Il file sembra vuoto.",
     csvNeedCols: "Servono almeno 2 colonne (feature + target).",
@@ -116,6 +117,7 @@ const I18N = {
     langButton: "IT",
     emptyArchitecture: "Drag layers here from the palette…",
     remove: "Remove",
+    weight: "Weight",
     csvNoFile: "No file selected.",
     csvEmpty: "The file seems empty.",
     csvNeedCols: "At least 2 columns are required (features + target).",
@@ -921,7 +923,25 @@ function renderNNVis() {
     g.addEventListener("mousemove", (e) => {
       const weight = g.dataset.weight;
 
-      tooltip.innerHTML = `<b>${t("weight")}</b>: ${weight}`;
+      tooltip.innerHTML = `
+  <div style="
+    font-size:12px;
+    opacity:.7;
+    margin-bottom:4px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+  ">
+    ${t("weight")}
+  </div>
+
+  <div style="
+    font-size:24px;
+    font-weight:700;
+    line-height:1;
+  ">
+    ${weight}
+  </div>
+`;
 
       tooltip.style.left = e.clientX + 16 + "px";
       tooltip.style.top = e.clientY + 16 + "px";
