@@ -161,13 +161,11 @@ function applyI18n() {
     const key = el.dataset.i18n;
 
     if (I18N_HTML[lang]?.[key] !== undefined) {
-
       if (el.tagName === "OPTION") {
         el.textContent = I18N_HTML[lang][key];
       } else {
         el.innerHTML = I18N_HTML[lang][key];
       }
-
     }
   });
 
@@ -241,7 +239,7 @@ const I18N_HTML = {
     download: "Download",
     copy: "Copy",
 
-    linearPreset: "Lineare"
+    linearPreset: "Lineare",
   },
 
   en: {
@@ -282,8 +280,8 @@ const I18N_HTML = {
     download: "Download",
     copy: "Copy",
 
-    linearPreset: "Linear"
-  }
+    linearPreset: "Linear",
+  },
 };
 
 // ========= NN Core =========
@@ -397,7 +395,7 @@ class DenseLayer {
     outputSize,
     activation = "relu",
     useBias = true,
-    rand = Math.random
+    rand = Math.random,
   ) {
     this.in = inputSize;
     this.out = outputSize;
@@ -411,7 +409,7 @@ class DenseLayer {
     this.X = X;
     const Zlin = addBias(
       dot(X, this.W),
-      this.useBias ? this.b : zeros(1, this.out)
+      this.useBias ? this.b : zeros(1, this.out),
     );
     this.Z = Zlin;
     this.A = applyActivation(Zlin, Activations[this.activation]);
@@ -438,7 +436,7 @@ class DenseLayer {
     const dB = this.useBias
       ? [
           Array.from({ length: c }, (_, j) =>
-            dZ.reduce((s, row) => s + row[j], 0)
+            dZ.reduce((s, row) => s + row[j], 0),
           ),
         ]
       : null;
@@ -546,7 +544,7 @@ function renderTestInputs() {
   if (!container) return;
 
   const prev = Array.from(container.querySelectorAll("[data-ti]")).map((inp) =>
-    Number(inp.value)
+    Number(inp.value),
   );
   container.innerHTML = "";
 
@@ -569,7 +567,7 @@ function renderArchitecture() {
 
   if (arch.length === 0) {
     archEl.innerHTML = `<div class="text-center small-muted py-4">${t(
-      "emptyArchitecture"
+      "emptyArchitecture",
     )}</div>`;
     return;
   }
@@ -584,8 +582,8 @@ function renderArchitecture() {
       L.type === "input"
         ? "bi-box-arrow-in-right text-warning"
         : L.type === "output"
-        ? "bi-box-arrow-right text-success"
-        : "bi-diagram-3 text-info";
+          ? "bi-box-arrow-right text-success"
+          : "bi-diagram-3 text-info";
 
     const layerNames = {
       input: t("input"),
@@ -603,7 +601,7 @@ function renderArchitecture() {
           <span class="badge rounded-pill bg-secondary">#${idx + 1}</span>
         </div>
         <button class="btn btn-sm btn-danger remove-layer" type="button" title="${t(
-          "remove"
+          "remove",
         )}">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -613,10 +611,10 @@ function renderArchitecture() {
           L.type !== "input"
             ? `<div class="col-6">
                 <label class="form-label">${t(
-                  "neurons"
+                  "neurons",
                 )}: <span class="small" id="neuronsVal-${L.id}">${
-                L.neurons
-              }</span></label>
+                  L.neurons
+                }</span></label>
                 <input type="range" min="1" max="64" step="1" value="${
                   L.neurons
                 }" class="form-range" data-field="neurons" data-id="${L.id}">
@@ -645,7 +643,7 @@ function renderArchitecture() {
                       (a) =>
                         `<option value="${a}" ${
                           L.activation === a ? "selected" : ""
-                        }>${a}</option>`
+                        }>${a}</option>`,
                     )
                     .join("")}
                 </select>
@@ -707,7 +705,7 @@ function renderArchitecture() {
     });
 
     card.addEventListener("dragleave", () =>
-      card.classList.remove("drop-hint")
+      card.classList.remove("drop-hint"),
     );
 
     card.addEventListener("drop", (ev) => {
@@ -852,9 +850,19 @@ function renderNNVis() {
         const cx = (from.x + to.x) / 2;
         const cy = from.y + (to.y - from.y) * 0.1;
 
-        edges += `<path d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
-          stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round"
-          fill="none" opacity="0.95" filter="url(#edgeGlow)"/>`;
+        edges += `
+  <path
+    d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
+    stroke="${stroke}"
+    stroke-width="${sw}"
+    stroke-linecap="round"
+    fill="none"
+    opacity="0.95"
+    filter="url(#edgeGlow)"
+  >
+    <title>${t("weight")}: ${w.toFixed(4)}</title>
+  </path>
+`;
       }
     }
   });
@@ -879,7 +887,7 @@ function renderNNVis() {
         !isInput && vRaw != null
           ? `<text x="${p.x}" y="${p.y - (nodeR + 7)}" text-anchor="middle"
               style="fill:#e5e7eb;font-size:10px;font-weight:600">${vRaw.toFixed(
-                2
+                2,
               )}</text>`
           : "";
 
@@ -1070,10 +1078,10 @@ function handleCSVFile(file) {
 
       setInfo(
         `CSV "${file.name}" ${t("csvLoaded")}: ${X.length} ${t(
-          "csvExamples"
+          "csvExamples",
         )}, ${inputSize} ${t("csvFeatures")} (${t("csvDelimiter")} "${
           delimiter === "\t" ? "TAB" : delimiter
-        }")`
+        }")`,
       );
 
       console.log("[CSV] OK. First rows:", X.slice(0, 3), y.slice(0, 3));
@@ -1265,7 +1273,7 @@ async function trainLoop() {
     const lrNow = lr * 0.995 ** ep;
     const batchSize = Math.min(
       Number(document.getElementById("batch")?.value ?? 4),
-      dataset.X.length
+      dataset.X.length,
     );
     const batches = getBatches(X, y, batchSize, rand);
 
@@ -1288,8 +1296,8 @@ async function trainLoop() {
 
     console.log(
       `Epoch ${ep} → Loss: ${L.toFixed(4)} | Acc: ${(acc * 100).toFixed(
-        1
-      )}% | LR: ${lrNow.toFixed(5)}`
+        1,
+      )}% | LR: ${lrNow.toFixed(5)}`,
     );
 
     const lossNow = document.getElementById("lossNow");
@@ -1325,7 +1333,7 @@ function predictOnce() {
   const predictOut = $("#predictOut");
   if (predictOut) {
     predictOut.textContent = JSON.stringify(
-      out[0].map((v) => Number(v.toFixed(5)))
+      out[0].map((v) => Number(v.toFixed(5))),
     );
   }
 
@@ -1396,7 +1404,7 @@ function handleJSONImportFile(file, inputEl) {
             L.out,
             L.activation,
             L.useBias,
-            Math.random
+            Math.random,
           );
           d.W = L.W;
           d.b = L.b;
@@ -1445,7 +1453,7 @@ function handleJSONImportFile(file, inputEl) {
         alert(
           t("importArchOk") +
             (o.weights ? t("importWeightsSuffix") : "") +
-            t("importClose")
+            t("importClose"),
         );
       } else {
         throw new Error(t("jsonUnknown"));
@@ -1513,7 +1521,7 @@ function initCsvInfoSafe() {
   btn.setAttribute("role", "button");
   btn.setAttribute(
     "aria-label",
-    getLang() === "it" ? "Informazioni formato CSV" : "CSV format info"
+    getLang() === "it" ? "Informazioni formato CSV" : "CSV format info",
   );
   btn.setAttribute("data-bs-toggle", "popover");
   btn.setAttribute("data-bs-theme", "dark");
@@ -1566,7 +1574,7 @@ function attachPopoverGlobalClosers() {
       if (btn.contains(e.target) || tip.contains(e.target)) return;
       pop.hide();
     },
-    true
+    true,
   );
 
   document.addEventListener(
@@ -1578,7 +1586,7 @@ function attachPopoverGlobalClosers() {
       const pop = bootstrap.Popover.getInstance(btn);
       if (pop) pop.hide();
     },
-    true
+    true,
   );
 }
 
@@ -1662,7 +1670,7 @@ function bindUIControls() {
 
   on("btnCopyJSON", "click", async () => {
     await navigator.clipboard.writeText(
-      document.getElementById("jsonArea")?.value || ""
+      document.getElementById("jsonArea")?.value || "",
     );
     const b = document.getElementById("btnCopyJSON");
     if (!b) return;
@@ -1672,10 +1680,10 @@ function bindUIControls() {
   });
 
   on("btnChooseCSV", "click", () =>
-    document.getElementById("csvFile")?.click()
+    document.getElementById("csvFile")?.click(),
   );
   on("btnImportJSON", "click", () =>
-    document.getElementById("importJSON")?.click()
+    document.getElementById("importJSON")?.click(),
   );
 
   on("btnLangToggle", "click", () => {
@@ -1735,7 +1743,7 @@ function sanityCheckButtons() {
   ids.forEach((id) => {
     const el = document.getElementById(id);
     console[el ? "log" : "warn"](
-      `${el ? "✓" : "✗"} ${id} ${el ? "found" : "missing"}`
+      `${el ? "✓" : "✗"} ${id} ${el ? "found" : "missing"}`,
     );
   });
   console.groupEnd();
