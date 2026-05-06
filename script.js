@@ -517,7 +517,18 @@ function computeNodeColorsForInput(xvec) {
   if (!xvec) return;
   net.forward([xvec]);
   lastNodeColors = { byLayer: [], raw: [] };
+  // ===== INPUT LAYER =====
 
+  lastNodeColors.raw[0] = xvec.slice();
+
+  let minIn = Math.min(...xvec);
+  let maxIn = Math.max(...xvec);
+
+  const denIn = maxIn - minIn || 1;
+
+  lastNodeColors.byLayer[0] = xvec.map((v) => (v - minIn) / denIn);
+
+  // ===== HIDDEN + OUTPUT =====
   net.layers.forEach((L, k) => {
     const vals = L.A && L.A[0] ? L.A[0].slice() : [];
     lastNodeColors.raw[k + 1] = vals.slice();
@@ -893,9 +904,16 @@ function renderNNVis() {
       const vRaw = lastNodeColors?.raw?.[li]?.[ni];
 
       let fill = "#0b1220";
-      if (!isInput && vNorm != null) {
+      if (vNorm != null) {
         const tt = clamp01(vNorm + 0.15);
-        fill = isOutput ? outputColor(tt) : hiddenColor(tt);
+
+        if (isInput) {
+          fill = `hsl(${Math.round(210 - tt * 160)}, 85%, 55%)`;
+        } else if (isOutput) {
+          fill = outputColor(tt);
+        } else {
+          fill = hiddenColor(tt);
+        }
       }
 
       const label = isInput ? "x" + (ni + 1) : isOutput ? "y" + (ni + 1) : "h";
