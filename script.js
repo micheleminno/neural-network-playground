@@ -1337,7 +1337,10 @@ async function trainLoop() {
   const lr = Number(document.getElementById("lr")?.value ?? 0.1);
   const epochs = Number(document.getElementById("epochs")?.value ?? 50);
   const rand = rng(42);
-
+  if (!dataset.X.length || !dataset.y.length) {
+    console.warn("No dataset loaded");
+    return;
+  }
   const ch = ensureChart();
   if (ch) {
     ch.data.labels = [];
@@ -1415,7 +1418,13 @@ function predictOnce() {
     return;
   }
 
+  if (!net.layers.length) {
+    alert("Rete non configurata");
+    return;
+  }
+
   const out = net.forward([vals]);
+
   computeNodeColorsForInput(vals);
 
   const predictOut = $("#predictOut");
