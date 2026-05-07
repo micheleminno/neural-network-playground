@@ -1338,11 +1338,6 @@ async function trainLoop() {
   const epochs = Number(document.getElementById("epochs")?.value ?? 50);
   const rand = rng(42);
 
-  if (dataset.X.length === 0) {
-    alert(t("trainNoDataset"));
-    return;
-  }
-
   const ch = ensureChart();
   if (ch) {
     ch.data.labels = [];
@@ -1702,10 +1697,17 @@ function bindUIControls() {
   };
 
   on("btnTrain", "click", () => {
+    if (dataset.X.length === 0) {
+      alert(t("trainNoDataset"));
+      return;
+    }
+
     const tbtn = $("#btnTrain");
     const sbtn = $("#btnStop");
+
     if (tbtn) tbtn.disabled = true;
     if (sbtn) sbtn.disabled = false;
+
     trainLoop();
   });
 
