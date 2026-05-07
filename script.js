@@ -285,7 +285,7 @@ const I18N_HTML = {
     download: "Download",
     copy: "Copy",
 
-    linearPreset: "Linear",
+    linearPreset: "Linear (x + y > 1)",
   },
 };
 
