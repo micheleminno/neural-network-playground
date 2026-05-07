@@ -242,7 +242,7 @@ const I18N_HTML = {
     download: "Download",
     copy: "Copy",
 
-    linearPreset: "Lineare",
+    linearPreset: "Lineare (x + y > 1)",
   },
 
   en: {
