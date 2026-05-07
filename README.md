@@ -1,4 +1,6 @@
-# 🇬🇧 README – NeuroBuilder 
+Go here to play: https://micheleminno.github.io/neural-network-playground/++
+
+# README – NeuroBuilder 
 ### (Scroll down for the Italian version)
 
 ## 🧠 What is NeuroBuilder
