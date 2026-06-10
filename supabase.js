@@ -25,7 +25,6 @@ async function saveTest() {
     },
     body: JSON.stringify({
       name: "Rete di prova",
-      author: "Michele",
       architecture: {
         layers: [2, 4, 1],
       },
