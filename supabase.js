@@ -14,3 +14,26 @@ async function testSupabase() {
 
   console.log("SUPABASE:", data);
 }
+
+async function saveTest() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/networks`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+    },
+    body: JSON.stringify({
+      name: "Rete di prova",
+      author: "Michele",
+      architecture: {
+        layers: [2, 4, 1],
+      },
+    }),
+  });
+
+  console.log("STATUS", res.status);
+
+  const txt = await res.text();
+  console.log(txt);
+}
