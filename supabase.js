@@ -91,6 +91,8 @@ async function populateNetworksSelect() {
 }
 
 async function loadNetworkById(id) {
+  console.log(network.architecture);
+
   const r = await fetch(
     `${SUPABASE_URL}/rest/v1/networks?id=eq.${id}&select=*`,
     {
