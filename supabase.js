@@ -118,7 +118,7 @@ async function loadNetworkById(id) {
   // ARCHITETTURA
   // ==========================
 
-  arch = network.architecture;
+  arch = network.layers.architecture;
 
   const inputLayer = arch.find((l) => l.type === "input");
   const outputLayer = arch.find((l) => l.type === "output");
