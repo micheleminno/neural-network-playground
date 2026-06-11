@@ -1779,16 +1779,21 @@ function bindUIControls() {
     }
   });
 
-  on("btnSaveNetwork", "click", () => {
-    saveNetwork();
+  on("btnSaveNetwork", "click", async () => {
+    await saveNetwork();
+
+    await populateNetworksSelect();
   });
 
-  on("btnLoadNetwork", "click", () => {
-    const id = document.getElementById("savedNetworks").value;
+  on("btnLoadNetwork", "click", async () => {
+    const id = document.getElementById("savedNetworks")?.value;
 
-    if (!id) return;
+    if (!id) {
+      alert("Select a network");
+      return;
+    }
 
-    loadNetworkById(id);
+    await loadNetworkById(id);
   });
 
   on("btnAddHidden", "click", () => addLayer("hidden"));
@@ -1909,6 +1914,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   wireCsvInputs();
   attachPopoverGlobalClosers();
   applyI18n();
-  await populateNetworksSelect();
   initCsvInfoSafe();
+  populateNetworksSelect();
 });

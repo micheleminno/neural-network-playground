@@ -3,8 +3,12 @@ const SUPABASE_URL = "https://ajdnlxgbkkwihqiflyby.supabase.co";
 const SUPABASE_KEY = "sb_publishable_CmojWuYCYnwEh0kgfZ5fmw_DfsQ7HrE";
 
 async function saveNetwork() {
+  const networkName = prompt("Network name?");
+
+  if (!networkName) return;
+
   const payload = {
-    name: prompt("Nome rete?"),
+    name: networkName,
 
     architecture: arch,
 
