@@ -1891,7 +1891,7 @@ function sanityCheckButtons() {
 }
 
 // ========= Init =========
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const savedLang = localStorage.getItem("neurobuilder-lang");
   if (savedLang === "it" || savedLang === "en") {
     document.body.dataset.lang = savedLang;
