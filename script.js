@@ -1791,12 +1791,6 @@ function bindUIControls() {
     loadNetworkById(id);
   });
 
-  on("btnLoadPreset", "click", () => {
-    const sel = document.getElementById("presetDataset");
-    const v = sel?.value || "none";
-    if (v !== "none") loadPreset(v);
-  });
-
   on("btnAddHidden", "click", () => addLayer("hidden"));
 
   on("btnClear", "click", () => {
@@ -1867,7 +1861,6 @@ function sanityCheckButtons() {
     "btnStop",
     "btnPredict",
     "btnQuickStart",
-    "btnLoadPreset",
     "btnAddHidden",
     "btnClear",
     "btnExport",
