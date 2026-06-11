@@ -1779,6 +1779,18 @@ function bindUIControls() {
     }
   });
 
+  on("btnSaveNetwork", "click", () => {
+    saveNetwork();
+  });
+
+  on("btnLoadNetwork", "click", () => {
+    const id = document.getElementById("savedNetworks").value;
+
+    if (!id) return;
+
+    loadNetworkById(id);
+  });
+
   on("btnLoadPreset", "click", () => {
     const sel = document.getElementById("presetDataset");
     const v = sel?.value || "none";
@@ -1904,5 +1916,6 @@ document.addEventListener("DOMContentLoaded", () => {
   wireCsvInputs();
   attachPopoverGlobalClosers();
   applyI18n();
+  await populateNetworksSelect();
   initCsvInfoSafe();
 });

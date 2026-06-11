@@ -60,6 +60,50 @@ async function loadNetworks() {
   return data;
 }
 
+async function populateNetworksSelect() {
+  const networks = await loadNetworks();
+
+  const sel = document.getElementById("savedNetworks");
+
+  if (!sel) return;
+
+  sel.innerHTML = '<option value="">-- Select network --</option>';
+
+  networks.forEach((n) => {
+    const opt = document.createElement("option");
+
+    opt.value = n.id;
+
+    opt.textContent = n.name;
+
+    sel.appendChild(opt);
+  });
+}
+
+async function loadNetworkById(id) {
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/networks?id=eq.${id}&select=*`,
+    {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+    },
+  );
+
+  const data = await r.json();
+
+  if (!data.length) return;
+
+  const network = data[0];
+
+  console.log(network);
+
+  // qui poi ricostruiremo la rete
+}
+
+// TEST
+
 async function testSupabase() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/networks?select=*`, {
     headers: {
