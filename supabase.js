@@ -109,6 +109,9 @@ async function loadNetworkById(id) {
   }
 
   const network = data[0];
+  console.log("NETWORK", network);
+  console.log("ARCHITECTURE", network.architecture);
+
   currentNetworkName = network.name;
   updateNetworkTitle();
 
