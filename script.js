@@ -1786,9 +1786,6 @@ function bindUIControls() {
   on("btnChooseCSV", "click", () =>
     document.getElementById("csvFile")?.click(),
   );
-  on("btnImportJSON", "click", () =>
-    document.getElementById("importJSON")?.click(),
-  );
 
   on("btnLangToggle", "click", () => {
     setLang(getLang() === "it" ? "en" : "it");
@@ -1834,7 +1831,6 @@ function sanityCheckButtons() {
     "btnExport",
     "btnDownloadJSON",
     "btnCopyJSON",
-    "btnImportJSON",
     "btnLangToggle",
     "csvFile",
     "csvInfoBtn",
