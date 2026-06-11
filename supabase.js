@@ -61,6 +61,8 @@ async function loadNetworks() {
 }
 
 async function populateNetworksSelect() {
+  console.log("LOADING NETWORKS...");
+
   const networks = await loadNetworks();
 
   const sel = document.getElementById("savedNetworks");
@@ -78,6 +80,8 @@ async function populateNetworksSelect() {
 
     sel.appendChild(opt);
   });
+
+  console.log("SELECT POPULATED");
 }
 
 async function loadNetworkById(id) {
