@@ -1743,55 +1743,6 @@ function bindUIControls() {
     predictOnce();
   });
 
-  on("btnQuickStart", "click", () => {
-    inputSize = 2;
-    outputSize = 1;
-
-    arch = [
-      {
-        id: crypto.randomUUID(),
-        type: "input",
-        neurons: 2,
-      },
-
-      {
-        id: crypto.randomUUID(),
-        type: "hidden",
-        neurons: 4,
-        activation: "tanh",
-        bias: true,
-      },
-
-      {
-        id: crypto.randomUUID(),
-        type: "output",
-        neurons: 1,
-        activation: "sigmoid",
-        bias: true,
-      },
-    ];
-
-    dataset.X = [
-      [0, 0],
-      [0, 1],
-      [1, 0],
-      [1, 1],
-    ];
-
-    dataset.y = [[0], [1], [1], [0]];
-
-    renderArchitecture();
-    buildNetwork();
-    renderTestInputs();
-
-    const csvInfo = $("#csvInfo");
-
-    if (csvInfo) {
-      csvInfo.textContent = t("presetXorLoaded");
-      csvInfo.dataset.auto = "loaded";
-    }
-  });
-
   on("btnSaveNetwork", "click", async () => {
     await saveNetwork();
 
@@ -1878,7 +1829,6 @@ function sanityCheckButtons() {
     "btnTrain",
     "btnStop",
     "btnPredict",
-    "btnQuickStart",
     "btnAddHidden",
     "btnClear",
     "btnExport",
@@ -1887,7 +1837,6 @@ function sanityCheckButtons() {
     "btnImportJSON",
     "btnLangToggle",
     "csvFile",
-    "presetDataset",
     "csvInfoBtn",
   ];
 
