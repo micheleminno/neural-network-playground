@@ -122,11 +122,8 @@ async function loadNetworkById(id) {
   arch = network.architecture.layers;
   console.log("Architecture:", arch);
 
-  const inputLayer = arch.find((l) => l.type === "input");
-  const outputLayer = arch.find((l) => l.type === "output");
-
-  if (inputLayer) inputSize = inputLayer.neurons;
-  if (outputLayer) outputSize = outputLayer.neurons;
+  inputSize = arch[0];
+  outputSize = arch[arch.length - 1];
 
   buildNetwork();
 

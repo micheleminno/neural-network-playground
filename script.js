@@ -1000,25 +1000,32 @@ function renderNNVis() {
 
 // ========= Build Network =========
 function buildNetwork() {
-  let lastSize = inputSize;
   net = new Network();
 
-  // seed diverso a ogni rebuild, ma stabile dentro il rebuild
   const rand = rng(Date.now() + rebuildSeedCounter++);
 
-  arch.forEach((L) => {
-    if (L.type === "input") {
-      lastSize = L.neurons;
-    } else {
-      const act = L.activation || "relu";
-      const useBias = L.bias !== false;
-      net.add(new DenseLayer(lastSize, L.neurons, act, useBias, rand));
-      lastSize = L.neurons;
-    }
-  });
+  inputSize = arch[0];
 
-  outputSize = lastSize;
+  for (let i = 1; i < arch.length; i++) {
+    const neurons = arch[i];
+
+    const isOutput = i === arch.length - 1;
+
+    net.add(
+      new DenseLayer(
+        arch[i - 1],
+        neurons,
+        isOutput ? "sigmoid" : "relu",
+        true,
+        rand,
+      ),
+    );
+  }
+
+  outputSize = arch[arch.length - 1];
+
   lastNodeColors = null;
+
   renderTestInputs();
   renderNNVis();
   updateJSON();
