@@ -4,8 +4,10 @@ const SUPABASE_KEY = "sb_publishable_CmojWuYCYnwEh0kgfZ5fmw_DfsQ7HrE";
 
 async function saveNetwork() {
   const networkName = prompt("Network name?");
-
   if (!networkName) return;
+
+  currentNetworkName = networkName;
+  updateNetworkTitle();
 
   const payload = {
     name: networkName,
@@ -107,6 +109,8 @@ async function loadNetworkById(id) {
   }
 
   const network = data[0];
+  currentNetworkName = network.name;
+  updateNetworkTitle();
 
   // ==========================
   // ARCHITETTURA

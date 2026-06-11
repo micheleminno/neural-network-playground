@@ -505,6 +505,7 @@ let chart;
 let stopFlag = false;
 let lastNodeColors = null; // {byLayer:[], raw:[]}
 let rebuildSeedCounter = 1;
+let currentNetworkName = "";
 
 // ========= Colors & Node Coloring =========
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
@@ -1437,6 +1438,18 @@ function predictOnce() {
   renderNNVis();
 }
 
+function updateNetworkTitle() {
+  const title = document.getElementById("networkTitle");
+
+  if (!title) return;
+
+  if (currentNetworkName) {
+    title.innerHTML = `<i class="bi bi-eye"></i> ${currentNetworkName}`;
+  } else {
+    title.innerHTML = `<i class="bi bi-eye"></i> ${t("network")}`;
+  }
+}
+
 // ========= JSON Export/Import & sync =========
 function updateJSON() {
   const j = {
@@ -1916,4 +1929,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   applyI18n();
   initCsvInfoSafe();
   populateNetworksSelect();
+  updateNetworkTitle();
 });
