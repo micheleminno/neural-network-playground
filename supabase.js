@@ -97,15 +97,70 @@ async function loadNetworkById(id) {
 
   const data = await r.json();
 
-  if (!data.length) return;
+  if (!data.length) {
+    alert("Network not found");
+    return;
+  }
 
   const network = data[0];
 
-  console.log(network);
+  // ==========================
+  // ARCHITETTURA
+  // ==========================
 
-  // qui poi ricostruiremo la rete
+  arch = network.architecture;
+
+  const inputLayer = arch.find((l) => l.type === "input");
+  const outputLayer = arch.find((l) => l.type === "output");
+
+  if (inputLayer) inputSize = inputLayer.neurons;
+  if (outputLayer) outputSize = outputLayer.neurons;
+
+  buildNetwork();
+
+  // ==========================
+  // PESI
+  // ==========================
+
+  if (network.weights && network.weights.length === net.layers.length) {
+    for (let i = 0; i < net.layers.length; i++) {
+      net.layers[i].W = network.weights[i].W;
+
+      net.layers[i].b = network.weights[i].b;
+
+      net.layers[i].activation = network.weights[i].activation;
+
+      net.layers[i].useBias = network.weights[i].useBias;
+    }
+  }
+
+  // ==========================
+  // DATASET
+  // ==========================
+
+  if (network.dataset) {
+    dataset.X = network.dataset.X || [];
+
+    dataset.y = network.dataset.y || [];
+  }
+
+  // ==========================
+  // METRICHE
+  // ==========================
+
+  if ($("#lossNow")) $("#lossNow").textContent = network.loss ?? "-";
+
+  if ($("#accNow"))
+    $("#accNow").textContent =
+      network.accuracy != null ? network.accuracy + "%" : "-";
+
+  renderArchitecture();
+  renderTestInputs();
+  renderNNVis();
+  updateJSON();
+
+  console.log("Network loaded:", network.name);
 }
-
 // TEST
 
 async function testSupabase() {
