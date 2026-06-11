@@ -109,8 +109,6 @@ async function loadNetworkById(id) {
   }
 
   const network = data[0];
-  console.log(network.architecture);
-
   currentNetworkName = network.name;
   updateNetworkTitle();
 
@@ -119,6 +117,7 @@ async function loadNetworkById(id) {
   // ==========================
 
   arch = network.architecture.layers;
+  console.log("Architecture:", arch);
 
   const inputLayer = arch.find((l) => l.type === "input");
   const outputLayer = arch.find((l) => l.type === "output");
