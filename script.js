@@ -1783,10 +1783,6 @@ function bindUIControls() {
     setTimeout(() => (b.innerHTML = txt), 1200);
   });
 
-  on("btnChooseCSV", "click", () =>
-    document.getElementById("csvFile")?.click(),
-  );
-
   on("btnLangToggle", "click", () => {
     setLang(getLang() === "it" ? "en" : "it");
   });
