@@ -28,11 +28,17 @@ async function saveTest() {
       architecture: {
         layers: [2, 4, 1],
       },
+      weights: {
+        layers: [],
+      },
+      dataset: {
+        name: "xor",
+      },
+      loss: null,
+      accuracy: null,
     }),
   });
 
   console.log("STATUS", res.status);
-
-  const txt = await res.text();
-  console.log(txt);
+  console.log(await res.text());
 }
