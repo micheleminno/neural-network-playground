@@ -497,13 +497,14 @@ class Network {
 
 // ========= State =========
 let net = new Network();
-let arch = []; // [{id,type:'input'|'hidden'|'output', neurons, activation, bias}]
+let arch = [];
+let layerConfig = [];
 let inputSize = 2;
 let outputSize = 1;
 let dataset = { X: [], y: [] };
 let chart;
 let stopFlag = false;
-let lastNodeColors = null; // {byLayer:[], raw:[]}
+let lastNodeColors = null;
 let rebuildSeedCounter = 1;
 let currentNetworkName = "";
 
@@ -589,26 +590,31 @@ function renderArchitecture() {
     return;
   }
 
-  arch.forEach((L, idx) => {
-    const card = document.createElement("div");
-    card.className = "layer-card mb-2";
-    card.dataset.id = L.id;
-    card.draggable = true;
+  arch.forEach((neurons, idx) => {
+    const isInput = idx === 0;
+    const isOutput = idx === arch.length - 1;
+    const isHidden = !isInput && !isOutput;
+
+    const type = isInput ? "input" : isOutput ? "output" : "hidden";
 
     const icon =
-      L.type === "input"
+      type === "input"
         ? "bi-box-arrow-in-right text-warning"
-        : L.type === "output"
+        : type === "output"
           ? "bi-box-arrow-right text-success"
           : "bi-diagram-3 text-info";
 
-    const layerNames = {
-      input: t("input"),
-      output: t("output"),
-      hidden: t("hiddenLayer"),
-    };
+    const name =
+      type === "input"
+        ? t("input")
+        : type === "output"
+          ? t("output")
+          : t("hiddenLayer");
 
-    const name = layerNames[L.type] || L.type;
+    const layer = isInput ? null : layerConfig[idx - 1] || net.layers[idx - 1];
+
+    const card = document.createElement("div");
+    card.className = "layer-card mb-2";
 
     card.innerHTML = `
       <div class="d-flex align-items-center justify-content-between mb-2">
@@ -617,129 +623,90 @@ function renderArchitecture() {
           <strong>${name}</strong>
           <span class="badge rounded-pill bg-secondary">#${idx + 1}</span>
         </div>
-        <button class="btn btn-sm btn-danger remove-layer" type="button" title="${t(
-          "remove",
-        )}">
-          <i class="bi bi-x-lg"></i>
-        </button>
+
+        ${
+          isHidden
+            ? `<button class="btn btn-sm btn-danger remove-layer" type="button" title="${t(
+                "remove",
+              )}">
+                <i class="bi bi-x-lg"></i>
+              </button>`
+            : ""
+        }
       </div>
+
       <div class="row g-2">
+        <div class="col-6">
+          <label class="form-label">
+            ${isInput ? t("inputSize") : t("neurons")}:
+            <span class="small" id="neuronsVal-${idx}">${neurons}</span>
+          </label>
+
+          <input
+            type="${isInput ? "number" : "range"}"
+            min="1"
+            max="64"
+            step="1"
+            value="${neurons}"
+            class="${isInput ? "form-control" : "form-range"}"
+            data-idx="${idx}"
+          >
+        </div>
+
         ${
-          L.type !== "input"
-            ? `<div class="col-6">
-                <label class="form-label">${t(
-                  "neurons",
-                )}: <span class="small" id="neuronsVal-${L.id}">${
-                  L.neurons
-                }</span></label>
-                <input type="range" min="1" max="64" step="1" value="${
-                  L.neurons
-                }" class="form-range" data-field="neurons" data-id="${L.id}">
-              </div>`
-            : ""
-        }
-        ${
-          L.type === "input"
-            ? `<div class="col-6">
-                <label class="form-label">${t("inputSize")}</label>
-                <input type="number" min="1" max="64" value="${
-                  L.neurons
-                }" class="form-control" data-field="neurons" data-id="${L.id}">
-              </div>`
-            : ""
-        }
-        ${
-          L.type !== "input"
+          !isInput
             ? `<div class="col-6">
                 <label class="form-label">${t("activation")}</label>
-                <select class="form-select" data-field="activation" data-id="${
-                  L.id
-                }">
-                  ${["relu", "sigmoid", "tanh", "linear"]
-                    .map(
-                      (a) =>
-                        `<option value="${a}" ${
-                          L.activation === a ? "selected" : ""
-                        }>${a}</option>`,
-                    )
-                    .join("")}
-                </select>
-              </div>`
-            : ""
-        }
-        ${
-          L.type !== "input"
-            ? `<div class="col-6 form-check form-switch ms-3">
-                <input class="form-check-input" type="checkbox" data-field="bias" data-id="${
-                  L.id
-                }" ${L.bias ? "checked" : ""}>
+                <input
+                  class="form-control"
+                  value="${layer?.activation || ""}"
+                  disabled
+                >
+              </div>
+
+              <div class="col-6 form-check form-switch ms-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  ${layer?.useBias ? "checked" : ""}
+                  disabled
+                >
                 <label class="form-check-label">${t("bias")}</label>
               </div>`
             : ""
         }
-      </div>`;
+      </div>
+    `;
 
-    card.querySelector(".remove-layer").addEventListener("click", (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      arch = arch.filter((x) => x.id !== L.id);
-      renderArchitecture();
+    const input = card.querySelector("[data-idx]");
+
+    input.addEventListener("input", (e) => {
+      const i = Number(e.target.dataset.idx);
+      arch[i] = Number(e.target.value);
+
+      const sp = document.getElementById(`neuronsVal-${i}`);
+      if (sp) sp.textContent = arch[i];
+
       buildNetwork();
+      renderArchitecture();
       updateJSON();
     });
 
-    card.querySelectorAll("[data-field]").forEach((ctrl) => {
-      ctrl.addEventListener("input", (e) => {
-        const id = e.target.dataset.id;
-        const fld = e.target.dataset.field;
-        const obj = arch.find((x) => x.id === id);
-        if (!obj) return;
+    const removeBtn = card.querySelector(".remove-layer");
 
-        if (fld === "neurons") {
-          obj.neurons = Number(e.target.value);
-          const sp = $(`#neuronsVal-${id}`);
-          if (sp) sp.textContent = obj.neurons;
-          if (obj.type === "input") inputSize = obj.neurons;
+    if (removeBtn) {
+      removeBtn.addEventListener("click", () => {
+        arch.splice(idx, 1);
+
+        if (idx > 0) {
+          layerConfig.splice(idx - 1, 1);
         }
-        if (fld === "activation") obj.activation = e.target.value;
-        if (fld === "bias") obj.bias = e.target.checked;
 
         buildNetwork();
+        renderArchitecture();
         updateJSON();
       });
-    });
-
-    card.addEventListener("dragstart", (ev) => {
-      ev.dataTransfer.setData("text/plain", L.id);
-      card.classList.add("ghost");
-    });
-
-    card.addEventListener("dragend", () => card.classList.remove("ghost"));
-
-    card.addEventListener("dragover", (ev) => {
-      ev.preventDefault();
-      card.classList.add("drop-hint");
-    });
-
-    card.addEventListener("dragleave", () =>
-      card.classList.remove("drop-hint"),
-    );
-
-    card.addEventListener("drop", (ev) => {
-      ev.preventDefault();
-      card.classList.remove("drop-hint");
-
-      const id = ev.dataTransfer.getData("text/plain");
-      const fromI = arch.findIndex((x) => x.id === id);
-      const toI = arch.findIndex((x) => x.id === L.id);
-      if (fromI < 0 || toI < 0 || fromI === toI) return;
-
-      const [moved] = arch.splice(fromI, 1);
-      arch.splice(toI, 0, moved);
-      renderArchitecture();
-      buildNetwork();
-      updateJSON();
-    });
+    }
 
     archEl.appendChild(card);
   });
@@ -776,26 +743,24 @@ function attachArchDnD() {
 }
 
 function addLayer(type) {
-  const id = crypto.randomUUID();
+  if (arch.length === 0) {
+    arch = [inputSize, outputSize];
+  }
+
+  if (type === "hidden") {
+    arch.splice(arch.length - 1, 0, 4);
+    layerConfig.splice(arch.length - 2, 0, {
+      activation: "relu",
+      useBias: true,
+    });
+  }
 
   if (type === "input") {
-    arch.push({ id, type: "input", neurons: inputSize });
-  } else if (type === "output") {
-    arch.push({
-      id,
-      type: "output",
-      neurons: outputSize,
-      activation: "sigmoid",
-      bias: true,
-    });
-  } else {
-    arch.push({
-      id,
-      type: "hidden",
-      neurons: 4,
-      activation: "relu",
-      bias: true,
-    });
+    arch[0] = inputSize;
+  }
+
+  if (type === "output") {
+    arch[arch.length - 1] = outputSize;
   }
 
   renderArchitecture();
@@ -1008,15 +973,18 @@ function buildNetwork() {
 
   for (let i = 1; i < arch.length; i++) {
     const neurons = arch[i];
+    const previousNeurons = arch[i - 1];
+
+    const cfg = layerConfig[i - 1] || {};
 
     const isOutput = i === arch.length - 1;
 
     net.add(
       new DenseLayer(
-        arch[i - 1],
+        previousNeurons,
         neurons,
-        isOutput ? "sigmoid" : "relu",
-        true,
+        cfg.activation || (isOutput ? "sigmoid" : "relu"),
+        cfg.useBias ?? true,
         rand,
       ),
     );
@@ -1074,28 +1042,15 @@ function loadPreset(name) {
 }
 
 function ensureIOInArch() {
-  let inL = arch.find((l) => l.type === "input");
-  if (!inL) {
-    inL = { id: crypto.randomUUID(), type: "input", neurons: inputSize };
-    arch.unshift(inL);
-  } else {
-    inL.neurons = inputSize;
+  if (arch.length === 0) {
+    arch = [inputSize, outputSize];
   }
 
-  let outL = arch.find((l) => l.type === "output");
-  if (!outL) {
-    outL = {
-      id: crypto.randomUUID(),
-      type: "output",
-      neurons: outputSize,
-      activation: "sigmoid",
-      bias: true,
-    };
-    arch.push(outL);
-  } else {
-    outL.neurons = outputSize;
-    if (!outL.activation) outL.activation = "sigmoid";
-  }
+  // primo layer = input
+  arch[0] = inputSize;
+
+  // ultimo layer = output
+  arch[arch.length - 1] = outputSize;
 
   renderArchitecture();
   buildNetwork();
@@ -1460,12 +1415,10 @@ function updateNetworkTitle() {
 // ========= JSON Export/Import & sync =========
 function updateJSON() {
   const j = {
-    architecture: arch.map((l) => ({
-      type: l.type,
-      neurons: l.neurons,
-      activation: l.activation || null,
-      bias: l.bias ?? null,
-    })),
+    architecture: {
+      layers: arch,
+    },
+
     weights: net.layers.map((l) => ({
       in: l.in,
       out: l.out,
@@ -1478,6 +1431,7 @@ function updateJSON() {
 
   const ta = $("#jsonArea");
   if (!ta) return;
+
   ta.value = JSON.stringify(j, null, 2);
 }
 
@@ -1485,71 +1439,54 @@ function handleJSONImportFile(file, inputEl) {
   if (!file) return;
 
   const fr = new FileReader();
+
   fr.onload = () => {
     try {
       const o = JSON.parse(fr.result);
 
+      // ========= PESI =========
+
       if (Array.isArray(o.layers)) {
         if (!o.layers.length) throw new Error(t("layersEmpty"));
 
-        inputSize = o.layers[0].in ?? inputSize;
-        outputSize = o.layers.at(-1).out ?? outputSize;
+        arch = [o.layers[0].in, ...o.layers.map((L) => L.out)];
 
-        arch = [
-          { id: crypto.randomUUID(), type: "input", neurons: inputSize },
-          ...o.layers.slice(0, -1).map((L) => ({
-            id: crypto.randomUUID(),
-            type: "hidden",
-            neurons: L.out,
-            activation: L.activation,
-            bias: L.useBias,
-          })),
-          {
-            id: crypto.randomUUID(),
-            type: "output",
-            neurons: outputSize,
-            activation: o.layers.at(-1).activation || "sigmoid",
-            bias: o.layers.at(-1).useBias ?? true,
-          },
-        ];
+        inputSize = arch[0];
+        outputSize = arch[arch.length - 1];
 
-        net = new Network();
-        let last = inputSize;
-        net.layers = o.layers.map((L) => {
-          const d = new DenseLayer(
-            last,
-            L.out,
-            L.activation,
-            L.useBias,
-            Math.random,
-          );
-          d.W = L.W;
-          d.b = L.b;
-          last = L.out;
-          return d;
-        });
+        layerConfig = o.layers.map((L) => ({
+          activation: L.activation,
+          useBias: L.useBias,
+        }));
+
+        buildNetwork();
+
+        for (let i = 0; i < net.layers.length; i++) {
+          net.layers[i].W = o.layers[i].W;
+          net.layers[i].b = o.layers[i].b;
+        }
 
         renderArchitecture();
         renderTestInputs();
         renderNNVis();
         updateJSON();
+
         alert(t("importWeightsOk"));
-      } else if (o.architecture || o.weights) {
-        if (!Array.isArray(o.architecture))
-          throw new Error(t("architectureMissing"));
+      }
 
-        arch = o.architecture.map((L) => ({
-          id: crypto.randomUUID(),
-          type: L.type,
-          neurons: Number(L.neurons),
-          activation: L.activation,
-          bias: L.bias,
+      // ========= ARCHITETTURA =========
+      else if (o.architecture || o.weights) {
+        if (!o.architecture?.layers) throw new Error(t("architectureMissing"));
+
+        arch = o.architecture.layers;
+
+        inputSize = arch[0];
+        outputSize = arch[arch.length - 1];
+
+        layerConfig = o.weights.map((w) => ({
+          activation: w.activation,
+          useBias: w.useBias,
         }));
-
-        const inL = arch.find((l) => l.type === "input");
-        const outL = arch.find((l) => l.type === "output");
-        if (inL) inputSize = Number(inL.neurons);
-        if (outL) outputSize = Number(outL.neurons);
 
         buildNetwork();
 
@@ -1557,9 +1494,16 @@ function handleJSONImportFile(file, inputEl) {
           Array.isArray(o.weights) &&
           o.weights.length === net.layers.length
         ) {
-          for (let i = 0; i < net.layers.length; i++) {
-            if (o.weights[i].W) net.layers[i].W = o.weights[i].W;
-            if (o.weights[i].b !== undefined) net.layers[i].b = o.weights[i].b;
+          if (
+            Array.isArray(o.weights) &&
+            o.weights.length === net.layers.length
+          ) {
+            for (let i = 0; i < net.layers.length; i++) {
+              if (o.weights[i].W) net.layers[i].W = o.weights[i].W;
+
+              if (o.weights[i].b !== undefined)
+                net.layers[i].b = o.weights[i].b;
+            }
           }
         }
 
@@ -1567,6 +1511,7 @@ function handleJSONImportFile(file, inputEl) {
         renderTestInputs();
         renderNNVis();
         updateJSON();
+
         alert(
           t("importArchOk") +
             (o.weights ? t("importWeightsSuffix") : "") +
@@ -1588,21 +1533,22 @@ function handleJSONImportFile(file, inputEl) {
 
 function exportArchitecture() {
   const j = {
-    architecture: arch.map((l) => ({
-      type: l.type,
-      neurons: l.neurons,
-      activation: l.activation || null,
-      bias: l.bias ?? null,
-    })),
+    architecture: {
+      layers: arch,
+    },
   };
 
   const blob = new Blob([JSON.stringify(j, null, 2)], {
     type: "application/json",
   });
+
   const a = document.createElement("a");
+
   a.href = URL.createObjectURL(blob);
   a.download = "neurobuilder-arch.json";
+
   a.click();
+
   URL.revokeObjectURL(a.href);
 }
 
@@ -1865,11 +1811,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   attachCsvDnD();
   observeCsvInputs();
 
-  arch = [];
-  addLayer("input");
-  addLayer("hidden");
-  addLayer("output");
+  arch = [2, 4, 1];
+  inputSize = 2;
+  outputSize = 1;
   buildNetwork();
+  renderArchitecture();
 
   bindUIControls();
   wireCsvInputs();

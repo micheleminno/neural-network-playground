@@ -12,7 +12,9 @@ async function saveNetwork() {
   const payload = {
     name: networkName,
 
-    architecture: arch,
+    architecture: {
+      layers: arch,
+    },
 
     weights: net.layers.map((layer) => ({
       W: layer.W,
@@ -120,7 +122,11 @@ async function loadNetworkById(id) {
   // ==========================
 
   arch = network.architecture.layers;
-  console.log("Architecture:", arch);
+
+  layerConfig = network.weights.map((w) => ({
+    activation: w.activation,
+    useBias: w.useBias,
+  }));
 
   inputSize = arch[0];
   outputSize = arch[arch.length - 1];
