@@ -46,50 +46,27 @@
       </div>
 
       <div class="row g-3">
-        <!-- PALETTE -->
-        <div class="col-md-3">
-          <div class="nb-card p-3 mb-3">
-            <h6 data-i18n="palette">Palette</h6>
-
-            <p class="small-muted mb-3" data-i18n="dragHere">
-              Trascina i blocchi qui sotto 👉
-            </p>
-
-            <div class="palette-item mb-2" draggable="true" data-type="input">
-              <i class="bi bi-box-arrow-in-right text-warning"></i>
-              <span data-i18n="input">Input</span>
-            </div>
-
-            <div class="palette-item mb-2" draggable="true" data-type="hidden">
-              <i class="bi bi-diagram-3 text-info"></i>
-              <span data-i18n="hiddenLayer">Layer nascosto</span>
-            </div>
-
-            <div class="palette-item mb-2" draggable="true" data-type="output">
-              <i class="bi bi-box-arrow-right text-success"></i>
-              <span data-i18n="output">Output</span>
-            </div>
-
-            <div class="d-flex gap-2 mt-3">
-              <button class="btn btn-sm btn-secondary" id="btnClear">
-                <i class="bi bi-trash"></i>
-                <span data-i18n="clear">Pulisci</span>
-              </button>
-
-              <button class="btn btn-sm btn-primary" id="btnAddHidden">
-                <i class="bi bi-plus-circle"></i>
-                <span data-i18n="hiddenLayer">Layer nascosto</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         <!-- ARCHITECTURE -->
         <div class="col-md-4">
           <div class="nb-card p-3 mb-3">
-            <h6 data-i18n="architecture">Architettura</h6>
+            <div class="d-flex justify-content-between align-items-center mb-3">
 
-            <div id="architecture" class="drop-area"></div>
+              <h6 class="mb-0" data-i18n="architecture">
+                Architettura
+              </h6>
+
+              <button
+                id="btnAddHidden"
+                class="btn btn-primary btn-sm"
+                type="button">
+
+                <i class="bi bi-plus-circle"></i>
+                Add layer
+              </button>
+
+            </div>
+
+            <div id="architecture"></div>
           </div>
         </div>
 
@@ -176,7 +153,7 @@
             </div>
           </div>
         </div>
-      </div>
+        </div>
 
       <!-- VISUALIZATION + TEST -->
       <div class="row g-3">
