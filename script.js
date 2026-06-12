@@ -882,7 +882,12 @@ function renderNNVis() {
         }
       }
 
-      const label = isInput ? "x" + (ni + 1) : isOutput ? "y" + (ni + 1) : "h";
+      const label = isInput
+        ? "x" + (ni + 1)
+        : isOutput
+          ? "y" + (ni + 1)
+          : "h" + (ni + 1);
+
       const badge =
         !isInput && vRaw != null
           ? `<text x="${p.x}" y="${p.y - (nodeR + 7)}" text-anchor="middle"
