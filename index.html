@@ -184,8 +184,36 @@
       </div>
 
       <div class="row g-3">
+        <!-- DATASET -->
+        <div class="col-lg-4">
+          <div class="nb-card p-3 mb-3">
+            <h6 data-i18n="dataset">Dataset</h6>
+            <div class="small text-secondary mb-2">
+              Supervised learning data
+            </div>
+
+            <!-- CSV DROP -->
+            <div
+              id="csvDrop"
+              class="drop-zone mb-2 d-flex align-items-center justify-content-between"
+            >
+              <span data-i18n="csvDropText"> Trascina CSV qui </span>
+
+              <button id="csvInfoBtn" class="btn btn-link p-0 text-info">
+                <i class="bi bi-info-circle-fill"></i>
+              </button>
+            </div>
+
+            <input type="file" id="csvFile" class="form-control mb-2" />
+
+            <div id="csvInfo" class="small-muted">
+              <span data-i18n="noDataset"> Nessun dataset caricato </span>
+            </div>
+          </div>
+        </div>
+
         <!-- TRAINING -->
-        <div class="col-lg-6">
+        <div class="col-lg-4">
           <div class="nb-card p-3 mb-3">
             <h6 data-i18n="training">Training</h6>
 
@@ -268,10 +296,10 @@
           </div>
         </div>
 
-        <div class="col-lg-6">
-          <!-- PREDICT -->
+        <!-- PREDICTION -->
+        <div class="col-lg-4">
           <div class="nb-card p-3 mb-3">
-            <h6 data-i18n="prediction">Test predizione</h6>
+            <h6 data-i18n="prediction">Prediction</h6>
 
             <div id="testInputs"></div>
 
@@ -284,30 +312,11 @@
               <span id="predictOut">-</span>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- DATASET -->
-          <div class="nb-card p-3 mb-3">
-            <h6 data-i18n="dataset">Dataset</h6>
-
-            <!-- CSV DROP -->
-            <div
-              id="csvDrop"
-              class="drop-zone mb-2 d-flex align-items-center justify-content-between"
-            >
-              <span data-i18n="csvDropText"> Trascina CSV qui </span>
-
-              <button id="csvInfoBtn" class="btn btn-link p-0 text-info">
-                <i class="bi bi-info-circle-fill"></i>
-              </button>
-            </div>
-
-            <input type="file" id="csvFile" class="form-control mb-2" />
-
-            <div id="csvInfo" class="small-muted">
-              <span data-i18n="noDataset"> Nessun dataset caricato </span>
-            </div>
-          </div>
-
+      <div class="row g-3">
+        <div class="col-12">
           <!-- JSON -->
           <div class="nb-card p-3 mb-3">
             <h6 data-i18n="json">JSON</h6>
