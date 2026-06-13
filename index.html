@@ -45,7 +45,7 @@
         </button>
       </div>
 
-      <div class="row g-3">
+      <div class="row g-3 mb-3">
         <!-- ARCHITECTURE -->
         <div class="col-md-4">
           <div class="nb-card p-3 mb-3">
@@ -90,93 +90,6 @@
           </div>
         </div>
 
-        <!-- TRAINING -->
-        <div class="col-md-5">
-          <div class="nb-card p-3 mb-3">
-            <h6 data-i18n="training">Training</h6>
-
-            <div class="row g-2">
-              <div class="col-4">
-                <label class="form-label">
-                  <span data-i18n="learningRate">Learning rate</span>:
-                  <span id="lrVal">0.1</span>
-                </label>
-
-                <input
-                  type="range"
-                  id="lr"
-                  min="0.01"
-                  max="1"
-                  step="0.01"
-                  value="0.1"
-                  class="form-range"
-                />
-              </div>
-
-              <div class="col-4">
-                <label class="form-label">
-                  <span data-i18n="epochs">Epoche</span>:
-                  <span id="epochsVal">50</span>
-                </label>
-
-                <input
-                  type="range"
-                  id="epochs"
-                  min="1"
-                  max="200"
-                  value="50"
-                  class="form-range"
-                />
-              </div>
-
-              <div class="col-4">
-                <label class="form-label">
-                  <span data-i18n="batch">Batch</span>:
-                  <span id="batchVal">4</span>
-                </label>
-
-                <input
-                  type="range"
-                  id="batch"
-                  min="1"
-                  max="64"
-                  value="4"
-                  class="form-range"
-                />
-              </div>
-            </div>
-
-            <div class="mt-2 d-flex flex-wrap gap-2">
-              <button class="btn btn-primary" id="btnTrain">
-                <span data-i18n="train">Allena</span>
-              </button>
-
-              <button class="btn btn-danger" id="btnStop" disabled>
-                <span data-i18n="stop">Stop</span>
-              </button>
-            </div>
-
-            <div class="mt-3">
-              <canvas id="lossChart" height="150"></canvas>
-
-              <div class="d-flex justify-content-between small mt-2">
-                <span>
-                  <span data-i18n="loss">Loss</span>:
-                  <span id="lossNow">-</span>
-                </span>
-
-                <span>
-                  <span data-i18n="accuracy">Accuracy</span>:
-                  <span id="accNow">-</span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- VISUALIZATION + TEST -->
-      <div class="row g-3">
         <!-- NETWORK -->
         <div class="col-lg-8">
           <div class="nb-card p-3 mb-3">
@@ -268,9 +181,94 @@
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- TEST + DATA -->
-        <div class="col-lg-4">
+      <div class="row g-3">
+        <!-- TRAINING -->
+        <div class="col-lg-6">
+          <div class="nb-card p-3 mb-3">
+            <h6 data-i18n="training">Training</h6>
+
+            <div class="row g-2">
+              <div class="col-4">
+                <label class="form-label">
+                  <span data-i18n="learningRate">Learning rate</span>:
+                  <span id="lrVal">0.1</span>
+                </label>
+
+                <input
+                  type="range"
+                  id="lr"
+                  min="0.01"
+                  max="1"
+                  step="0.01"
+                  value="0.1"
+                  class="form-range"
+                />
+              </div>
+
+              <div class="col-4">
+                <label class="form-label">
+                  <span data-i18n="epochs">Epoche</span>:
+                  <span id="epochsVal">50</span>
+                </label>
+
+                <input
+                  type="range"
+                  id="epochs"
+                  min="1"
+                  max="200"
+                  value="50"
+                  class="form-range"
+                />
+              </div>
+
+              <div class="col-4">
+                <label class="form-label">
+                  <span data-i18n="batch">Batch</span>:
+                  <span id="batchVal">4</span>
+                </label>
+
+                <input
+                  type="range"
+                  id="batch"
+                  min="1"
+                  max="64"
+                  value="4"
+                  class="form-range"
+                />
+              </div>
+            </div>
+
+            <div class="mt-2 d-flex flex-wrap gap-2">
+              <button class="btn btn-primary" id="btnTrain">
+                <span data-i18n="train">Allena</span>
+              </button>
+
+              <button class="btn btn-danger" id="btnStop" disabled>
+                <span data-i18n="stop">Stop</span>
+              </button>
+            </div>
+
+            <div class="mt-3">
+              <canvas id="lossChart" height="150"></canvas>
+
+              <div class="d-flex justify-content-between small mt-2">
+                <span>
+                  <span data-i18n="loss">Loss</span>:
+                  <span id="lossNow">-</span>
+                </span>
+
+                <span>
+                  <span data-i18n="accuracy">Accuracy</span>:
+                  <span id="accNow">-</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
           <!-- PREDICT -->
           <div class="nb-card p-3 mb-3">
             <h6 data-i18n="prediction">Test predizione</h6>
@@ -290,27 +288,6 @@
           <!-- DATASET -->
           <div class="nb-card p-3 mb-3">
             <h6 data-i18n="dataset">Dataset</h6>
-
-            <!-- CLOUD NETWORKS -->
-
-            <label class="form-label">
-              <i class="bi bi-cloud"></i>
-              Saved Neural Networks
-            </label>
-
-            <select id="savedNetworks" class="form-select mb-2">
-              <option value="">-- Select network --</option>
-            </select>
-
-            <div class="d-flex gap-2 mb-3">
-              <button class="btn btn-primary" id="btnLoadNetwork">
-                Load Network
-              </button>
-
-              <button class="btn btn-success" id="btnSaveNetwork">
-                Save Network
-              </button>
-            </div>
 
             <!-- CSV DROP -->
             <div
