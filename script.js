@@ -1808,17 +1808,6 @@ function bindUIControls() {
     await populateNetworksSelect();
   });
 
-  on("btnLoadNetwork", "click", async () => {
-    const id = document.getElementById("savedNetworks")?.value;
-
-    if (!id) {
-      alert("Select a network");
-      return;
-    }
-
-    await loadNetworkById(id);
-  });
-
   on("btnAddHidden", "click", () => addLayer("hidden"));
 
   on("btnClear", "click", () => {

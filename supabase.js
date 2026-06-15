@@ -127,9 +127,11 @@ async function populateNetworksSelect() {
       btn?.classList.remove("opacity-100");
       btn?.classList.add("opacity-0");
     });
-    item.addEventListener("click", () => {
+    item.addEventListener("click", async () => {
       hidden.value = item.dataset.id;
       label.textContent = item.dataset.name;
+
+      await loadNetwork(item.dataset.id);
     });
   });
 
