@@ -653,12 +653,12 @@ function renderArchitecture() {
           </label>
 
           <input
-            type="${isInput ? "number" : "range"}"
+            type="number"
             min="1"
             max="64"
             step="1"
             value="${layerDef.neurons}"
-            class="${isInput ? "form-control" : "form-range"}"
+            class="form-control"
             data-neurons="${idx}"
           >
 
