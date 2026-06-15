@@ -163,6 +163,7 @@ async function loadNetworkById(id) {
   }
 
   const network = data[0];
+
   console.log("NETWORK", network);
   console.log("ARCHITECTURE", network.architecture);
 
@@ -173,15 +174,17 @@ async function loadNetworkById(id) {
   // ARCHITETTURA
   // ==========================
 
-  arch = network.architecture.layers;
-
-  layerConfig = network.weights.map((w) => ({
-    activation: w.activation,
-    useBias: w.useBias,
+  arch = network.architecture.layers.map((l) => ({
+    id: l.id || crypto.randomUUID(),
+    type: l.type,
+    neurons: l.neurons,
+    activation: l.activation,
+    bias: l.bias,
   }));
 
-  inputSize = arch[0];
-  outputSize = arch[arch.length - 1];
+  inputSize = arch.find((l) => l.type === "input")?.neurons || 1;
+
+  outputSize = arch.find((l) => l.type === "output")?.neurons || 1;
 
   buildNetwork();
 
@@ -189,15 +192,13 @@ async function loadNetworkById(id) {
   // PESI
   // ==========================
 
-  if (network.weights && network.weights.length === net.layers.length) {
+  if (
+    Array.isArray(network.weights) &&
+    network.weights.length === net.layers.length
+  ) {
     for (let i = 0; i < net.layers.length; i++) {
       net.layers[i].W = network.weights[i].W;
-
       net.layers[i].b = network.weights[i].b;
-
-      net.layers[i].activation = network.weights[i].activation;
-
-      net.layers[i].useBias = network.weights[i].useBias;
     }
   }
 
@@ -207,7 +208,6 @@ async function loadNetworkById(id) {
 
   if (network.dataset) {
     dataset.X = network.dataset.X || [];
-
     dataset.y = network.dataset.y || [];
   }
 
@@ -215,11 +215,14 @@ async function loadNetworkById(id) {
   // METRICHE
   // ==========================
 
-  if ($("#lossNow")) $("#lossNow").textContent = network.loss ?? "-";
+  if ($("#lossNow")) {
+    $("#lossNow").textContent = network.loss ?? "-";
+  }
 
-  if ($("#accNow"))
+  if ($("#accNow")) {
     $("#accNow").textContent =
       network.accuracy != null ? network.accuracy + "%" : "-";
+  }
 
   renderArchitecture();
   renderTestInputs();
