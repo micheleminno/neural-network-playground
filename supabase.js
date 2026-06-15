@@ -83,23 +83,22 @@ async function populateNetworksSelect() {
     const li = document.createElement("li");
 
     li.innerHTML = `
-      <div
+      <button
+        type="button"
         class="dropdown-item d-flex justify-content-between align-items-center saved-network-item"
         data-id="${n.id}"
         data-name="${n.name}"
-        style="cursor:pointer"
       >
         <span>${n.name}</span>
 
-        <button
-          type="button"
-          class="btn btn-sm btn-danger delete-network-btn opacity-0"
+        <span
+          class="delete-network-btn opacity-0 text-danger fw-bold"
           data-id="${n.id}"
-          title="Delete"
+          style="cursor:pointer"
         >
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
+          ×
+        </span>
+      </button>
     `;
 
     menu.appendChild(li);
