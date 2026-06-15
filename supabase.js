@@ -69,27 +69,64 @@ async function loadNetworks() {
 }
 
 async function populateNetworksSelect() {
-  console.log("LOADING NETWORKS...");
-
   const networks = await loadNetworks();
 
-  const sel = document.getElementById("savedNetworks");
+  const menu = document.getElementById("savedNetworksMenu");
+  const hidden = document.getElementById("savedNetworks");
+  const label = document.getElementById("savedNetworkLabel");
 
-  if (!sel) return;
+  if (!menu || !hidden || !label) return;
 
-  sel.innerHTML = '<option value="">-- Select network --</option>';
+  menu.innerHTML = "";
 
   networks.forEach((n) => {
-    const opt = document.createElement("option");
+    const li = document.createElement("li");
 
-    opt.value = n.id;
+    li.innerHTML = `
+      <div
+        class="dropdown-item d-flex justify-content-between align-items-center saved-network-item"
+        data-id="${n.id}"
+        data-name="${n.name}"
+        style="cursor:pointer"
+      >
+        <span>${n.name}</span>
 
-    opt.textContent = n.name;
+        <button
+          type="button"
+          class="btn btn-sm btn-danger delete-network-btn opacity-0"
+          data-id="${n.id}"
+          title="Delete"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    `;
 
-    sel.appendChild(opt);
+    menu.appendChild(li);
   });
 
-  console.log("SELECT POPULATED");
+  menu.querySelectorAll(".saved-network-item").forEach((item) => {
+    item.addEventListener("mouseenter", () => {
+      item.querySelector(".delete-network-btn")?.classList.remove("opacity-0");
+    });
+
+    item.addEventListener("mouseleave", () => {
+      item.querySelector(".delete-network-btn")?.classList.add("opacity-0");
+    });
+
+    item.addEventListener("click", () => {
+      hidden.value = item.dataset.id;
+      label.textContent = item.dataset.name;
+    });
+  });
+
+  menu.querySelectorAll(".delete-network-btn").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+
+      await deleteNetworkById(btn.dataset.id);
+    });
+  });
 }
 
 async function loadNetworkById(id) {
@@ -176,6 +213,36 @@ async function loadNetworkById(id) {
 
   console.log("Network loaded:", network.name);
 }
+
+async function deleteNetworkById(id) {
+  if (!id) return;
+
+  const ok = confirm("Delete this network from cloud?");
+  if (!ok) return;
+
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/networks?id=eq.${id}`, {
+    method: "DELETE",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+    },
+  });
+
+  console.log("DELETE STATUS", r.status);
+
+  if (!r.ok) {
+    console.error(await r.text());
+    alert("Delete failed");
+    return;
+  }
+
+  document.getElementById("savedNetworks").value = "";
+  document.getElementById("savedNetworkLabel").textContent =
+    "-- Select network --";
+
+  await populateNetworksSelect();
+}
+
 // TEST
 
 async function testSupabase() {

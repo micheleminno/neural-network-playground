@@ -57,9 +57,19 @@
             <div class="mb-3">
               <label class="form-label fw-semibold"> Saved Networks </label>
 
-              <select id="savedNetworks" class="form-select mb-2">
-                <option value="">-- Select network --</option>
-              </select>
+              <div class="dropdown w-100" id="savedNetworksDropdown">
+                <button
+                  class="btn btn-light dropdown-toggle w-100 text-start"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  <span id="savedNetworkLabel">-- Select network --</span>
+                </button>
+
+                <ul class="dropdown-menu w-100" id="savedNetworksMenu"></ul>
+              </div>
+
+              <input type="hidden" id="savedNetworks" value="" />
               <button id="btnLoadNetwork" class="btn btn-secondary">
                 <i class="bi bi-cloud-download"></i>
                 Load
