@@ -1764,10 +1764,10 @@ function bindUIControls() {
     });
   });
 
-  const importJSON = document.getElementById("importJSON");
-  if (importJSON && !importJSON._wiredJson) {
-    importJSON._wiredJson = true;
-    importJSON.addEventListener("change", (e) => {
+  const jsonFile = document.getElementById("jsonFile");
+  if (jsonFile && !jsonFile._wiredJson) {
+    jsonFile._wiredJson = true;
+    jsonFile.addEventListener("change", (e) => {
       const input = e.target;
       const file = input.files?.[0];
       handleJSONImportFile(file, input);

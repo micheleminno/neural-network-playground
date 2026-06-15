@@ -47,9 +47,12 @@
 
       <div class="row g-3 mb-3">
         <!-- ARCHITECTURE -->
-        <div class="col-md-4">
+        <div class="col-lg-4">
           <div class="nb-card p-3 mb-3">
-            <h6 class="mb-3" data-i18n="architecture">Architecture</h6>
+            <h6 data-i18n="architecture">
+              <i class="bi bi-diagram-3"></i>
+              Architecture
+            </h6>
 
             <div class="mb-3">
               <label class="form-label fw-semibold"> Saved Networks </label>
@@ -57,22 +60,6 @@
               <select id="savedNetworks" class="form-select mb-2">
                 <option value="">-- Select network --</option>
               </select>
-
-              <div class="d-flex gap-2">
-                <button
-                  id="btnLoadNetwork"
-                  class="btn btn-secondary btn-sm flex-fill"
-                >
-                  Load
-                </button>
-
-                <button
-                  id="btnSaveNetwork"
-                  class="btn btn-primary btn-sm flex-fill"
-                >
-                  Save
-                </button>
-              </div>
             </div>
 
             <div id="architecture"></div>
@@ -187,10 +174,18 @@
         <!-- DATASET -->
         <div class="col-lg-4">
           <div class="nb-card p-3 mb-3">
-            <h6 data-i18n="dataset">Dataset</h6>
+            <h6 data-i18n="dataset">
+              <i class="bi bi-table"></i>
+              Dataset
+            </h6>
             <div class="small text-secondary mb-2">
               Supervised learning data
             </div>
+            <select id="presetDataset" class="form-select mb-2">
+              <option value="">Select preset dataset</option>
+              <option value="xor">XOR</option>
+              <option value="linsep">Linear Separation</option>
+            </select>
 
             <!-- CSV DROP -->
             <div
@@ -215,7 +210,10 @@
         <!-- TRAINING -->
         <div class="col-lg-4">
           <div class="nb-card p-3 mb-3">
-            <h6 data-i18n="training">Training</h6>
+            <h6 data-i18n="training">
+              <i class="bi bi-cpu"></i>
+              Training
+            </h6>
 
             <div class="row g-2">
               <div class="col-4">
@@ -299,7 +297,10 @@
         <!-- PREDICTION -->
         <div class="col-lg-4">
           <div class="nb-card p-3 mb-3">
-            <h6 data-i18n="prediction">Prediction</h6>
+            <h6 data-i18n="prediction">
+              <i class="bi bi-lightning"></i>
+              Prediction
+            </h6>
 
             <div id="testInputs"></div>
 
@@ -318,39 +319,72 @@
       <div class="row g-3">
         <div class="col-lg-4">
           <div class="nb-card p-3 mb-3">
-            <div class="d-flex flex-wrap gap-2">
-              <button class="btn btn-secondary" id="btnExport">
-                <span data-i18n="export">Export</span>
-              </button>
+            <h6>
+              <i class="bi bi-folder2-open"></i>
+              Network Files
+            </h6>
 
-              <button class="btn btn-secondary" id="btnDownloadJSON">
-                <span data-i18n="download">Download</span>
-              </button>
+            <button id="btnLoadNetwork" class="btn btn-secondary w-100 mb-2">
+              <i class="bi bi-cloud-download"></i>
+              Load from Cloud
+            </button>
 
-              <button class="btn btn-secondary" id="btnCopyJSON">
-                <span data-i18n="copy">Copy</span>
-              </button>
-            </div>
-
-            <select id="presetDataset" class="form-select mb-2">
-              <option value="">Select preset dataset</option>
-              <option value="xor">XOR</option>
-              <option value="linsep">Linear Separation</option>
-            </select>
-
+            <button id="btnSaveNetwork" class="btn btn-success w-100 mb-2">
+              <i class="bi bi-cloud-upload"></i>
+              Save to Cloud
+            </button>
             <input
               type="file"
-              id="importJSON"
-              class="form-control form-control-sm mt-2"
+              id="jsonFile"
+              class="form-control mb-2"
               accept=".json"
             />
+
+            <button id="btnImportJSON" class="btn btn-secondary w-100 mb-2">
+              Import Network
+            </button>
+
+            <button
+              id="btnExportArchitecture"
+              class="btn btn-secondary w-100 mb-2"
+            >
+              <i class="bi bi-diagram-3"></i>
+              Export Architecture
+            </button>
+
+            <button id="btnExportWeights" class="btn btn-secondary w-100 mb-2">
+              <i class="bi bi-bezier2"></i>
+              Export Weights
+            </button>
+
+            <button id="btnExport" class="btn btn-primary w-100">
+              <i class="bi bi-download"></i>
+              Export Full Network
+            </button>
           </div>
         </div>
 
         <div class="col-lg-8">
-          <h6 data-i18n="json">JSON Preview</h6>
+          <div class="nb-card p-3 mb-3">
+            <h6>
+              <i class="bi bi-code-slash"></i>
+              JSON Preview
+            </h6>
 
-          <textarea id="jsonArea" class="form-control mb-2" rows="6"></textarea>
+            <textarea
+              id="jsonArea"
+              class="form-control mb-2 font-monospace"
+              rows="6"
+              readonly
+            ></textarea>
+            <div class="d-flex gap-2">
+              <button class="btn btn-secondary" id="btnCopyJSON">Copy</button>
+
+              <button class="btn btn-secondary" id="btnDownloadJSON">
+                Download
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
