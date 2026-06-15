@@ -1809,14 +1809,6 @@ function bindUIControls() {
   });
 
   on("btnAddHidden", "click", () => addLayer("hidden"));
-
-  on("btnClear", "click", () => {
-    arch = [];
-    renderArchitecture();
-    buildNetwork();
-    updateJSON();
-  });
-
   on("btnExport", "click", () => exportArchitecture());
   on("btnDownloadJSON", "click", () => downloadWeights());
 
@@ -1871,7 +1863,6 @@ function sanityCheckButtons() {
     "btnStop",
     "btnPredict",
     "btnAddHidden",
-    "btnClear",
     "btnExport",
     "btnDownloadJSON",
     "btnCopyJSON",

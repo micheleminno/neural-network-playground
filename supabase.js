@@ -131,7 +131,7 @@ async function populateNetworksSelect() {
       hidden.value = item.dataset.id;
       label.textContent = item.dataset.name;
 
-      await loadNetwork(item.dataset.id);
+      await loadNetworkById(item.dataset.id);
     });
   });
 
