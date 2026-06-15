@@ -216,6 +216,8 @@ async function loadNetworkById(id) {
 async function deleteNetworkById(id) {
   if (!id) return;
 
+  console.log("DELETE ID =", id);
+
   const ok = confirm("Delete this network from cloud?");
   if (!ok) return;
 
