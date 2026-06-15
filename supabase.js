@@ -83,22 +83,31 @@ async function populateNetworksSelect() {
     const li = document.createElement("li");
 
     li.innerHTML = `
-      <button
-        type="button"
+      <div
         class="dropdown-item d-flex justify-content-between align-items-center saved-network-item"
         data-id="${n.id}"
         data-name="${n.name}"
+        style="cursor:pointer"
       >
         <span>${n.name}</span>
 
-        <span
-          class="delete-network-btn opacity-0 text-danger fw-bold"
+        <button
+          type="button"
+          class="btn btn-danger btn-sm delete-network-btn opacity-0"
           data-id="${n.id}"
-          style="cursor:pointer"
+          title="Delete network"
+          style="
+            width:32px;
+            height:32px;
+            padding:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+          "
         >
-          ×
-        </span>
-      </button>
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
     `;
 
     menu.appendChild(li);
@@ -106,13 +115,18 @@ async function populateNetworksSelect() {
 
   menu.querySelectorAll(".saved-network-item").forEach((item) => {
     item.addEventListener("mouseenter", () => {
-      item.querySelector(".delete-network-btn")?.classList.remove("opacity-0");
+      const btn = item.querySelector(".delete-network-btn");
+
+      btn?.classList.remove("opacity-0");
+      btn?.classList.add("opacity-100");
     });
 
     item.addEventListener("mouseleave", () => {
-      item.querySelector(".delete-network-btn")?.classList.add("opacity-0");
-    });
+      const btn = item.querySelector(".delete-network-btn");
 
+      btn?.classList.remove("opacity-100");
+      btn?.classList.add("opacity-0");
+    });
     item.addEventListener("click", () => {
       hidden.value = item.dataset.id;
       label.textContent = item.dataset.name;

@@ -267,3 +267,40 @@ body {
   border: 2px solid white;
   background: radial-gradient(circle, #fde047, #2563eb);
 }
+
+.delete-network-btn {
+  transition: opacity 0.15s ease;
+}
+
+/* --- Saved Networks Dropdown --- */
+
+.saved-network-item {
+  cursor: pointer;
+  user-select: none;
+}
+
+.saved-network-item:hover {
+  background-color: rgba(96, 165, 250, 0.12);
+}
+
+.delete-network-btn {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.delete-network-btn:hover {
+  transform: scale(1.08);
+}
+
+.dropdown-menu {
+  overflow: hidden;
+}
+
+.dropdown-item {
+  min-height: 42px;
+}
+
+.dropdown-item .delete-network-btn {
+  flex-shrink: 0;
+}
