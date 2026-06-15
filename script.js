@@ -498,7 +498,6 @@ class Network {
 // ========= State =========
 let net = new Network();
 let arch = [];
-let layerConfig = [];
 let inputSize = 2;
 let outputSize = 1;
 let dataset = { X: [], y: [] };
@@ -583,63 +582,74 @@ function renderArchitecture() {
 
   archEl.innerHTML = "";
 
-  if (arch.length === 0) {
-    archEl.innerHTML = `<div class="text-center small-muted py-4">${t(
-      "emptyArchitecture",
-    )}</div>`;
+  if (!arch.length) {
+    archEl.innerHTML = `
+      <div class="text-center small-muted py-4">
+        ${t("emptyArchitecture")}
+      </div>
+    `;
     return;
   }
 
-  arch.forEach((neurons, idx) => {
-    const isInput = idx === 0;
-    const isOutput = idx === arch.length - 1;
-    const isHidden = !isInput && !isOutput;
-
-    const type = isInput ? "input" : isOutput ? "output" : "hidden";
+  arch.forEach((layerDef, idx) => {
+    const isInput = layerDef.type === "input";
+    const isOutput = layerDef.type === "output";
+    const isHidden = layerDef.type === "hidden";
 
     const icon =
-      type === "input"
+      layerDef.type === "input"
         ? "bi-box-arrow-in-right text-warning"
-        : type === "output"
+        : layerDef.type === "output"
           ? "bi-box-arrow-right text-success"
           : "bi-diagram-3 text-info";
 
     const name =
-      type === "input"
+      layerDef.type === "input"
         ? t("input")
-        : type === "output"
+        : layerDef.type === "output"
           ? t("output")
           : t("hiddenLayer");
-
-    const layer = isInput ? null : layerConfig[idx - 1] || net.layers[idx - 1];
 
     const card = document.createElement("div");
     card.className = "layer-card mb-2";
 
     card.innerHTML = `
       <div class="d-flex align-items-center justify-content-between mb-2">
+
         <div class="d-flex align-items-center gap-2">
           <i class="bi ${icon}"></i>
+
           <strong>${name}</strong>
-          <span class="badge rounded-pill bg-secondary">#${idx + 1}</span>
+
+          <span class="badge rounded-pill bg-secondary">
+            #${idx + 1}
+          </span>
         </div>
 
         ${
           isHidden
-            ? `<button class="btn btn-sm btn-danger remove-layer" type="button" title="${t(
-                "remove",
-              )}">
+            ? `
+              <button
+                class="btn btn-sm btn-danger remove-layer"
+                type="button"
+                title="${t("remove")}"
+              >
                 <i class="bi bi-x-lg"></i>
-              </button>`
+              </button>
+            `
             : ""
         }
       </div>
 
       <div class="row g-2">
+
         <div class="col-6">
+
           <label class="form-label">
             ${isInput ? t("inputSize") : t("neurons")}:
-            <span class="small" id="neuronsVal-${idx}">${neurons}</span>
+            <span id="neuronsVal-${idx}">
+              ${layerDef.neurons}
+            </span>
           </label>
 
           <input
@@ -647,60 +657,118 @@ function renderArchitecture() {
             min="1"
             max="64"
             step="1"
-            value="${neurons}"
+            value="${layerDef.neurons}"
             class="${isInput ? "form-control" : "form-range"}"
-            data-idx="${idx}"
+            data-neurons="${idx}"
           >
+
         </div>
 
         ${
           !isInput
-            ? `<div class="col-6">
-                <label class="form-label">${t("activation")}</label>
-                <input
-                  class="form-control"
-                  value="${layer?.activation || ""}"
-                  disabled
+            ? `
+              <div class="col-6">
+
+                <label class="form-label">
+                  ${t("activation")}
+                </label>
+
+                <select
+                  class="form-select activation-select"
+                  data-activation="${idx}"
                 >
+                  <option value="relu"
+                    ${layerDef.activation === "relu" ? "selected" : ""}>
+                    ReLU
+                  </option>
+
+                  <option value="sigmoid"
+                    ${layerDef.activation === "sigmoid" ? "selected" : ""}>
+                    Sigmoid
+                  </option>
+
+                  <option value="tanh"
+                    ${layerDef.activation === "tanh" ? "selected" : ""}>
+                    Tanh
+                  </option>
+
+                  <option value="linear"
+                    ${layerDef.activation === "linear" ? "selected" : ""}>
+                    Linear
+                  </option>
+                </select>
+
               </div>
 
               <div class="col-6 form-check form-switch ms-3">
+
                 <input
-                  class="form-check-input"
+                  class="form-check-input bias-switch"
                   type="checkbox"
-                  ${layer?.useBias ? "checked" : ""}
-                  disabled
+                  data-bias="${idx}"
+                  ${layerDef.bias ? "checked" : ""}
                 >
-                <label class="form-check-label">${t("bias")}</label>
-              </div>`
+
+                <label class="form-check-label">
+                  ${t("bias")}
+                </label>
+
+              </div>
+            `
             : ""
         }
+
       </div>
     `;
 
-    const input = card.querySelector("[data-idx]");
+    const neuronInput = card.querySelector("[data-neurons]");
 
-    input.addEventListener("input", (e) => {
-      const i = Number(e.target.dataset.idx);
-      arch[i] = Number(e.target.value);
+    neuronInput.addEventListener("input", (e) => {
+      const i = Number(e.target.dataset.neurons);
+
+      arch[i].neurons = Number(e.target.value);
 
       const sp = document.getElementById(`neuronsVal-${i}`);
-      if (sp) sp.textContent = arch[i];
+      if (sp) sp.textContent = arch[i].neurons;
 
       buildNetwork();
       renderArchitecture();
       updateJSON();
     });
 
+    const activationSelect = card.querySelector(".activation-select");
+
+    if (activationSelect) {
+      activationSelect.addEventListener("change", (e) => {
+        const i = Number(e.target.dataset.activation);
+
+        arch[i].activation = e.target.value;
+
+        buildNetwork();
+        renderArchitecture();
+        updateJSON();
+      });
+    }
+
+    const biasSwitch = card.querySelector(".bias-switch");
+
+    if (biasSwitch) {
+      biasSwitch.addEventListener("change", (e) => {
+        const i = Number(e.target.dataset.bias);
+
+        arch[i].bias = e.target.checked;
+
+        buildNetwork();
+        renderArchitecture();
+        updateJSON();
+      });
+    }
+
     const removeBtn = card.querySelector(".remove-layer");
 
     if (removeBtn) {
       removeBtn.addEventListener("click", () => {
         arch.splice(idx, 1);
-
-        if (idx > 0) {
-          layerConfig.splice(idx - 1, 1);
-        }
 
         buildNetwork();
         renderArchitecture();
@@ -743,28 +811,18 @@ function attachArchDnD() {
 }
 
 function addLayer(type) {
-  if (arch.length === 0) {
-    arch = [inputSize, outputSize];
-  }
+  if (type !== "hidden") return;
 
-  if (type === "hidden") {
-    arch.splice(arch.length - 1, 0, 4);
-    layerConfig.splice(arch.length - 2, 0, {
-      activation: "relu",
-      useBias: true,
-    });
-  }
+  arch.splice(arch.length - 1, 0, {
+    id: crypto.randomUUID(),
+    type: "hidden",
+    neurons: 4,
+    activation: "relu",
+    bias: true,
+  });
 
-  if (type === "input") {
-    arch[0] = inputSize;
-  }
-
-  if (type === "output") {
-    arch[arch.length - 1] = outputSize;
-  }
-
-  renderArchitecture();
   buildNetwork();
+  renderArchitecture();
   updateJSON();
 }
 
@@ -974,28 +1032,33 @@ function buildNetwork() {
 
   const rand = rng(Date.now() + rebuildSeedCounter++);
 
-  inputSize = arch[0];
+  const inputLayer = arch.find((l) => l.type === "input");
+
+  inputSize = inputLayer?.neurons || 1;
+
+  let previousNeurons = inputSize;
 
   for (let i = 1; i < arch.length; i++) {
-    const neurons = arch[i];
-    const previousNeurons = arch[i - 1];
+    const layer = arch[i];
 
-    const cfg = layerConfig[i - 1] || {};
-
-    const isOutput = i === arch.length - 1;
+    if (layer.type === "input") continue;
 
     net.add(
       new DenseLayer(
         previousNeurons,
-        neurons,
-        cfg.activation || (isOutput ? "sigmoid" : "relu"),
-        cfg.useBias ?? true,
+        layer.neurons,
+        layer.activation || (layer.type === "output" ? "sigmoid" : "relu"),
+        layer.bias ?? true,
         rand,
       ),
     );
+
+    previousNeurons = layer.neurons;
   }
 
-  outputSize = arch[arch.length - 1];
+  const outputLayer = arch.find((l) => l.type === "output");
+
+  outputSize = outputLayer?.neurons || 1;
 
   lastNodeColors = null;
 
@@ -1047,18 +1110,34 @@ function loadPreset(name) {
 }
 
 function ensureIOInArch() {
-  if (arch.length === 0) {
-    arch = [inputSize, outputSize];
+  let inL = arch.find((l) => l.type === "input");
+
+  if (!inL) {
+    arch.unshift({
+      id: crypto.randomUUID(),
+      type: "input",
+      neurons: inputSize,
+    });
+  } else {
+    inL.neurons = inputSize;
   }
 
-  // primo layer = input
-  arch[0] = inputSize;
+  let outL = arch.find((l) => l.type === "output");
 
-  // ultimo layer = output
-  arch[arch.length - 1] = outputSize;
+  if (!outL) {
+    arch.push({
+      id: crypto.randomUUID(),
+      type: "output",
+      neurons: outputSize,
+      activation: "sigmoid",
+      bias: true,
+    });
+  } else {
+    outL.neurons = outputSize;
+  }
 
-  renderArchitecture();
   buildNetwork();
+  renderArchitecture();
   updateJSON();
 }
 
@@ -1454,15 +1533,32 @@ function handleJSONImportFile(file, inputEl) {
       if (Array.isArray(o.layers)) {
         if (!o.layers.length) throw new Error(t("layersEmpty"));
 
-        arch = [o.layers[0].in, ...o.layers.map((L) => L.out)];
+        arch = [
+          {
+            id: crypto.randomUUID(),
+            type: "input",
+            neurons: o.layers[0].in,
+          },
 
-        inputSize = arch[0];
-        outputSize = arch[arch.length - 1];
+          ...o.layers.slice(0, -1).map((L) => ({
+            id: crypto.randomUUID(),
+            type: "hidden",
+            neurons: L.out,
+            activation: L.activation,
+            bias: L.useBias,
+          })),
 
-        layerConfig = o.layers.map((L) => ({
-          activation: L.activation,
-          useBias: L.useBias,
-        }));
+          {
+            id: crypto.randomUUID(),
+            type: "output",
+            neurons: o.layers.at(-1).out,
+            activation: o.layers.at(-1).activation,
+            bias: o.layers.at(-1).useBias,
+          },
+        ];
+
+        inputSize = arch[0].neurons;
+        outputSize = arch[arch.length - 1].neurons;
 
         buildNetwork();
 
@@ -1483,15 +1579,17 @@ function handleJSONImportFile(file, inputEl) {
       else if (o.architecture || o.weights) {
         if (!o.architecture?.layers) throw new Error(t("architectureMissing"));
 
-        arch = o.architecture.layers;
-
-        inputSize = arch[0];
-        outputSize = arch[arch.length - 1];
-
-        layerConfig = o.weights.map((w) => ({
-          activation: w.activation,
-          useBias: w.useBias,
+        arch = o.architecture.layers.map((l) => ({
+          id: l.id || crypto.randomUUID(),
+          type: l.type,
+          neurons: l.neurons,
+          activation: l.activation,
+          bias: l.bias,
         }));
+
+        inputSize = arch.find((l) => l.type === "input")?.neurons;
+
+        outputSize = arch.find((l) => l.type === "output")?.neurons;
 
         buildNetwork();
 
@@ -1499,15 +1597,13 @@ function handleJSONImportFile(file, inputEl) {
           Array.isArray(o.weights) &&
           o.weights.length === net.layers.length
         ) {
-          if (
-            Array.isArray(o.weights) &&
-            o.weights.length === net.layers.length
-          ) {
-            for (let i = 0; i < net.layers.length; i++) {
-              if (o.weights[i].W) net.layers[i].W = o.weights[i].W;
+          for (let i = 0; i < net.layers.length; i++) {
+            if (o.weights[i].W) {
+              net.layers[i].W = o.weights[i].W;
+            }
 
-              if (o.weights[i].b !== undefined)
-                net.layers[i].b = o.weights[i].b;
+            if (o.weights[i].b !== undefined) {
+              net.layers[i].b = o.weights[i].b;
             }
           }
         }
@@ -1539,7 +1635,12 @@ function handleJSONImportFile(file, inputEl) {
 function exportArchitecture() {
   const j = {
     architecture: {
-      layers: arch,
+      layers: arch.map((l) => ({
+        type: l.type,
+        neurons: l.neurons,
+        activation: l.activation,
+        bias: l.bias,
+      })),
     },
   };
 
@@ -1816,7 +1917,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   attachCsvDnD();
   observeCsvInputs();
 
-  arch = [2, 4, 1];
+  arch = [
+    {
+      id: crypto.randomUUID(),
+      type: "input",
+      neurons: 2,
+    },
+    {
+      id: crypto.randomUUID(),
+      type: "hidden",
+      neurons: 4,
+      activation: "relu",
+      bias: true,
+    },
+    {
+      id: crypto.randomUUID(),
+      type: "output",
+      neurons: 1,
+      activation: "sigmoid",
+      bias: true,
+    },
+  ];
   inputSize = 2;
   outputSize = 1;
   buildNetwork();
