@@ -316,17 +316,8 @@
       </div>
 
       <div class="row g-3">
-        <div class="col-12">
-          <!-- JSON -->
+        <div class="col-lg-4">
           <div class="nb-card p-3 mb-3">
-            <h6 data-i18n="json">JSON</h6>
-
-            <textarea
-              id="jsonArea"
-              class="form-control mb-2"
-              rows="6"
-            ></textarea>
-
             <div class="d-flex flex-wrap gap-2">
               <button class="btn btn-secondary" id="btnExport">
                 <span data-i18n="export">Export</span>
@@ -341,6 +332,12 @@
               </button>
             </div>
 
+            <select id="presetDataset" class="form-select mb-2">
+              <option value="">Select preset dataset</option>
+              <option value="xor">XOR</option>
+              <option value="linsep">Linear Separation</option>
+            </select>
+
             <input
               type="file"
               id="importJSON"
@@ -348,6 +345,12 @@
               accept=".json"
             />
           </div>
+        </div>
+
+        <div class="col-lg-8">
+          <h6 data-i18n="json">JSON Preview</h6>
+
+          <textarea id="jsonArea" class="form-control mb-2" rows="6"></textarea>
         </div>
       </div>
     </div>
