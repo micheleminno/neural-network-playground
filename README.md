@@ -1,287 +1,225 @@
-Go here to play: https://micheleminno.github.io/neural-network-playground/
+# NeuroBuilder
 
-# README – NeuroBuilder 
-### (Scroll down for the Italian version)
+Play online:
 
-## 🧠 What is NeuroBuilder
+https://micheleminno.github.io/neural-network-playground/
 
-**NeuroBuilder** is an interactive web app to build, train, and visualize **neural networks** in a simple and intuitive way.
+---
+
+# 🧠 NeuroBuilder
+
+NeuroBuilder is an interactive educational tool for building, training, visualizing, saving and experimenting with artificial neural networks directly in the browser.
 
 Designed for:
 
-* high school students
-* AI introduction
-* classroom activities
+- High school students
+- AI and Machine Learning introduction
+- Computer Science classrooms
+- Self-learning and experimentation
+
+No installation required.
 
 ---
 
-## 🚀 Main Features
+# ✨ Features
 
-### 🔧 Network Builder (Drag & Drop)
+## 🔧 Neural Network Builder
 
-* Drag:
+Create fully-connected feed-forward neural networks visually.
 
-  * Input
-  * Hidden layer
-  * Output
-* Configure:
+Configure:
 
-  * neurons
-  * activation function
-  * bias
+- Number of input neurons
+- Hidden layers
+- Number of neurons per layer
+- Activation functions
+- Bias enable/disable
 
----
+Supported activations:
 
-### 🏋️ Training
-
-* Adjustable learning rate
-* Epochs
-* Batch size
-* Real-time loss chart
+- ReLU
+- Sigmoid
+- Tanh
+- Linear
 
 ---
 
-### 👁️ Visualization
+## 👁️ Interactive Network Visualization
 
-* SVG network rendering
-* Colors:
+Visualize the neural network structure in real time.
 
-  * nodes → activation
-  * edges → weight
-* Edge thickness = weight intensity
+Features:
+
+- Input, hidden and output neurons
+- Weight visualization
+- Bias nodes
+- Positive weights (green)
+- Negative weights (red)
+- Weight thickness proportional to magnitude
+- Hover tooltips showing:
+  - Weights
+  - Activations
+  - Bias values
 
 ---
 
-### ⚡ Prediction Test
+## 🏋️ Training
 
-* Insert custom inputs
-* Get network output
-* Live visualization update
+Train neural networks directly in the browser.
+
+Adjustable parameters:
+
+- Learning rate
+- Epochs
+- Batch size
+
+Includes:
+
+- Real-time loss chart
+- Accuracy monitoring
+- Stop training at any time
 
 ---
 
-### 📊 Dataset
+## ⚡ Prediction
 
-#### ✅ Presets
+Test trained networks interactively.
 
-* XOR
-* Linear (x + y > 1)
+Features:
 
-#### 📂 CSV
+- Custom inputs
+- Immediate inference
+- Live network activation visualization
+- Output inspection
 
-Required format:
+---
 
-```
+## 📊 Dataset Management
+
+### Built-in datasets
+
+- XOR
+- Linear Separation
+
+### CSV Import
+
+Supported format:
+
 0,0,0
 0,1,1
 1,0,1
 1,1,0
-```
 
 Rules:
 
-* numeric only
-* last column = target
-* no headers
+- Numeric values only
+- Last column = target
+- No header row
 
 ---
 
-### 💾 JSON
+## ☁️ Cloud Storage
 
-* Export architecture
-* Export weights
-* Import models
+Networks can be saved online using Supabase.
 
----
+Features:
 
-### 🌍 Language
-
-* Italian 🇮🇹
-* English 🇬🇧
-* Toggle button
+- Save networks to the cloud
+- Load previously saved networks
+- Delete saved networks
+- Persistent storage between sessions
 
 ---
 
-## 🛠️ Tech Stack
+## 💾 Import / Export
 
-* HTML5
-* CSS (Bootstrap 5)
-* Vanilla JavaScript
-* Chart.js
-* SVG
+### Export Architecture
 
----
+Exports only:
 
-## ▶️ How to use
+- Layers
+- Neurons
+- Activations
+- Bias configuration
 
-1. Open `index.html`
-2. Build the network
-3. Load dataset or preset
-4. Click **Train**
-5. Test with **Predict**
+### Export Weights
 
----
+Exports:
 
-## 🎓 Educational Use
+- Trained weights
+- Bias values
 
-Great for teaching:
+### Export Full Network
 
-* neural networks basics
-* forward propagation
-* backpropagation
-* classification
-* training dynamics
+Exports everything required to recreate a trained model.
+
+### Import Network
+
+Import previously exported JSON files.
 
 ---
 
-## 👨‍🏫 Authors
+## 📄 JSON Preview
 
-**Michele Minno**
+Live JSON representation of the current network.
 
-* ChatGPT
+Useful for:
 
-
----
-
-
-# 🇮🇹 README – NeuroBuilder
-
-## 🧠 Cos’è NeuroBuilder
-
-**NeuroBuilder** è un’app web interattiva per costruire, addestrare e visualizzare **reti neurali artificiali** in modo semplice e intuitivo.
-
-È pensata per:
-
-* studenti delle superiori
-* introduzione all’AI
-* attività laboratoriali di informatica
+- Learning network structure
+- Debugging
+- Understanding model serialization
 
 ---
 
-## 🚀 Funzionalità principali
+## 🌍 Languages
 
-### 🔧 Costruzione rete (Drag & Drop)
+- Italian 🇮🇹
+- English 🇬🇧
 
-* Trascina:
-
-  * Input
-  * Hidden layer
-  * Output
-* Modifica:
-
-  * numero di neuroni
-  * funzione di attivazione
-  * bias
+Instant language switching.
 
 ---
 
-### 🏋️ Training
+## 🎓 Educational Goals
 
-* Learning rate regolabile
-* Numero di epoche
-* Batch size
-* Grafico della loss in tempo reale
+NeuroBuilder helps students understand:
 
----
-
-### 👁️ Visualizzazione
-
-* Rete disegnata in SVG
-* Colori:
-
-  * nodi → attivazione
-  * archi → peso
-* Spessore archi = intensità
+- Artificial neurons
+- Activation functions
+- Weights and bias
+- Forward propagation
+- Backpropagation
+- Binary classification
+- Training dynamics
+- Neural network architecture design
 
 ---
 
-### ⚡ Test predizione
+## 🛠️ Technologies
 
-* Inserisci input manualmente
-* Ottieni output della rete
-* Visualizzazione aggiornata live
-
----
-
-### 📊 Dataset
-
-Puoi usare:
-
-#### ✅ Preset
-
-* XOR
-* Lineare (x + y > 1)
-
-#### 📂 CSV
-
-Formato richiesto:
-
-```
-0,0,0
-0,1,1
-1,0,1
-1,1,0
-```
-
-Regole:
-
-* solo numeri
-* ultima colonna = output
-* niente intestazioni
+- HTML5
+- CSS3
+- Bootstrap 5
+- Vanilla JavaScript
+- Chart.js
+- SVG
+- Supabase
 
 ---
 
-### 💾 JSON
+## 🚀 Quick Start
 
-* Esporta architettura
-* Esporta pesi
-* Importa modelli
-
----
-
-### 🌍 Lingua
-
-* Italiano 🇮🇹
-* Inglese 🇬🇧
-* Toggle con pulsante
+1. Build a network
+2. Select or import a dataset
+3. Configure training parameters
+4. Train the network
+5. Test predictions
+6. Save or export the model
 
 ---
 
-## 🛠️ Tecnologie usate
+## 👨‍🏫 Author
 
-* HTML5
-* CSS (Bootstrap 5)
-* JavaScript vanilla
-* Chart.js
-* SVG
+Michele Minno
 
----
-
-## ▶️ Come usare
-
-1. Apri `index.html`
-2. Costruisci la rete
-3. Carica dataset o usa preset
-4. Premi **Allena**
-5. Testa con **Predici**
-
----
-
-## 🎓 Uso didattico
-
-Perfetto per spiegare:
-
-* neuroni artificiali
-* forward pass
-* backpropagation
-* overfitting / underfitting
-* classificazione binaria
-
----
-
-## 👨‍🏫 Autori
-
-**Michele Minno**
-
-* ChatGPT
-
+Developed with the support of ChatGPT.
