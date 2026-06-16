@@ -1354,6 +1354,7 @@ function ensureChart() {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { labels: { color: "#e5e7eb" } },
         tooltip: {

@@ -308,3 +308,7 @@ body {
 .dropdown-item .delete-network-btn {
   flex-shrink: 0;
 }
+
+.chart-container {
+  height: 180px;
+}
