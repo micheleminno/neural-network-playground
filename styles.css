@@ -274,6 +274,10 @@ body {
 
 /* --- Saved Networks Dropdown --- */
 
+#savedNetworksDropdown .dropdown-toggle::after {
+  margin-left: auto;
+}
+
 .saved-network-item {
   cursor: pointer;
   user-select: none;
