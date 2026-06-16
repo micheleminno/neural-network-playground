@@ -1828,6 +1828,9 @@ function bindUIControls() {
   });
 
   on("btnAddHidden", "click", () => addLayer("hidden"));
+  on("btnImportJSON", "click", () => {
+    document.getElementById("jsonFile")?.click();
+  });
   on("btnExport", "click", () => exportArchitecture());
   on("btnDownloadJSON", "click", () => downloadWeights());
 
