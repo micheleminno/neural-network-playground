@@ -1636,6 +1636,76 @@ function handleJSONImportFile(file, inputEl) {
   fr.readAsText(file);
 }
 
+function exportJSONFile(mode = "full") {
+  let j;
+  let filename;
+
+  if (mode === "architecture") {
+    j = {
+      architecture: {
+        layers: arch.map((l) => ({
+          type: l.type,
+          neurons: l.neurons,
+          activation: l.activation,
+          bias: l.bias,
+        })),
+      },
+    };
+
+    filename = "neurobuilder-architecture.json";
+  } else if (mode === "weights") {
+    j = {
+      layers: net.layers.map((l) => ({
+        in: l.in,
+        out: l.out,
+        activation: l.activation,
+        useBias: l.useBias,
+        W: l.W,
+        b: l.b,
+      })),
+    };
+
+    filename = "neurobuilder-weights.json";
+  } else {
+    j = {
+      architecture: {
+        layers: arch.map((l) => ({
+          type: l.type,
+          neurons: l.neurons,
+          activation: l.activation,
+          bias: l.bias,
+        })),
+      },
+
+      weights: net.layers.map((l) => ({
+        in: l.in,
+        out: l.out,
+        activation: l.activation,
+        useBias: l.useBias,
+        W: l.W,
+        b: l.b,
+      })),
+
+      dataset: {
+        X: dataset.X,
+        y: dataset.y,
+      },
+    };
+
+    filename = "neurobuilder-full-network.json";
+  }
+
+  const blob = new Blob([JSON.stringify(j, null, 2)], {
+    type: "application/json",
+  });
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 function exportArchitecture() {
   const j = {
     architecture: {
@@ -1831,7 +1901,10 @@ function bindUIControls() {
   on("btnImportJSON", "click", () => {
     document.getElementById("jsonFile")?.click();
   });
-  on("btnExport", "click", () => exportArchitecture());
+  on("btnExport", "click", () => {
+    const mode = document.getElementById("exportMode")?.value || "full";
+    exportJSONFile(mode);
+  });
   on("btnDownloadJSON", "click", () => downloadWeights());
 
   on("btnCopyJSON", "click", async () => {

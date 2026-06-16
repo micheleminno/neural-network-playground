@@ -356,23 +356,18 @@
               Import Network as JSON file
             </button>
 
-            <button
-              id="btnExportArchitecture"
-              class="btn btn-secondary w-100 mb-2"
-            >
-              <i class="bi bi-diagram-3"></i>
-              Export Architecture
-            </button>
+            <div class="d-flex gap-2">
+              <select id="exportMode" class="form-select">
+                <option value="full" selected>Architecture + weights</option>
+                <option value="architecture">Architecture only</option>
+                <option value="weights">Weights only</option>
+              </select>
 
-            <button id="btnExportWeights" class="btn btn-secondary w-100 mb-2">
-              <i class="bi bi-bezier2"></i>
-              Export Weights
-            </button>
-
-            <button id="btnExport" class="btn btn-primary w-100">
-              <i class="bi bi-download"></i>
-              Export Full Network
-            </button>
+              <button id="btnExport" class="btn btn-primary">
+                <i class="bi bi-download"></i>
+                Export as JSON file
+              </button>
+            </div>
           </div>
         </div>
 
