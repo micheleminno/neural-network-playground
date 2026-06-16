@@ -1521,9 +1521,7 @@ function updateJSON() {
   const jsonArea = $("#jsonArea");
   if (!jsonArea) return;
 
-  jsonArea.value = jsonCompact
-    ? JSON.stringify(obj)
-    : JSON.stringify(obj, null, 2);
+  jsonArea.value = jsonCompact ? JSON.stringify(j) : JSON.stringify(j, null, 2);
 }
 
 function handleJSONImportFile(file, inputEl) {
