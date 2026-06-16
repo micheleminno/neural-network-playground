@@ -1777,6 +1777,10 @@ function bindUIControls() {
     return clone;
   };
 
+  on("presetDataset", "change", (e) => {
+    loadPreset(e.target.value);
+  });
+
   on("btnTrain", "click", () => {
     if (dataset.X.length === 0) {
       alert(t("trainNoDataset"));
