@@ -1055,24 +1055,24 @@ function renderNNVis() {
       const weight = g.dataset.weight;
 
       tooltip.innerHTML = `
-  <div style="
-    font-size:12px;
-    opacity:.7;
-    margin-bottom:4px;
-    text-transform:uppercase;
-    letter-spacing:.8px;
-  ">
-    ${t("weight")}
-  </div>
+        <div style="
+          font-size:12px;
+          opacity:.7;
+          margin-bottom:4px;
+          text-transform:uppercase;
+          letter-spacing:.8px;
+        ">
+          ${t("weight")}
+        </div>
 
-  <div style="
-    font-size:24px;
-    font-weight:700;
-    line-height:1;
-  ">
-    ${weight}
-  </div>
-`;
+        <div style="
+          font-size:24px;
+          font-weight:700;
+          line-height:1;
+        ">
+          ${weight}
+        </div>
+      `;
 
       tooltip.style.left = e.clientX + 16 + "px";
       tooltip.style.top = e.clientY + 16 + "px";
