@@ -507,6 +507,7 @@ let lastNodeColors = null;
 let rebuildSeedCounter = 1;
 let currentNetworkName = "";
 let currentNetworkId = null;
+let jsonCompact = false;
 
 // ========= Colors & Node Coloring =========
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
@@ -1517,10 +1518,12 @@ function updateJSON() {
     })),
   };
 
-  const ta = $("#jsonArea");
-  if (!ta) return;
+  const jsonArea = $("#jsonArea");
+  if (!jsonArea) return;
 
-  ta.value = JSON.stringify(j, null, 2);
+  jsonArea.value = jsonCompact
+    ? JSON.stringify(obj)
+    : JSON.stringify(obj, null, 2);
 }
 
 function handleJSONImportFile(file, inputEl) {
@@ -1904,6 +1907,10 @@ function bindUIControls() {
   on("btnExport", "click", () => {
     const mode = document.getElementById("exportMode")?.value || "full";
     exportJSONFile(mode);
+  });
+  on("jsonCompact", "change", (e) => {
+    jsonCompact = e.target.checked;
+    updateJSON();
   });
   on("btnDownloadJSON", "click", () => downloadWeights());
 
