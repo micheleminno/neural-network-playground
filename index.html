@@ -336,10 +336,22 @@
               Network Files
             </h6>
 
-            <button id="btnSaveNetwork" class="btn btn-success w-100 mb-4">
-              <i class="bi bi-cloud-upload"></i>
-              Save to Cloud
-            </button>
+            <div class="d-flex gap-2 mb-4">
+              <button id="btnSaveNetwork" class="btn btn-success flex-fill">
+                <i class="bi bi-cloud-plus"></i>
+                Save As New
+              </button>
+
+              <button
+                id="btnUpdateNetwork"
+                class="btn btn-outline-success flex-fill"
+                disabled
+              >
+                <i class="bi bi-cloud-check"></i>
+                Update Current
+              </button>
+            </div>
+
             <input
               type="file"
               id="jsonFile"

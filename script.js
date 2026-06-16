@@ -506,6 +506,7 @@ let stopFlag = false;
 let lastNodeColors = null;
 let rebuildSeedCounter = 1;
 let currentNetworkName = "";
+let currentNetworkId = null;
 
 // ========= Colors & Node Coloring =========
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
@@ -1811,6 +1812,17 @@ function bindUIControls() {
 
   on("btnSaveNetwork", "click", async () => {
     await saveNetwork();
+
+    await populateNetworksSelect();
+  });
+
+  on("btnUpdateNetwork", "click", async () => {
+    if (!currentNetworkId) {
+      alert("No network loaded");
+      return;
+    }
+
+    await updateNetwork(currentNetworkId);
 
     await populateNetworksSelect();
   });

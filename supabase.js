@@ -170,6 +170,8 @@ async function loadNetworkById(id) {
   console.log("WEIGHTS", network.weights);
 
   currentNetworkName = network.name;
+  currentNetworkId = network.id;
+  document.getElementById("btnUpdateNetwork")?.removeAttribute("disabled");
   updateNetworkTitle();
 
   // ==========================
@@ -248,6 +250,55 @@ async function loadNetworkById(id) {
   updateJSON();
 
   console.log("Network loaded:", network.name);
+}
+
+async function updateNetwork(id) {
+  if (!id) {
+    alert("No network loaded");
+    return;
+  }
+
+  const payload = {
+    architecture: {
+      layers: arch,
+    },
+
+    weights: net.layers.map((layer) => ({
+      W: layer.W,
+      b: layer.b,
+      activation: layer.activation,
+      useBias: layer.useBias,
+    })),
+
+    dataset: {
+      X: dataset.X,
+      y: dataset.y,
+    },
+
+    loss: Number($("#lossNow")?.textContent || 0),
+
+    accuracy: parseFloat(($("#accNow")?.textContent || "0").replace("%", "")),
+  };
+
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/networks?id=eq.${id}`, {
+    method: "PATCH",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const txt = await r.text();
+
+  console.log("UPDATE STATUS", r.status);
+  console.log(txt);
+
+  if (r.ok) {
+    alert("Network updated");
+  }
 }
 
 async function deleteNetworkById(id) {
