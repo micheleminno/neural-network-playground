@@ -166,6 +166,8 @@ async function loadNetworkById(id) {
 
   console.log("NETWORK", network);
   console.log("ARCHITECTURE", network.architecture);
+  console.log("WEIGHTS ARRAY?", Array.isArray(network.weights));
+  console.log("WEIGHTS", network.weights);
 
   currentNetworkName = network.name;
   updateNetworkTitle();
@@ -185,6 +187,22 @@ async function loadNetworkById(id) {
   inputSize = arch.find((l) => l.type === "input")?.neurons || 1;
 
   outputSize = arch.find((l) => l.type === "output")?.neurons || 1;
+
+  inputSize = arch.find((l) => l.type === "input")?.neurons || 1;
+
+  outputSize = arch.find((l) => l.type === "output")?.neurons || 1;
+
+  console.log("ARCH RAW", network.architecture.layers);
+
+  console.log("ARCH MAPPED", arch);
+
+  console.log(
+    "ARCH TYPES",
+    arch.map((x) => ({
+      type: x.type,
+      neurons: x.neurons,
+    })),
+  );
 
   buildNetwork();
 

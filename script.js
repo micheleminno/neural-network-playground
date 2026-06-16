@@ -1028,6 +1028,8 @@ function renderNNVis() {
 
 // ========= Build Network =========
 function buildNetwork() {
+  console.log("BUILD ARCH", arch);
+
   net = new Network();
 
   const rand = rng(Date.now() + rebuildSeedCounter++);
