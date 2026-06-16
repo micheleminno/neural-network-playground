@@ -847,6 +847,7 @@ function renderNNVis() {
   const yPad = 30;
   const colW = (W - 2 * xPad) / (layerCount - 1 || 1);
   const nodeR = 13;
+  const BIAS_ROW_Y = 40;
 
   const pos = [];
   for (let li = 0; li < layerCount; li++) {
@@ -939,7 +940,7 @@ function renderNNVis() {
       const minY = Math.min(...layerNodes.map((p) => p.y));
 
       const biasX = xPad + targetLayerIndex * colW - colW * 0.35;
-      const biasY = Math.max(18, minY - 42);
+      const biasY = BIAS_ROW_Y;
 
       const biasLabel = `b${targetLayerIndex}`;
 
