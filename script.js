@@ -1500,7 +1500,8 @@ async function trainLoop() {
     );
     const batches = getBatches(X, y, batchSize, rand);
 
-    for (const b of batches) {
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const b = batches[batchIndex];
       const ypred = net.forward(b.X);
       const [, dLdy] = bce(ypred, b.y);
       net.backward(dLdy, lrNow);
