@@ -1511,6 +1511,9 @@ async function trainLoop() {
         renderNNVis();
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
+
+      $("#batchProgress").style.width = (batch / totalBatches) * 100 + "%";
+      $("#batchText").textContent = `${batch}/${totalBatches}`;
     }
 
     const fullPred = net.forward(X);
@@ -1534,12 +1537,37 @@ async function trainLoop() {
       ch.update();
     }
 
+    $("#epochProgress").style.width = (epoch / totalEpochs) * 100 + "%";
+    $("#epochText").textContent = `${epoch}/${totalEpochs}`;
+
     if (stopFlag) break;
   }
 
   if (btnStop) btnStop.disabled = true;
   if (btnTrain) btnTrain.disabled = false;
+
+  $("#epochProgressBar").style.width = "100%";
+  $("#batchProgressBar").style.width = "100%";
+  $("#epochProgressText").textContent = "Completed";
+  $("#batchProgressText").textContent = "Completed";
+
   updateJSON();
+}
+
+function updateTrainingProgress(epoch, totalEpochs, batch, totalBatches) {
+  const epochText = $("#epochProgressText");
+  const epochBar = $("#epochProgressBar");
+
+  const batchText = $("#batchProgressText");
+  const batchBar = $("#batchProgressBar");
+
+  if (epochText) epochText.textContent = `Epoch ${epoch}/${totalEpochs}`;
+
+  if (epochBar) epochBar.style.width = (epoch / totalEpochs) * 100 + "%";
+
+  if (batchText) batchText.textContent = `Batch ${batch}/${totalBatches}`;
+
+  if (batchBar) batchBar.style.width = (batch / totalBatches) * 100 + "%";
 }
 
 // ========= Predict =========

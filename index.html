@@ -276,14 +276,44 @@
               </div>
             </div>
 
-            <div class="mt-2 d-flex flex-wrap gap-2">
-              <button class="btn btn-primary" id="btnTrain">
-                <span data-i18n="train">Allena</span>
-              </button>
+            <div class="row mt-3">
+              <div class="col-4">
+                <div class="d-flex gap-2">
+                  <button class="btn btn-primary" id="btnTrain">Train</button>
 
-              <button class="btn btn-danger" id="btnStop" disabled>
-                <span data-i18n="stop">Stop</span>
-              </button>
+                  <button class="btn btn-danger" id="btnStop" disabled>
+                    Stop
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-4">
+                <div class="small mb-1">
+                  <span id="epochProgressText"> Epoch 0 / 0 </span>
+                </div>
+
+                <div class="progress" style="height: 10px">
+                  <div
+                    id="epochProgressBar"
+                    class="progress-bar"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="col-4">
+                <div class="small mb-1">
+                  <span id="batchProgressText"> Batch 0 / 0 </span>
+                </div>
+
+                <div class="progress" style="height: 10px">
+                  <div
+                    id="batchProgressBar"
+                    class="progress-bar bg-info"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
             </div>
 
             <div class="mt-3">
