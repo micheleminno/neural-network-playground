@@ -1512,8 +1512,7 @@ async function trainLoop() {
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
 
-      $("#batchProgress").style.width = (batch / totalBatches) * 100 + "%";
-      $("#batchText").textContent = `${batch}/${totalBatches}`;
+      updateTrainingProgress(ep, epochs, batchIndex + 1, batches.length);
     }
 
     const fullPred = net.forward(X);
@@ -1536,9 +1535,6 @@ async function trainLoop() {
       ch.data.datasets[0].data.push(L);
       ch.update();
     }
-
-    $("#epochProgress").style.width = (epoch / totalEpochs) * 100 + "%";
-    $("#epochText").textContent = `${epoch}/${totalEpochs}`;
 
     if (stopFlag) break;
   }
