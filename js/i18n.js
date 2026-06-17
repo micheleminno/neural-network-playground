@@ -8,6 +8,7 @@ const I18N = {
     inputSize: "Dimensione input",
     activation: "Attivazione",
     bias: "Bias",
+    network: "Nuova rete",
     langButton: "EN",
     emptyArchitecture: "Trascina qui i layer dalla palette…",
     remove: "Rimuovi",
@@ -56,6 +57,7 @@ const I18N = {
     inputSize: "Input size",
     activation: "Activation",
     bias: "Bias",
+    network: "New network",
     langButton: "IT",
     emptyArchitecture: "Drag layers here from the palette…",
     remove: "Remove",
@@ -230,4 +232,3 @@ const I18N_HTML = {
     linearPreset: "Linear (x + y > 1)",
   },
 };
-
