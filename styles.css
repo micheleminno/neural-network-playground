@@ -129,6 +129,15 @@ body {
 }
 
 /* --- Chart loss --- */
+.progress {
+  height: 10px;
+  width: 100%;
+}
+
+.progress-bar {
+  transition: width 0.2s ease;
+}
+
 #lossChart {
   background: #0f172a;
   border-radius: 8px;
