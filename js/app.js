@@ -131,6 +131,7 @@ function sanityCheckButtons() {
     "btnDownloadJSON",
     "btnCopyJSON",
     "btnLangToggle",
+    "btnLogout",
     "csvFile",
     "csvInfoBtn",
   ];
@@ -192,6 +193,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   attachPopoverGlobalClosers();
   applyI18n();
   initCsvInfoSafe();
-  populateNetworksSelect();
+  await initAuthUI();
   updateNetworkTitle();
 });

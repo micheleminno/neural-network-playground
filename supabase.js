@@ -1,8 +1,48 @@
 const SUPABASE_URL = "https://ajdnlxgbkkwihqiflyby.supabase.co";
-
 const SUPABASE_KEY = "sb_publishable_CmojWuYCYnwEh0kgfZ5fmw_DfsQ7HrE";
 
+const supabaseClient = window.supabase?.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY,
+);
+
+let currentSession = null;
+let currentProfile = null;
+
+async function getSession() {
+  if (!supabaseClient) return null;
+
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error) {
+    console.error("[Auth] Session error:", error);
+    return null;
+  }
+
+  currentSession = data.session;
+  return currentSession;
+}
+
+async function requireSession() {
+  const session = currentSession || (await getSession());
+
+  if (!session?.user) {
+    throw new Error("Please log in first.");
+  }
+
+  return session;
+}
+
+async function authHeaders() {
+  const session = await requireSession();
+
+  return {
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${session.access_token}`,
+  };
+}
+
 async function saveNetwork() {
+  const session = await requireSession();
   const networkName = prompt("Network name?");
   if (!networkName) return;
 
@@ -10,6 +50,7 @@ async function saveNetwork() {
   updateNetworkTitle();
 
   const payload = {
+    user_id: session.user.id,
     name: networkName,
 
     architecture: {
@@ -36,8 +77,7 @@ async function saveNetwork() {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/networks`, {
     method: "POST",
     headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
+      ...(await authHeaders()),
       "Content-Type": "application/json",
       Prefer: "return=representation",
     },
@@ -45,32 +85,40 @@ async function saveNetwork() {
   });
 
   const txt = await r.text();
-
   console.log("STATUS", r.status);
   console.log(txt);
+
+  if (!r.ok) {
+    alert("Save failed");
+    return;
+  }
+
+  const saved = JSON.parse(txt)[0];
+  currentNetworkId = saved?.id || null;
+  document.getElementById("btnUpdateNetwork")?.removeAttribute("disabled");
 }
 
 async function loadNetworks() {
+  const session = await requireSession();
   const r = await fetch(
-    `${SUPABASE_URL}/rest/v1/networks?select=id,name,created_at`,
+    `${SUPABASE_URL}/rest/v1/networks?select=id,name,created_at&user_id=eq.${session.user.id}&order=created_at.desc`,
     {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-      },
+      headers: await authHeaders(),
     },
   );
 
-  const data = await r.json();
+  if (!r.ok) {
+    console.error(await r.text());
+    return [];
+  }
 
+  const data = await r.json();
   console.log("NETWORKS:", data);
 
   return data;
 }
 
 async function populateNetworksSelect() {
-  const networks = await loadNetworks();
-
   const menu = document.getElementById("savedNetworksMenu");
   const hidden = document.getElementById("savedNetworks");
   const label = document.getElementById("savedNetworkLabel");
@@ -79,37 +127,55 @@ async function populateNetworksSelect() {
 
   menu.innerHTML = "";
 
+  if (!currentSession?.user) {
+    label.textContent = "-- Log in to load networks --";
+    return;
+  }
+
+  const networks = await loadNetworks();
+
+  if (!networks.length) {
+    const li = document.createElement("li");
+    const empty = document.createElement("span");
+    empty.className = "dropdown-item text-secondary";
+    empty.textContent = "No saved networks yet";
+    li.appendChild(empty);
+    menu.appendChild(li);
+    label.textContent = "-- Select network --";
+    return;
+  }
+
   networks.forEach((n) => {
     const li = document.createElement("li");
+    const item = document.createElement("div");
+    const name = document.createElement("span");
+    const btn = document.createElement("button");
+    const icon = document.createElement("i");
 
-    li.innerHTML = `
-      <div
-        class="dropdown-item d-flex justify-content-between align-items-center saved-network-item"
-        data-id="${n.id}"
-        data-name="${n.name}"
-        style="cursor:pointer"
-      >
-        <span>${n.name}</span>
+    item.className =
+      "dropdown-item d-flex justify-content-between align-items-center saved-network-item";
+    item.dataset.id = n.id;
+    item.dataset.name = n.name;
+    item.style.cursor = "pointer";
 
-        <button
-          type="button"
-          class="btn btn-danger btn-sm delete-network-btn opacity-0"
-          data-id="${n.id}"
-          title="Delete network"
-          style="
-            width:32px;
-            height:32px;
-            padding:0;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-          "
-        >
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
-    `;
+    name.textContent = n.name;
 
+    btn.type = "button";
+    btn.className = "btn btn-danger btn-sm delete-network-btn opacity-0";
+    btn.dataset.id = n.id;
+    btn.title = "Delete network";
+    btn.style.width = "32px";
+    btn.style.height = "32px";
+    btn.style.padding = "0";
+    btn.style.display = "flex";
+    btn.style.alignItems = "center";
+    btn.style.justifyContent = "center";
+
+    icon.className = "bi bi-x-lg";
+    btn.appendChild(icon);
+    item.appendChild(name);
+    item.appendChild(btn);
+    li.appendChild(item);
     menu.appendChild(li);
   });
 
@@ -145,13 +211,11 @@ async function populateNetworksSelect() {
 }
 
 async function loadNetworkById(id) {
+  const session = await requireSession();
   const r = await fetch(
-    `${SUPABASE_URL}/rest/v1/networks?id=eq.${id}&select=*`,
+    `${SUPABASE_URL}/rest/v1/networks?id=eq.${id}&user_id=eq.${session.user.id}&select=*`,
     {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-      },
+      headers: await authHeaders(),
     },
   );
 
@@ -174,10 +238,6 @@ async function loadNetworkById(id) {
   document.getElementById("btnUpdateNetwork")?.removeAttribute("disabled");
   updateNetworkTitle();
 
-  // ==========================
-  // ARCHITETTURA
-  // ==========================
-
   arch = network.architecture.layers.map((l) => ({
     id: l.id || crypto.randomUUID(),
     type: l.type,
@@ -187,17 +247,10 @@ async function loadNetworkById(id) {
   }));
 
   inputSize = arch.find((l) => l.type === "input")?.neurons || 1;
-
-  outputSize = arch.find((l) => l.type === "output")?.neurons || 1;
-
-  inputSize = arch.find((l) => l.type === "input")?.neurons || 1;
-
   outputSize = arch.find((l) => l.type === "output")?.neurons || 1;
 
   console.log("ARCH RAW", network.architecture.layers);
-
   console.log("ARCH MAPPED", arch);
-
   console.log(
     "ARCH TYPES",
     arch.map((x) => ({
@@ -207,10 +260,6 @@ async function loadNetworkById(id) {
   );
 
   buildNetwork();
-
-  // ==========================
-  // PESI
-  // ==========================
 
   if (
     Array.isArray(network.weights) &&
@@ -222,18 +271,10 @@ async function loadNetworkById(id) {
     }
   }
 
-  // ==========================
-  // DATASET
-  // ==========================
-
   if (network.dataset) {
     dataset.X = network.dataset.X || [];
     dataset.y = network.dataset.y || [];
   }
-
-  // ==========================
-  // METRICHE
-  // ==========================
 
   if ($("#lossNow")) {
     $("#lossNow").textContent = network.loss ?? "-";
@@ -258,7 +299,10 @@ async function updateNetwork(id) {
     return;
   }
 
+  const session = await requireSession();
   const payload = {
+    user_id: session.user.id,
+
     architecture: {
       layers: arch,
     },
@@ -280,16 +324,18 @@ async function updateNetwork(id) {
     accuracy: parseFloat(($("#accNow")?.textContent || "0").replace("%", "")),
   };
 
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/networks?id=eq.${id}`, {
-    method: "PATCH",
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-      Prefer: "return=representation",
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/networks?id=eq.${id}&user_id=eq.${session.user.id}`,
+    {
+      method: "PATCH",
+      headers: {
+        ...(await authHeaders()),
+        "Content-Type": "application/json",
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+  );
 
   const txt = await r.text();
 
@@ -304,18 +350,19 @@ async function updateNetwork(id) {
 async function deleteNetworkById(id) {
   if (!id) return;
 
+  const session = await requireSession();
   console.log("DELETE ID =", id);
 
   const ok = confirm("Delete this network from cloud?");
   if (!ok) return;
 
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/networks?id=eq.${id}`, {
-    method: "DELETE",
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/networks?id=eq.${id}&user_id=eq.${session.user.id}`,
+    {
+      method: "DELETE",
+      headers: await authHeaders(),
     },
-  });
+  );
 
   console.log("DELETE STATUS", r.status);
 
@@ -329,48 +376,13 @@ async function deleteNetworkById(id) {
   document.getElementById("savedNetworkLabel").textContent =
     "-- Select network --";
 
+  if (currentNetworkId === id) {
+    currentNetworkId = null;
+    currentNetworkName = "";
+    document.getElementById("btnUpdateNetwork")?.setAttribute("disabled", "");
+    updateNetworkTitle();
+  }
+
   await populateNetworksSelect();
 }
 
-// TEST
-
-async function testSupabase() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/networks?select=*`, {
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-    },
-  });
-
-  const data = await res.json();
-
-  console.log("SUPABASE:", data);
-}
-
-async function saveTest() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/networks`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-    },
-    body: JSON.stringify({
-      name: "Rete di prova",
-      architecture: {
-        layers: [2, 4, 1],
-      },
-      weights: {
-        layers: [],
-      },
-      dataset: {
-        name: "xor",
-      },
-      loss: null,
-      accuracy: null,
-    }),
-  });
-
-  console.log("STATUS", res.status);
-  console.log(await res.text());
-}
