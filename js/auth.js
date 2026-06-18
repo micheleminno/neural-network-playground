@@ -291,7 +291,7 @@ async function handleGoogleLogin() {
   const { error } = await supabaseClient.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: window.location.href.split("#")[0],
+      redirectTo: "https://micheleminno.github.io/neural-network-playground/",
     },
   });
 
