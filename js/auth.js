@@ -36,6 +36,7 @@ function setAuthBusy(isBusy) {
 function showLanding() {
   document.getElementById("landingPage")?.classList.remove("d-none");
   document.getElementById("appShell")?.classList.add("d-none");
+  document.getElementById("appAcknowledgment")?.classList.add("d-none");
 }
 
 function hasCompleteProfile(profile) {
@@ -102,6 +103,7 @@ function showCompleteProfile() {
 async function showApp() {
   document.getElementById("landingPage")?.classList.add("d-none");
   document.getElementById("appShell")?.classList.remove("d-none");
+  document.getElementById("appAcknowledgment")?.classList.remove("d-none");
 
   const user = currentSession?.user;
   const userBadge = document.getElementById("userBadge");
