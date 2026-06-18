@@ -52,6 +52,24 @@ function showAuthForms() {
   document.getElementById("completeProfileForm")?.classList.add("d-none");
 }
 
+function activateAuthTab(tabName) {
+  const signupTab = document.getElementById("signup-tab");
+  const loginTab = document.getElementById("login-tab");
+  const signupPane = document.getElementById("signupPane");
+  const loginPane = document.getElementById("loginPane");
+  const showLogin = tabName === "login";
+
+  signupTab?.classList.toggle("active", !showLogin);
+  signupTab?.setAttribute("aria-selected", String(!showLogin));
+  loginTab?.classList.toggle("active", showLogin);
+  loginTab?.setAttribute("aria-selected", String(showLogin));
+
+  signupPane?.classList.toggle("show", !showLogin);
+  signupPane?.classList.toggle("active", !showLogin);
+  loginPane?.classList.toggle("show", showLogin);
+  loginPane?.classList.toggle("active", showLogin);
+}
+
 function showCompleteProfile() {
   showLanding();
   document.getElementById("authTabs")?.classList.add("d-none");
@@ -95,6 +113,38 @@ async function showApp() {
   }
 
   await populateNetworksSelect();
+}
+
+async function routeAuthenticatedUser() {
+  if (!currentSession?.user) {
+    showAuthForms();
+    showLanding();
+    return;
+  }
+
+  await loadProfile();
+
+  if (!currentProfile) {
+    const pending = localStorage.getItem("neurobuilder-pending-profile");
+    if (pending) {
+      try {
+        const parsed = JSON.parse(pending);
+        if (parsed.first_name && parsed.last_name && parsed.teaching_subject) {
+          await upsertProfile(parsed);
+          localStorage.removeItem("neurobuilder-pending-profile");
+        }
+      } catch (error) {
+        console.warn("[Profile] Pending profile ignored:", error);
+      }
+    }
+  }
+
+  if (hasCompleteProfile(currentProfile)) {
+    setAuthMessage("");
+    await showApp();
+  } else {
+    showCompleteProfile();
+  }
 }
 
 function profilePayloadFromSignup() {
@@ -188,8 +238,7 @@ async function handleSignup(e) {
 
     if (currentSession?.user) {
       await upsertProfile(profile);
-      setAuthMessage("");
-      await showApp();
+      await routeAuthenticatedUser();
     } else {
       setAuthMessage(
         "Account created. Check your email to confirm it, then log in.",
@@ -222,9 +271,7 @@ async function handleLogin(e) {
     if (error) throw error;
 
     currentSession = data.session;
-    await loadProfile();
-    setAuthMessage("");
-    await showApp();
+    await routeAuthenticatedUser();
   } catch (error) {
     console.error("[Auth] Login failed:", error);
     setAuthMessage(error.message || "Login failed.", "error");
@@ -294,6 +341,7 @@ async function handleLogout() {
   document.getElementById("btnUpdateNetwork")?.setAttribute("disabled", "");
   updateNetworkTitle();
   showAuthForms();
+  activateAuthTab("login");
   showLanding();
 }
 
@@ -320,27 +368,7 @@ async function initAuthUI() {
 
   currentSession = await getSession();
   if (currentSession?.user) {
-    await loadProfile();
-    if (!currentProfile) {
-      const pending = localStorage.getItem("neurobuilder-pending-profile");
-      if (pending) {
-        try {
-          const parsed = JSON.parse(pending);
-          if (parsed.first_name && parsed.last_name && parsed.teaching_subject) {
-            await upsertProfile(parsed);
-            localStorage.removeItem("neurobuilder-pending-profile");
-          }
-        } catch (error) {
-          console.warn("[Profile] Pending profile ignored:", error);
-        }
-      }
-    }
-
-    if (hasCompleteProfile(currentProfile)) {
-      await showApp();
-    } else {
-      showCompleteProfile();
-    }
+    await routeAuthenticatedUser();
   } else {
     showAuthForms();
     showLanding();
@@ -350,12 +378,7 @@ async function initAuthUI() {
     currentSession = session;
 
     if (session?.user) {
-      await loadProfile();
-      if (hasCompleteProfile(currentProfile)) {
-        await showApp();
-      } else {
-        showCompleteProfile();
-      }
+      await routeAuthenticatedUser();
     } else {
       currentProfile = null;
       showAuthForms();
