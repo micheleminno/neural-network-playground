@@ -115,6 +115,7 @@ async function showApp() {
   }
 
   await populateNetworksSelect();
+  startTutorialIfNeeded();
 }
 
 async function routeAuthenticatedUser() {

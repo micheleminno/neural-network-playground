@@ -103,6 +103,70 @@ body {
   color: #86efac;
 }
 
+/* --- In-app tutorial --- */
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  pointer-events: none;
+}
+
+.tutorial-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.58);
+}
+
+.tutorial-highlight {
+  position: fixed;
+  z-index: 5001;
+  border: 2px solid #38bdf8;
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 4px rgba(56, 189, 248, 0.18),
+    0 0 34px rgba(56, 189, 248, 0.42);
+  transition:
+    left 0.18s ease,
+    top 0.18s ease,
+    width 0.18s ease,
+    height 0.18s ease;
+}
+
+.tutorial-card {
+  position: fixed;
+  z-index: 5002;
+  width: min(360px, calc(100vw - 24px));
+  padding: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.42);
+  border-radius: 8px;
+  background: #0f172a;
+  color: #e5e7eb;
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+
+.tutorial-counter {
+  color: #93c5fd;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tutorial-card p {
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.tutorial-action {
+  padding: 10px 12px;
+  border-left: 3px solid #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  color: #e0f2fe;
+  font-size: 0.92rem;
+}
+
 @media (max-width: 900px) {
   .landing-page {
     align-items: flex-start;

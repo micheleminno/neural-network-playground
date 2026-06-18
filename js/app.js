@@ -189,6 +189,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderArchitecture();
 
   bindUIControls();
+  initTutorialControls();
   wireCsvInputs();
   attachPopoverGlobalClosers();
   applyI18n();
