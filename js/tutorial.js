@@ -405,6 +405,10 @@ function endTutorial(markSeen = false) {
   tutorialEls().overlay?.classList.add("d-none");
 }
 
+function refreshActiveTutorialLanguage() {
+  if (tutorialActive) showTutorialStep(tutorialIndex);
+}
+
 function initTutorialControls() {
   document.getElementById("btnStartTutorial")?.addEventListener("click", () => {
     startTutorial(true);
