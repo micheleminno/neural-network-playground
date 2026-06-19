@@ -298,6 +298,32 @@ function positionTutorialCard(target, placement) {
   card.style.top = `${top}px`;
 }
 
+function positionTutorialHighlight() {
+  if (!tutorialActive) return;
+
+  const step = tutorialSteps()[tutorialIndex];
+  const target = step && document.querySelector(step.selector);
+  const { highlight } = tutorialEls();
+
+  if (!target || !highlight) return;
+
+  const rect = target.getBoundingClientRect();
+  const pad = 8;
+
+  highlight.style.left = `${Math.max(6, rect.left - pad)}px`;
+  highlight.style.top = `${Math.max(6, rect.top - pad)}px`;
+  highlight.style.width = `${Math.min(
+    window.innerWidth - 12,
+    rect.width + pad * 2,
+  )}px`;
+  highlight.style.height = `${Math.min(
+    window.innerHeight - 12,
+    rect.height + pad * 2,
+  )}px`;
+
+  positionTutorialCard(target, step.placement);
+}
+
 function showTutorialStep(index) {
   if (!tutorialActive) return;
 
@@ -323,23 +349,10 @@ function showTutorialStep(index) {
 
   if (!overlay || !highlight || !target) return;
 
-  target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+  target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
 
   requestAnimationFrame(() => {
-    const rect = target.getBoundingClientRect();
-    const pad = 8;
     const progressPct = ((tutorialIndex + 1) / steps.length) * 100;
-
-    highlight.style.left = `${Math.max(6, rect.left - pad)}px`;
-    highlight.style.top = `${Math.max(6, rect.top - pad)}px`;
-    highlight.style.width = `${Math.min(
-      window.innerWidth - 12,
-      rect.width + pad * 2,
-    )}px`;
-    highlight.style.height = `${Math.min(
-      window.innerHeight - 12,
-      rect.height + pad * 2,
-    )}px`;
 
     if (progress) progress.style.width = `${progressPct}%`;
     if (counter) {
@@ -366,7 +379,7 @@ function showTutorialStep(index) {
     if (skip) skip.textContent = copy.skip;
     if (close) close.setAttribute("aria-label", copy.close);
 
-    positionTutorialCard(target, step.placement);
+    positionTutorialHighlight();
   });
 }
 
@@ -398,8 +411,20 @@ function initTutorialControls() {
   });
 
   window.addEventListener("resize", () => {
-    if (tutorialActive) showTutorialStep(tutorialIndex);
+    positionTutorialHighlight();
   });
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      positionTutorialHighlight();
+    },
+    true,
+  );
+}
+
+function resetTutorialForCurrentUser() {
+  localStorage.removeItem(tutorialStorageKey());
 }
 
 function startTutorialIfNeeded() {
