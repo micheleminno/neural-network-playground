@@ -113,7 +113,8 @@ Supported format:
 Rules:
 
 - Numeric values only
-- Last column = target
+- Input columns first, followed by output columns
+- The number of columns must match the network architecture
 - No header row
 
 ---

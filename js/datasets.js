@@ -118,7 +118,31 @@ function handleCSVFile(file) {
     const cols = rows[0].length;
     if (cols < 2) throw new Error(t("csvNeedCols"));
 
+    const expectedInputSize =
+      arch.find((layer) => layer.type === "input")?.neurons || inputSize;
+    const expectedOutputSize =
+      arch.find((layer) => layer.type === "output")?.neurons || outputSize;
+    const expectedCols = expectedInputSize + expectedOutputSize;
+
+    if (cols !== expectedCols) {
+      throw new Error(
+        t("csvColumnMismatch")
+          .replace("{expected}", expectedCols)
+          .replace("{inputs}", expectedInputSize)
+          .replace("{outputs}", expectedOutputSize)
+          .replace("{actual}", cols),
+      );
+    }
+
     const data = rows.map((row, ri) => {
+      if (row.length !== cols) {
+        throw new Error(
+          t("csvRowColumnMismatch")
+            .replace("{row}", ri + 1)
+            .replace("{expected}", cols)
+            .replace("{actual}", row.length),
+        );
+      }
       const nums = row.map(toNumber);
       if (nums.some((x) => Number.isNaN(x))) {
         throw new Error(`${t("csvNonNumeric")} ${ri + 1}.`);
@@ -126,10 +150,9 @@ function handleCSVFile(file) {
       return nums;
     });
 
-    const inputSizeNew = cols - 1;
-    const X = data.map((row) => row.slice(0, inputSizeNew));
-    const y = data.map((row) => [row[cols - 1]]);
-    return { X, y, inputSizeNew, delimiter: delim };
+    const X = data.map((row) => row.slice(0, expectedInputSize));
+    const y = data.map((row) => row.slice(expectedInputSize));
+    return { X, y, delimiter: delim };
   };
 
   const fr = new FileReader();
@@ -137,14 +160,11 @@ function handleCSVFile(file) {
   fr.onload = () => {
     try {
       const text = fr.result;
-      const { X, y, inputSizeNew, delimiter } = parse(text);
+      const { X, y, delimiter } = parse(text);
 
       dataset.X = X;
       dataset.y = y;
-      inputSize = inputSizeNew;
-      outputSize = 1;
 
-      ensureIOInArch();
       renderTestInputs();
 
       setInfo(
@@ -235,4 +255,3 @@ function attachCsvDnD() {
     handleCSVFile(e.dataTransfer.files?.[0]);
   });
 }
-

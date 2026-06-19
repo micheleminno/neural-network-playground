@@ -16,6 +16,10 @@ const I18N = {
     csvNoFile: "Nessun file selezionato.",
     csvEmpty: "Il file sembra vuoto.",
     csvNeedCols: "Servono almeno 2 colonne (feature + target).",
+    csvColumnMismatch:
+      "La rete richiede {expected} colonne: {inputs} input e {outputs} output, ma il CSV ne contiene {actual}.",
+    csvRowColumnMismatch:
+      "La riga {row} contiene {actual} colonne invece di {expected}.",
     csvNonNumeric: "Valori non numerici alla riga",
     csvLoaded: "caricato",
     csvExamples: "esempi",
@@ -44,7 +48,8 @@ const I18N = {
         <b>• Senza intestazioni</b><br>
         • Separatore: virgola (<code>,</code>)<br>
         • Tutto numerico (niente NaN)<br>
-        • <b>Ultima colonna = target</b> (0/1)<br>
+        • Prima gli input, poi gli output della rete<br>
+        • Il numero di colonne deve corrispondere all'architettura<br>
         • Esempio:<br>
         <code>0,0,0<br>0,1,1<br>1,0,1<br>1,1,0</code>
       </div>`,
@@ -65,6 +70,10 @@ const I18N = {
     csvNoFile: "No file selected.",
     csvEmpty: "The file seems empty.",
     csvNeedCols: "At least 2 columns are required (features + target).",
+    csvColumnMismatch:
+      "The network requires {expected} columns: {inputs} inputs and {outputs} outputs, but the CSV contains {actual}.",
+    csvRowColumnMismatch:
+      "Row {row} contains {actual} columns instead of {expected}.",
     csvNonNumeric: "Non-numeric values at row",
     csvLoaded: "loaded",
     csvExamples: "examples",
@@ -93,7 +102,8 @@ const I18N = {
         <b>• No headers</b><br>
         • Separator: comma (<code>,</code>)<br>
         • All numeric values (no NaN)<br>
-        • <b>Last column = target</b> (0/1)<br>
+        • Network inputs first, then network outputs<br>
+        • The number of columns must match the architecture<br>
         • Example:<br>
         <code>0,0,0<br>0,1,1<br>1,0,1<br>1,1,0</code>
       </div>`,
