@@ -20,8 +20,8 @@ const tutorialCopy = {
       {
         selector: "#datasetCard",
         title: "Load a tiny learning problem",
-        body: "A network needs examples before it can learn. XOR is small enough to inspect by hand, but hard enough to need a hidden layer.",
-        action: "Load the XOR dataset now.",
+        body: "A network needs examples before it can learn. Built-in presets have a known shape: XOR automatically sets 2 inputs and 1 output. With a custom CSV, configure the network first: its input and output counts determine how the columns are interpreted.",
+        action: "Load XOR now and notice that the architecture becomes 2 inputs and 1 output.",
         placement: "right",
         primaryLabel: "Load XOR",
         onPrimary: () => {
@@ -104,8 +104,8 @@ const tutorialCopy = {
       {
         selector: "#datasetCard",
         title: "Carica un problema piccolo",
-        body: "Una rete ha bisogno di esempi per imparare. XOR e' piccolo da leggere a mano, ma abbastanza difficile da richiedere un layer nascosto.",
-        action: "Carica ora il dataset XOR.",
+        body: "Una rete ha bisogno di esempi per imparare. I preset hanno una struttura nota: XOR imposta automaticamente 2 input e 1 output. Con un CSV personalizzato, configura prima la rete: il numero di input e output stabilisce come vengono interpretate le colonne.",
+        action: "Carica XOR e osserva che l'architettura diventa 2 input e 1 output.",
         placement: "right",
         primaryLabel: "Carica XOR",
         onPrimary: () => {
