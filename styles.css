@@ -163,6 +163,21 @@ body {
   text-transform: uppercase;
 }
 
+.tutorial-progress-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.24);
+}
+
+.tutorial-progress {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: #38bdf8;
+  transition: width 0.18s ease;
+}
+
 .tutorial-card p {
   color: #cbd5e1;
   line-height: 1.45;

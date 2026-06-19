@@ -1,69 +1,188 @@
-const tutorialSteps = [
-  {
-    selector: "#architecture",
-    title: "1. Start from the architecture",
-    body: "Here you design the neural network: input layer, hidden layers, output layer, neurons, activation functions and bias.",
-    action: "Look at the default 2-4-1 network before changing anything.",
-    placement: "right",
+const tutorialCopy = {
+  en: {
+    step: "Step",
+    of: "of",
+    back: "Back",
+    next: "Next",
+    finish: "Finish",
+    skip: "Skip",
+    close: "Close tutorial",
+    actionLabel: "Try this",
+    steps: [
+      {
+        selector: "#architectureCard",
+        title: "Start with the network recipe",
+        body: "This column is the model architecture. Students can see that a neural network is built from layers, neurons, activation functions and bias.",
+        action:
+          "For a first classroom demo, keep the default 2 inputs, 4 hidden neurons and 1 sigmoid output.",
+        placement: "right",
+      },
+      {
+        selector: "#datasetCard",
+        title: "Load a tiny learning problem",
+        body: "A network needs examples before it can learn. XOR is small enough to inspect by hand, but hard enough to need a hidden layer.",
+        action: "Load the XOR dataset now.",
+        placement: "right",
+        primaryLabel: "Load XOR",
+        onPrimary: () => {
+          const preset = document.getElementById("presetDataset");
+          if (preset) preset.value = "xor";
+          loadPreset("xor");
+        },
+      },
+      {
+        selector: "#trainingCard",
+        title: "Train and watch learning happen",
+        body: "Training changes weights and bias. The loss chart is the story: if it goes down, the network is learning from the examples.",
+        action: "Click Train after XOR is loaded, then watch loss and accuracy.",
+        placement: "top",
+      },
+      {
+        selector: "#networkVisCard",
+        title: "Read the network visually",
+        body: "Green links push activations up, red links push them down. Thicker links are stronger. Neuron color shows activation.",
+        action: "Hover over a connection to reveal its numeric weight.",
+        placement: "left",
+      },
+      {
+        selector: "#predictionCard",
+        title: "Ask the trained model a question",
+        body: "Prediction turns the trained network into an experiment. Change x1 and x2 to test what the model believes.",
+        action: "Prepare the classic XOR test input: x1 = 1 and x2 = 0.",
+        placement: "left",
+        primaryLabel: "Set 1, 0",
+        onPrimary: () => {
+          const inputs = document.querySelectorAll("#testInputs [data-ti]");
+          if (inputs[0]) inputs[0].value = "1";
+          if (inputs[1]) inputs[1].value = "0";
+          predictOnce();
+        },
+      },
+      {
+        selector: "#networkFilesCard",
+        title: "Save the classroom artifact",
+        body: "Saved networks are stored in the cloud under the teacher account, so each teacher sees only their own models.",
+        action:
+          "When the result is useful, save it with a name students can recognize.",
+        placement: "right",
+      },
+      {
+        selector: "#savedNetworksDropdown",
+        title: "Reuse and compare",
+        body: "The saved networks menu lets a teacher come back later, compare architectures, or prepare examples before class.",
+        action:
+          "Load old networks from here, then modify and save new versions.",
+        placement: "right",
+      },
+      {
+        selector: "#btnStartTutorial",
+        title: "You can restart this anytime",
+        body: "The Tutorial button brings this guide back. Use it when presenting NeuroBuilder to another teacher or a class.",
+        action: "Close the tour and start experimenting.",
+        placement: "bottom",
+      },
+    ],
   },
-  {
-    selector: "#btnAddHidden",
-    title: "2. Add capacity",
-    body: "Hidden layers let the network learn patterns that are not just straight lines.",
-    action: "Click Add Hidden Layer when you want to make the model more expressive.",
-    placement: "right",
-    advanceOnClick: true,
+  it: {
+    step: "Passo",
+    of: "di",
+    back: "Indietro",
+    next: "Avanti",
+    finish: "Fine",
+    skip: "Salta",
+    close: "Chiudi tutorial",
+    actionLabel: "Prova ora",
+    steps: [
+      {
+        selector: "#architectureCard",
+        title: "Parti dalla ricetta della rete",
+        body: "Questa colonna descrive l'architettura del modello. Gli studenti vedono che una rete neurale nasce da layer, neuroni, funzioni di attivazione e bias.",
+        action:
+          "Per la prima dimostrazione in classe, tieni la rete di default: 2 input, 4 neuroni nascosti e 1 output sigmoid.",
+        placement: "right",
+      },
+      {
+        selector: "#datasetCard",
+        title: "Carica un problema piccolo",
+        body: "Una rete ha bisogno di esempi per imparare. XOR e' piccolo da leggere a mano, ma abbastanza difficile da richiedere un layer nascosto.",
+        action: "Carica ora il dataset XOR.",
+        placement: "right",
+        primaryLabel: "Carica XOR",
+        onPrimary: () => {
+          const preset = document.getElementById("presetDataset");
+          if (preset) preset.value = "xor";
+          loadPreset("xor");
+        },
+      },
+      {
+        selector: "#trainingCard",
+        title: "Allena e osserva l'apprendimento",
+        body: "L'allenamento modifica pesi e bias. Il grafico della loss racconta cosa sta succedendo: se scende, la rete sta imparando dagli esempi.",
+        action: "Dopo aver caricato XOR, clicca Train e osserva loss e accuracy.",
+        placement: "top",
+      },
+      {
+        selector: "#networkVisCard",
+        title: "Leggi la rete in modo visuale",
+        body: "I collegamenti verdi aumentano l'attivazione, quelli rossi la riducono. Le linee piu' spesse sono piu' forti. Il colore dei neuroni mostra l'attivazione.",
+        action: "Passa sopra un collegamento per vedere il peso numerico.",
+        placement: "left",
+      },
+      {
+        selector: "#predictionCard",
+        title: "Fai una domanda al modello",
+        body: "La predizione trasforma la rete allenata in un esperimento. Cambia x1 e x2 per testare cosa ha imparato.",
+        action: "Prepara il classico test XOR: x1 = 1 e x2 = 0.",
+        placement: "left",
+        primaryLabel: "Imposta 1, 0",
+        onPrimary: () => {
+          const inputs = document.querySelectorAll("#testInputs [data-ti]");
+          if (inputs[0]) inputs[0].value = "1";
+          if (inputs[1]) inputs[1].value = "0";
+          predictOnce();
+        },
+      },
+      {
+        selector: "#networkFilesCard",
+        title: "Salva il risultato della lezione",
+        body: "Le reti salvate finiscono nel cloud sotto l'account del docente: ogni docente vede solo i propri modelli.",
+        action:
+          "Quando il risultato e' utile, salvalo con un nome riconoscibile per gli studenti.",
+        placement: "right",
+      },
+      {
+        selector: "#savedNetworksDropdown",
+        title: "Riusa e confronta",
+        body: "Il menu delle reti salvate permette di tornare su un esempio, confrontare architetture o preparare modelli prima della lezione.",
+        action:
+          "Carica da qui una rete salvata, poi modificala e salvala come nuova versione.",
+        placement: "right",
+      },
+      {
+        selector: "#btnStartTutorial",
+        title: "Puoi riaprire la guida quando vuoi",
+        body: "Il pulsante Tutorial riapre questa guida. Usalo quando presenti NeuroBuilder ad altri docenti o alla classe.",
+        action: "Chiudi il tour e inizia a sperimentare.",
+        placement: "bottom",
+      },
+    ],
   },
-  {
-    selector: "#presetDataset",
-    title: "3. Choose data",
-    body: "Training needs examples. Start with XOR or Linear Separation before importing your own CSV.",
-    action: "Open this menu and choose a preset dataset.",
-    placement: "right",
-  },
-  {
-    selector: "#btnTrain",
-    title: "4. Train the network",
-    body: "Training adjusts weights and bias to reduce loss. The chart shows whether learning is improving.",
-    action: "After selecting a dataset, click Train.",
-    placement: "top",
-  },
-  {
-    selector: "#nnVis",
-    title: "5. Read the network",
-    body: "Green connections are positive weights, red connections are negative. Thicker lines mean stronger weights.",
-    action: "Hover a connection to inspect its numeric weight.",
-    placement: "left",
-  },
-  {
-    selector: "#btnPredict",
-    title: "6. Test a prediction",
-    body: "After training, enter custom input values and ask the network for an output.",
-    action: "Change the x values, then click Predici / Predict.",
-    placement: "left",
-  },
-  {
-    selector: "#btnSaveNetwork",
-    title: "7. Save your work",
-    body: "Saved networks are stored in the cloud and associated with your account.",
-    action: "Click Save As New when you want this network to appear in your saved list.",
-    placement: "right",
-  },
-  {
-    selector: "#savedNetworksDropdown",
-    title: "8. Come back later",
-    body: "This menu shows only your networks. Load one to continue teaching or experimenting from where you left off.",
-    action: "Use this dropdown to reopen a saved network.",
-    placement: "right",
-  },
-];
+};
 
 let tutorialIndex = 0;
 let tutorialActive = false;
 
+function currentTutorialCopy() {
+  return tutorialCopy[getLang()] || tutorialCopy.en;
+}
+
+function tutorialSteps() {
+  return currentTutorialCopy().steps;
+}
+
 function tutorialStorageKey() {
   const userId = currentSession?.user?.id || "anonymous";
-  return `neurobuilder-tutorial-seen:${userId}`;
+  return `neurobuilder-tutorial-v2-seen:${userId}`;
 }
 
 function tutorialEls() {
@@ -71,12 +190,16 @@ function tutorialEls() {
     overlay: document.getElementById("tutorialOverlay"),
     highlight: document.getElementById("tutorialHighlight"),
     card: document.getElementById("tutorialCard"),
+    progress: document.getElementById("tutorialProgress"),
     counter: document.getElementById("tutorialCounter"),
     title: document.getElementById("tutorialTitle"),
     body: document.getElementById("tutorialBody"),
     action: document.getElementById("tutorialAction"),
+    primary: document.getElementById("tutorialPrimary"),
     back: document.getElementById("tutorialBack"),
     next: document.getElementById("tutorialNext"),
+    skip: document.getElementById("tutorialSkip"),
+    close: document.getElementById("tutorialClose"),
   };
 }
 
@@ -89,36 +212,48 @@ function ensureTutorialDom() {
   overlay.innerHTML = `
     <div id="tutorialHighlight" class="tutorial-highlight"></div>
     <section id="tutorialCard" class="tutorial-card" aria-live="polite">
+      <div class="tutorial-progress-track mb-3">
+        <div id="tutorialProgress" class="tutorial-progress"></div>
+      </div>
       <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
         <div id="tutorialCounter" class="tutorial-counter"></div>
-        <button id="tutorialClose" class="btn btn-sm btn-outline-light" type="button" aria-label="Close tutorial">
+        <button id="tutorialClose" class="btn btn-sm btn-outline-light" type="button">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
       <h5 id="tutorialTitle" class="mb-2"></h5>
       <p id="tutorialBody" class="mb-2"></p>
       <div id="tutorialAction" class="tutorial-action mb-3"></div>
+      <button id="tutorialPrimary" class="btn btn-info w-100 mb-3 d-none" type="button"></button>
       <div class="d-flex justify-content-between gap-2">
-        <button id="tutorialBack" class="btn btn-outline-light" type="button">Back</button>
-        <button id="tutorialNext" class="btn btn-primary" type="button">Next</button>
+        <button id="tutorialSkip" class="btn btn-link text-secondary px-0" type="button"></button>
+        <div class="d-flex gap-2">
+          <button id="tutorialBack" class="btn btn-outline-light" type="button"></button>
+          <button id="tutorialNext" class="btn btn-primary" type="button"></button>
+        </div>
       </div>
     </section>
   `;
 
   document.body.appendChild(overlay);
 
-  document.getElementById("tutorialClose")?.addEventListener("click", () => {
-    endTutorial(true);
-  });
-  document.getElementById("tutorialBack")?.addEventListener("click", () => {
+  tutorialEls().close?.addEventListener("click", () => endTutorial(true));
+  tutorialEls().skip?.addEventListener("click", () => endTutorial(true));
+  tutorialEls().back?.addEventListener("click", () => {
     showTutorialStep(tutorialIndex - 1);
   });
-  document.getElementById("tutorialNext")?.addEventListener("click", () => {
-    if (tutorialIndex >= tutorialSteps.length - 1) {
+  tutorialEls().next?.addEventListener("click", () => {
+    const steps = tutorialSteps();
+    if (tutorialIndex >= steps.length - 1) {
       endTutorial(true);
     } else {
       showTutorialStep(tutorialIndex + 1);
     }
+  });
+  tutorialEls().primary?.addEventListener("click", () => {
+    const step = tutorialSteps()[tutorialIndex];
+    step?.onPrimary?.();
+    showTutorialStep(tutorialIndex);
   });
 
   document.addEventListener("keydown", (event) => {
@@ -134,22 +269,6 @@ function ensureTutorialDom() {
       showTutorialStep(tutorialIndex - 1);
     }
   });
-
-  document.addEventListener(
-    "click",
-    (event) => {
-      if (!tutorialActive) return;
-
-      const step = tutorialSteps[tutorialIndex];
-      if (!step?.advanceOnClick) return;
-
-      const target = document.querySelector(step.selector);
-      if (target && target.contains(event.target)) {
-        setTimeout(() => showTutorialStep(tutorialIndex + 1), 150);
-      }
-    },
-    true,
-  );
 }
 
 function positionTutorialCard(target, placement) {
@@ -182,11 +301,25 @@ function positionTutorialCard(target, placement) {
 function showTutorialStep(index) {
   if (!tutorialActive) return;
 
-  tutorialIndex = Math.max(0, Math.min(index, tutorialSteps.length - 1));
-  const step = tutorialSteps[tutorialIndex];
+  const copy = currentTutorialCopy();
+  const steps = tutorialSteps();
+  tutorialIndex = Math.max(0, Math.min(index, steps.length - 1));
+  const step = steps[tutorialIndex];
   const target = document.querySelector(step.selector);
-  const { overlay, highlight, counter, title, body, action, back, next } =
-    tutorialEls();
+  const {
+    overlay,
+    highlight,
+    progress,
+    counter,
+    title,
+    body,
+    action,
+    primary,
+    back,
+    next,
+    skip,
+    close,
+  } = tutorialEls();
 
   if (!overlay || !highlight || !target) return;
 
@@ -195,6 +328,7 @@ function showTutorialStep(index) {
   requestAnimationFrame(() => {
     const rect = target.getBoundingClientRect();
     const pad = 8;
+    const progressPct = ((tutorialIndex + 1) / steps.length) * 100;
 
     highlight.style.left = `${Math.max(6, rect.left - pad)}px`;
     highlight.style.top = `${Math.max(6, rect.top - pad)}px`;
@@ -207,17 +341,30 @@ function showTutorialStep(index) {
       rect.height + pad * 2,
     )}px`;
 
+    if (progress) progress.style.width = `${progressPct}%`;
     if (counter) {
-      counter.textContent = `Step ${tutorialIndex + 1} of ${tutorialSteps.length}`;
+      counter.textContent = `${copy.step} ${tutorialIndex + 1} ${copy.of} ${
+        steps.length
+      }`;
     }
     if (title) title.textContent = step.title;
     if (body) body.textContent = step.body;
-    if (action) action.textContent = step.action;
-    if (back) back.disabled = tutorialIndex === 0;
-    if (next) {
-      next.textContent =
-        tutorialIndex === tutorialSteps.length - 1 ? "Finish" : "Next";
+    if (action) {
+      action.innerHTML = `<strong>${copy.actionLabel}:</strong> ${step.action}`;
     }
+    if (primary) {
+      primary.classList.toggle("d-none", !step.primaryLabel);
+      primary.textContent = step.primaryLabel || "";
+    }
+    if (back) {
+      back.textContent = copy.back;
+      back.disabled = tutorialIndex === 0;
+    }
+    if (next) {
+      next.textContent = tutorialIndex === steps.length - 1 ? copy.finish : copy.next;
+    }
+    if (skip) skip.textContent = copy.skip;
+    if (close) close.setAttribute("aria-label", copy.close);
 
     positionTutorialCard(target, step.placement);
   });
@@ -231,8 +378,7 @@ function startTutorial(force = false) {
   tutorialActive = true;
   tutorialIndex = 0;
 
-  const { overlay } = tutorialEls();
-  overlay?.classList.remove("d-none");
+  tutorialEls().overlay?.classList.remove("d-none");
   showTutorialStep(0);
 }
 
@@ -257,5 +403,5 @@ function initTutorialControls() {
 }
 
 function startTutorialIfNeeded() {
-  setTimeout(() => startTutorial(false), 450);
+  setTimeout(() => startTutorial(false), 650);
 }
