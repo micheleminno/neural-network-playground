@@ -1,226 +1,144 @@
 # NeuroBuilder
 
-Play online:
+NeuroBuilder is a browser-based teaching tool for creating, training, testing,
+visualizing and saving fully connected neural networks.
 
-https://micheleminno.github.io/neural-network-playground/
+It is designed for teachers, students and anyone introducing coding, machine
+learning and artificial intelligence through direct experimentation.
 
----
+**[Open NeuroBuilder](https://micheleminno.github.io/neural-network-playground/)**
 
-# 🧠 NeuroBuilder
+![NeuroBuilder landing page](docs/screenshots/landing.jpg)
 
-NeuroBuilder is an interactive educational tool for building, training, visualizing, saving and experimenting with artificial neural networks directly in the browser.
+## The learning experience
 
-Designed for:
+Teachers can register with email and password or continue with Google. During
+registration, NeuroBuilder collects the teacher's name, surname, teaching
+subject and an optional phone number.
 
-- High school students
-- AI and Machine Learning introduction
-- Computer Science classrooms
-- Self-learning and experimentation
+After signing in, the guided tutorial introduces the complete workflow:
 
-No installation required.
+1. Configure the network architecture.
+2. Select a preset or import a dataset.
+3. Train the network and observe loss and accuracy.
+4. Inspect weights, bias and neuron activations.
+5. Test the trained model with new inputs.
+6. Save the network or export it as JSON.
 
----
+The application and tutorial are available in Italian and English. Changing
+the language while the tutorial is open updates the current step immediately.
 
-# ✨ Features
+## Network builder
 
-## 🔧 Neural Network Builder
+Build dense feed-forward networks and configure:
 
-Create fully-connected feed-forward neural networks visually.
+- Input and output dimensions
+- Any number of hidden layers
+- Neurons in each layer
+- ReLU, sigmoid, tanh and linear activation functions
+- Bias for hidden and output layers
 
-Configure:
+![Network architecture controls](docs/screenshots/architecture.jpg)
 
-- Number of input neurons
-- Hidden layers
-- Number of neurons per layer
-- Activation functions
-- Bias enable/disable
+## Interactive visualization and datasets
 
-Supported activations:
+The network diagram updates as the architecture changes. Connections show the
+sign and magnitude of each weight, while node colors represent activations.
+Hovering over the visualization reveals numeric values.
 
-- ReLU
-- Sigmoid
-- Tanh
-- Linear
+NeuroBuilder includes two presets:
 
----
+- **XOR:** automatically configures 2 inputs and 1 output
+- **Linear separation:** classifies points using `x + y > 1`
 
-## 👁️ Interactive Network Visualization
+Custom supervised datasets can be imported as CSV files. Configure the network
+before importing: the architecture determines how columns are interpreted.
+Input columns must come first, followed by output columns.
 
-Visualize the neural network structure in real time.
+For a network with 2 inputs and 1 output:
 
-Features:
-
-- Input, hidden and output neurons
-- Weight visualization
-- Bias nodes
-- Positive weights (green)
-- Negative weights (red)
-- Weight thickness proportional to magnitude
-- Hover tooltips showing:
-  - Weights
-  - Activations
-  - Bias values
-
----
-
-## 🏋️ Training
-
-Train neural networks directly in the browser.
-
-Adjustable parameters:
-
-- Learning rate
-- Epochs
-- Batch size
-
-Includes:
-
-- Real-time loss chart
-- Accuracy monitoring
-- Stop training at any time
-
----
-
-## ⚡ Prediction
-
-Test trained networks interactively.
-
-Features:
-
-- Custom inputs
-- Immediate inference
-- Live network activation visualization
-- Output inspection
-
----
-
-## 📊 Dataset Management
-
-### Built-in datasets
-
-- XOR
-- Linear Separation
-
-### CSV Import
-
-Supported format:
-
+```csv
 0,0,0
 0,1,1
 1,0,1
 1,1,0
+```
 
-Rules:
+CSV requirements:
 
 - Numeric values only
-- Input columns first, followed by output columns
-- The number of columns must match the network architecture
 - No header row
+- A consistent number of columns on every row
+- Exactly `input count + output count` columns
 
----
+![Network visualization and dataset controls](docs/screenshots/network-dataset.jpg)
 
-## ☁️ Cloud Storage
+## Training and prediction
 
-Networks can be saved online using Supabase.
+Training runs directly in the browser. Users can adjust learning rate, epochs
+and batch size, monitor progress, stop training and inspect loss and accuracy.
+The prediction panel accepts one value for each input and visualizes the model's
+response.
 
-Features:
+![Training and prediction controls](docs/screenshots/training-prediction.jpg)
 
-- Save networks to the cloud
-- Load previously saved networks
-- Delete saved networks
-- Persistent storage between sessions
+## Accounts and cloud storage
 
----
+Authentication and persistence are provided by Supabase. Each authenticated
+teacher can:
 
-## 💾 Import / Export
+- Save a network under their own account
+- Update the currently loaded network
+- Load or delete previously saved networks
+- Access only their own saved models
 
-### Export Architecture
+Email/password and Google authentication are supported. OAuth redirects return
+to the deployed GitHub Pages application.
 
-Exports only:
+## Import, export and JSON preview
 
-- Layers
-- Neurons
-- Activations
-- Bias configuration
+Networks can be imported from JSON or exported in three modes:
 
-### Export Weights
+- **Architecture only:** layers, dimensions, activations and bias settings
+- **Weights only:** trained weights and bias values
+- **Full network:** architecture, weights and dataset
 
-Exports:
+The live JSON preview can be formatted or compacted, copied to the clipboard or
+downloaded.
 
-- Trained weights
-- Bias values
+![Network files and JSON preview](docs/screenshots/files-json.jpg)
 
-### Export Full Network
+## Technology
 
-Exports everything required to recreate a trained model.
-
-### Import Network
-
-Import previously exported JSON files.
-
----
-
-## 📄 JSON Preview
-
-Live JSON representation of the current network.
-
-Useful for:
-
-- Learning network structure
-- Debugging
-- Understanding model serialization
-
----
-
-## 🌍 Languages
-
-- Italian 🇮🇹
-- English 🇬🇧
-
-Instant language switching.
-
----
-
-## 🎓 Educational Goals
-
-NeuroBuilder helps students understand:
-
-- Artificial neurons
-- Activation functions
-- Weights and bias
-- Forward propagation
-- Backpropagation
-- Binary classification
-- Training dynamics
-- Neural network architecture design
-
----
-
-## 🛠️ Technologies
-
-- HTML5
-- CSS3
-- Bootstrap 5
+- HTML5 and CSS3
 - Vanilla JavaScript
+- Bootstrap 5 and Bootstrap Icons
 - Chart.js
-- SVG
-- Supabase
+- SVG network visualization
+- Supabase Auth and PostgreSQL storage
+- GitHub Pages
 
----
+## Run locally
 
-## 🚀 Quick Start
+```bash
+npm install
+npm start
+```
 
-1. Build a network
-2. Select or import a dataset
-3. Configure training parameters
-4. Train the network
-5. Test predictions
-6. Save or export the model
+For authentication and cloud persistence, configure the Supabase project in
+`supabase.js`, run `supabase/auth-and-user-networks.sql`, enable the desired
+authentication providers and add the required callback and redirect URLs in
+Supabase and Google Cloud. The current Google OAuth redirect is
+`https://micheleminno.github.io/neural-network-playground/`.
 
----
+## Full application
 
-## 👨‍🏫 Author
+[View the full-page application screenshot](docs/screenshots/full-app.jpg)
 
-Michele Minno
+## Author
 
-Developed with the support of ChatGPT.
+[Michele Minno](https://github.com/micheleminno)
+
+## License
+
+This project is released under the [MIT License](LICENSE).
