@@ -14,27 +14,27 @@ const tutorialCopy = {
         title: "Start with the network recipe",
         body: "This column is the model architecture. Inputs can be numeric or text encoded as character frequencies; layers, neurons, activation functions and bias remain visible.",
         action:
-          "For a first classroom demo, keep the default 2 inputs, 4 hidden neurons and 1 sigmoid output.",
+          "For this first classroom demo, leave the hidden layer and sigmoid output as they are. The preset will configure the text input automatically.",
         placement: "right",
       },
       {
         selector: "#datasetCard",
-        title: "Load a tiny learning problem",
-        body: "A network needs examples before it can learn. Built-in presets have a known shape: XOR automatically sets 2 inputs and 1 output. With a custom CSV, configure the network first: its input and output counts determine how the columns are interpreted.",
-        action: "Load XOR now and notice that the architecture becomes 2 inputs and 1 output.",
+        title: "Teach the network with sentences",
+        body: "A network learns from labelled examples. This preset contains 40 English sentences: negative sentences are labelled 0 and positive sentences are labelled 1. It also configures the text input automatically.",
+        action: "Load English sentiment and notice that the input changes from numbers to text features.",
         placement: "right",
-        primaryLabel: "Load XOR",
+        primaryLabel: "Load sentiment",
         onPrimary: () => {
           const preset = document.getElementById("presetDataset");
-          if (preset) preset.value = "xor";
-          loadPreset("xor");
+          if (preset) preset.value = "sentiment-en";
+          loadPreset("sentiment-en");
         },
       },
       {
         selector: "#trainingCard",
         title: "Train and watch learning happen",
         body: "Training changes weights and bias. The loss chart is the story: if it goes down, the network is learning from the examples.",
-        action: "Click Train after XOR is loaded, then watch loss and accuracy.",
+        action: "Click Train after the sentiment preset is loaded, then watch loss decrease and accuracy increase.",
         placement: "top",
       },
       {
@@ -47,14 +47,16 @@ const tutorialCopy = {
       {
         selector: "#predictionCard",
         title: "Ask the trained model a question",
-        body: "Prediction turns the trained network into an experiment. Change x1 and x2 to test what the model believes.",
-        action: "Prepare the classic XOR test input: x1 = 1 and x2 = 0.",
+        body: "Prediction turns the trained network into an experiment. Write a new English sentence and compare the precise output with its rounded class: 0 is negative and 1 is positive.",
+        action: 'Try the sentence: "This lesson was clear and useful".',
         placement: "left",
-        primaryLabel: "Set 1, 0",
+        primaryLabel: "Use example sentence",
         onPrimary: () => {
-          const inputs = document.querySelectorAll("#testInputs [data-ti]");
-          if (inputs[0]) inputs[0].value = "1";
-          if (inputs[1]) inputs[1].value = "0";
+          const input = document.getElementById("textPredictInput");
+          if (input) {
+            input.value = "This lesson was clear and useful";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+          }
           predictOnce();
         },
       },
@@ -98,27 +100,27 @@ const tutorialCopy = {
         title: "Parti dalla ricetta della rete",
         body: "Questa colonna descrive l'architettura del modello. Gli input possono essere numerici oppure testi codificati come frequenze di caratteri; layer, neuroni, attivazioni e bias restano visibili.",
         action:
-          "Per la prima dimostrazione in classe, tieni la rete di default: 2 input, 4 neuroni nascosti e 1 output sigmoid.",
+          "Per questa prima dimostrazione, lascia invariati il layer nascosto e l'output sigmoid. Il preset configurerà automaticamente l'input testuale.",
         placement: "right",
       },
       {
         selector: "#datasetCard",
-        title: "Carica un problema piccolo",
-        body: "Una rete ha bisogno di esempi per imparare. I preset hanno una struttura nota: XOR imposta automaticamente 2 input e 1 output. Con un CSV personalizzato, configura prima la rete: il numero di input e output stabilisce come vengono interpretate le colonne.",
-        action: "Carica XOR e osserva che l'architettura diventa 2 input e 1 output.",
+        title: "Insegna alla rete usando delle frasi",
+        body: "Una rete impara da esempi etichettati. Questo preset contiene 40 frasi inglesi: le frasi negative hanno etichetta 0 e quelle positive etichetta 1. Configura anche l'input testuale automaticamente.",
+        action: "Carica il sentiment inglese e osserva che l'input passa dai numeri alle feature testuali.",
         placement: "right",
-        primaryLabel: "Carica XOR",
+        primaryLabel: "Carica sentiment",
         onPrimary: () => {
           const preset = document.getElementById("presetDataset");
-          if (preset) preset.value = "xor";
-          loadPreset("xor");
+          if (preset) preset.value = "sentiment-en";
+          loadPreset("sentiment-en");
         },
       },
       {
         selector: "#trainingCard",
         title: "Allena e osserva l'apprendimento",
         body: "L'allenamento modifica pesi e bias. Il grafico della loss racconta cosa sta succedendo: se scende, la rete sta imparando dagli esempi.",
-        action: "Dopo aver caricato XOR, clicca Train e osserva loss e accuracy.",
+        action: "Dopo aver caricato il sentiment, clicca Train e osserva la loss scendere e l'accuracy salire.",
         placement: "top",
       },
       {
@@ -131,14 +133,16 @@ const tutorialCopy = {
       {
         selector: "#predictionCard",
         title: "Fai una domanda al modello",
-        body: "La predizione trasforma la rete allenata in un esperimento. Cambia x1 e x2 per testare cosa ha imparato.",
-        action: "Prepara il classico test XOR: x1 = 1 e x2 = 0.",
+        body: "La predizione trasforma la rete allenata in un esperimento. Scrivi una nuova frase inglese e confronta l'output preciso con la classe arrotondata: 0 significa negativo e 1 positivo.",
+        action: 'Prova la frase: "This lesson was clear and useful".',
         placement: "left",
-        primaryLabel: "Imposta 1, 0",
+        primaryLabel: "Usa la frase di esempio",
         onPrimary: () => {
-          const inputs = document.querySelectorAll("#testInputs [data-ti]");
-          if (inputs[0]) inputs[0].value = "1";
-          if (inputs[1]) inputs[1].value = "0";
+          const input = document.getElementById("textPredictInput");
+          if (input) {
+            input.value = "This lesson was clear and useful";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+          }
           predictOnce();
         },
       },
@@ -182,7 +186,7 @@ function tutorialSteps() {
 
 function tutorialStorageKey() {
   const userId = currentSession?.user?.id || "anonymous";
-  return `neurobuilder-tutorial-v2-seen:${userId}`;
+  return `neurobuilder-tutorial-v3-seen:${userId}`;
 }
 
 function tutorialEls() {
