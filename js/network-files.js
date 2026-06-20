@@ -3,6 +3,7 @@ function updateJSON() {
   const j = {
     architecture: {
       layers: arch,
+      inputConfig: serializeInputConfig(),
     },
 
     weights: net.layers.map((l) => ({
@@ -61,6 +62,11 @@ function handleJSONImportFile(file, inputEl) {
 
         inputSize = arch[0].neurons;
         outputSize = arch[arch.length - 1].neurons;
+        applyInputConfig(o.inputConfig, inputSize);
+        if (inputConfig.mode === "text" && textFeatureCount() !== inputSize) {
+          throw new Error(t("textConfigMismatch"));
+        }
+        dataset = { X: [], y: [], rawText: [] };
 
         buildNetwork();
 
@@ -72,6 +78,7 @@ function handleJSONImportFile(file, inputEl) {
         renderArchitecture();
         renderTestInputs();
         renderNNVis();
+        syncInputModeControls();
         updateJSON();
 
         alert(t("importWeightsOk"));
@@ -92,6 +99,10 @@ function handleJSONImportFile(file, inputEl) {
         inputSize = arch.find((l) => l.type === "input")?.neurons;
 
         outputSize = arch.find((l) => l.type === "output")?.neurons;
+        applyInputConfig(o.inputConfig || o.architecture.inputConfig, inputSize);
+        if (inputConfig.mode === "text" && textFeatureCount() !== inputSize) {
+          throw new Error(t("textConfigMismatch"));
+        }
 
         buildNetwork();
 
@@ -110,9 +121,23 @@ function handleJSONImportFile(file, inputEl) {
           }
         }
 
+        if (o.dataset) {
+          dataset.X = Array.isArray(o.dataset.X) ? o.dataset.X : [];
+          dataset.y = Array.isArray(o.dataset.y) ? o.dataset.y : [];
+          dataset.rawText = Array.isArray(o.dataset.rawText)
+            ? o.dataset.rawText
+            : [];
+          if (inputConfig.mode === "text" && dataset.rawText.length) {
+            updateTextDatasetEncoding();
+          }
+        } else {
+          dataset = { X: [], y: [], rawText: [] };
+        }
+
         renderArchitecture();
         renderTestInputs();
         renderNNVis();
+        syncInputModeControls();
         updateJSON();
 
         alert(
@@ -141,6 +166,7 @@ function exportJSONFile(mode = "full") {
   if (mode === "architecture") {
     j = {
       architecture: {
+        inputConfig: serializeInputConfig(),
         layers: arch.map((l) => ({
           type: l.type,
           neurons: l.neurons,
@@ -153,6 +179,7 @@ function exportJSONFile(mode = "full") {
     filename = "neurobuilder-architecture.json";
   } else if (mode === "weights") {
     j = {
+      inputConfig: serializeInputConfig(),
       layers: net.layers.map((l) => ({
         in: l.in,
         out: l.out,
@@ -167,6 +194,7 @@ function exportJSONFile(mode = "full") {
   } else {
     j = {
       architecture: {
+        inputConfig: serializeInputConfig(),
         layers: arch.map((l) => ({
           type: l.type,
           neurons: l.neurons,
@@ -187,6 +215,7 @@ function exportJSONFile(mode = "full") {
       dataset: {
         X: dataset.X,
         y: dataset.y,
+        rawText: dataset.rawText,
       },
     };
 
@@ -207,6 +236,7 @@ function exportJSONFile(mode = "full") {
 function exportArchitecture() {
   const j = {
     architecture: {
+      inputConfig: serializeInputConfig(),
       layers: arch.map((l) => ({
         type: l.type,
         neurons: l.neurons,
@@ -232,6 +262,7 @@ function exportArchitecture() {
 
 function downloadWeights() {
   const j = {
+    inputConfig: serializeInputConfig(),
     layers: net.layers.map((l) => ({
       in: l.in,
       out: l.out,
@@ -330,4 +361,3 @@ function attachPopoverGlobalClosers() {
     true,
   );
 }
-

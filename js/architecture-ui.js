@@ -3,6 +3,30 @@ function renderTestInputs() {
   const container = $("#testInputs");
   if (!container) return;
 
+  if (inputConfig.mode === "text") {
+    const previousText = document.getElementById("textPredictInput")?.value || "";
+    container.innerHTML = `
+      <label class="form-label" for="textPredictInput">${t("textToPredict")}</label>
+      <textarea
+        id="textPredictInput"
+        class="form-control text-predict-input"
+        rows="4"
+        data-i18n-placeholder="textPredictPlaceholder"
+        placeholder="${t("textPredictPlaceholder")}"
+      ></textarea>
+      <div id="textEncodingPreview" class="small-muted mt-2"></div>
+    `;
+    const textarea = document.getElementById("textPredictInput");
+    textarea.value = previousText;
+    textarea.addEventListener("input", () => updateTextEncodingPreview(textarea.value));
+    updateTextEncodingPreview(previousText);
+
+    if (typeof renderPredictionOutputs === "function") {
+      renderPredictionOutputs();
+    }
+    return;
+  }
+
   const prev = Array.from(container.querySelectorAll("[data-ti]")).map((inp) =>
     Number(inp.value),
   );
@@ -93,7 +117,13 @@ function renderArchitecture() {
         <div class="col-6">
 
           <label class="form-label">
-            ${isInput ? t("inputSize") : t("neurons")}:
+            ${
+              isInput
+                ? inputConfig.mode === "text"
+                  ? t("textFeatures")
+                  : t("inputSize")
+                : t("neurons")
+            }:
             <span id="neuronsVal-${idx}">
               ${layerDef.neurons}
             </span>
@@ -107,6 +137,7 @@ function renderArchitecture() {
             value="${layerDef.neurons}"
             class="form-control"
             data-neurons="${idx}"
+            ${isInput && inputConfig.mode === "text" ? "disabled" : ""}
           >
 
         </div>
@@ -174,6 +205,10 @@ function renderArchitecture() {
       const i = Number(e.target.dataset.neurons);
 
       arch[i].neurons = Number(e.target.value);
+
+      if (arch[i].type === "input") {
+        inputConfig.numericSize = arch[i].neurons;
+      }
 
       const sp = document.getElementById(`neuronsVal-${i}`);
       if (sp) sp.textContent = arch[i].neurons;

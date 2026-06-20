@@ -40,8 +40,10 @@ function bindUIControls() {
   });
 
   on("btnPredict", "click", () => {
-    const ti = document.querySelectorAll("#testInputs [data-ti]");
-    if (ti.length !== inputSize) renderTestInputs();
+    if (inputConfig.mode === "numeric") {
+      const ti = document.querySelectorAll("#testInputs [data-ti]");
+      if (ti.length !== inputSize) renderTestInputs();
+    }
     predictOnce();
   });
 
@@ -189,6 +191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderArchitecture();
 
   bindUIControls();
+  wireInputModeControls();
   initTutorialControls();
   wireCsvInputs();
   attachPopoverGlobalClosers();

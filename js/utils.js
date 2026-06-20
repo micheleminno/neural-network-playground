@@ -8,6 +8,15 @@
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
+function escapeHTML(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function getLang() {
   return document.body?.dataset?.lang === "en" ? "en" : "it";
 }
@@ -28,6 +37,10 @@ function setLang(lang) {
   renderNNVis();
   updateJSON();
   updateNetworkTitle();
+
+  if (typeof syncInputModeControls === "function") {
+    syncInputModeControls();
+  }
 
   if (typeof refreshActiveTutorialLanguage === "function") {
     refreshActiveTutorialLanguage();

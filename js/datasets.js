@@ -1,6 +1,7 @@
 // ========= Dataset Preset & CSV =========
 function loadPreset(name) {
   if (name === "xor") {
+    applyInputConfig({ ...serializeInputConfig(), mode: "numeric", numericSize: 2 }, 2);
     dataset.X = [
       [0, 0],
       [0, 1],
@@ -8,6 +9,7 @@ function loadPreset(name) {
       [1, 1],
     ];
     dataset.y = [[0], [1], [1], [0]];
+    dataset.rawText = [];
     inputSize = 2;
     outputSize = 1;
     ensureIOInArch();
@@ -17,6 +19,7 @@ function loadPreset(name) {
       csvInfo.dataset.auto = "loaded";
     }
   } else if (name === "linsep") {
+    applyInputConfig({ ...serializeInputConfig(), mode: "numeric", numericSize: 2 }, 2);
     const X = [];
     const y = [];
     const r = rng(7);
@@ -28,6 +31,7 @@ function loadPreset(name) {
     }
     dataset.X = X;
     dataset.y = y;
+    dataset.rawText = [];
     inputSize = 2;
     outputSize = 1;
     ensureIOInArch();
@@ -88,35 +92,93 @@ function handleCSVFile(file) {
     }
   };
 
-  const sniffDelimiter = (text) => {
-    const counts = {
-      ",": (text.match(/,/g) || []).length,
-      ";": (text.match(/;/g) || []).length,
-      "\t": (text.match(/\t/g) || []).length,
-    };
-    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0] || ",";
-  };
-
   const toNumber = (token) => {
-    const value = token.trim().replace(",", ".");
+    const value = String(token).trim().replace(",", ".");
     const n = Number(value);
     return Number.isFinite(n) ? n : NaN;
   };
 
   const parse = (text) => {
-    let lines = text
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean);
+    if (!window.Papa) throw new Error(t("csvParserUnavailable"));
 
-    if (lines.length === 0) throw new Error(t("csvEmpty"));
+    const parsed = Papa.parse(text, {
+      header: false,
+      dynamicTyping: false,
+      skipEmptyLines: "greedy",
+    });
 
-    const delim = sniffDelimiter(lines.slice(0, 50).join("\n"));
-    if (/[a-zA-Z]/.test(lines[0])) lines.shift();
+    const fatalError = parsed.errors.find(
+      (error) => error.code !== "TooFewFields" && error.code !== "TooManyFields",
+    );
+    if (fatalError) throw new Error(fatalError.message);
 
-    const rows = lines.map((line) => line.split(delim));
+    let rows = parsed.data.map((row) => row.map((cell) => String(cell).trim()));
+    if (!rows.length) throw new Error(t("csvEmpty"));
+
+    const outputColumns =
+      arch.find((layer) => layer.type === "output")?.neurons || outputSize;
+    const firstRow = rows[0];
+    const firstTextCell = firstRow[0]?.toLocaleLowerCase() || "";
+    const hasHeader =
+      inputConfig.mode === "text"
+        ? ["text", "testo", "sentence", "phrase", "input"].includes(firstTextCell) ||
+          firstRow.slice(1).some((cell) => Number.isNaN(toNumber(cell)))
+        : firstRow.some((cell) => Number.isNaN(toNumber(cell)));
+
+    if (hasHeader) rows = rows.slice(1);
+    if (!rows.length) throw new Error(t("csvEmpty"));
+
     const cols = rows[0].length;
     if (cols < 2) throw new Error(t("csvNeedCols"));
+
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+      if (rows[rowIndex].length !== cols) {
+        throw new Error(
+          t("csvRowColumnMismatch")
+            .replace("{row}", rowIndex + 1)
+            .replace("{expected}", cols)
+            .replace("{actual}", rows[rowIndex].length),
+        );
+      }
+    }
+
+    if (inputConfig.mode === "text") {
+      const expectedCols = 1 + outputColumns;
+      if (cols !== expectedCols) {
+        throw new Error(
+          t("textCsvColumnMismatch")
+            .replace("{expected}", expectedCols)
+            .replace("{outputs}", outputColumns)
+            .replace("{actual}", cols),
+        );
+      }
+
+      const rawText = [];
+      const y = [];
+
+      rows.forEach((row, rowIndex) => {
+        if (!row[0]) {
+          throw new Error(`${t("textCsvEmptyText")} ${rowIndex + 1}.`);
+        }
+        const targets = row.slice(1).map(toNumber);
+        if (targets.some(Number.isNaN)) {
+          throw new Error(`${t("csvNonNumeric")} ${rowIndex + 1}.`);
+        }
+        rawText.push(row[0]);
+        y.push(targets);
+      });
+
+      const derivedAlphabet = deriveTextAlphabet(rawText);
+      if (derivedAlphabet) inputConfig.text.alphabet = derivedAlphabet;
+      const X = rawText.map(encodeTextInput);
+      return {
+        X,
+        y,
+        rawText,
+        inputSizeNew: textFeatureCount(),
+        delimiter: parsed.meta.delimiter,
+      };
+    }
 
     const expectedInputSize =
       arch.find((layer) => layer.type === "input")?.neurons || inputSize;
@@ -135,14 +197,6 @@ function handleCSVFile(file) {
     }
 
     const data = rows.map((row, ri) => {
-      if (row.length !== cols) {
-        throw new Error(
-          t("csvRowColumnMismatch")
-            .replace("{row}", ri + 1)
-            .replace("{expected}", cols)
-            .replace("{actual}", row.length),
-        );
-      }
       const nums = row.map(toNumber);
       if (nums.some((x) => Number.isNaN(x))) {
         throw new Error(`${t("csvNonNumeric")} ${ri + 1}.`);
@@ -152,7 +206,13 @@ function handleCSVFile(file) {
 
     const X = data.map((row) => row.slice(0, expectedInputSize));
     const y = data.map((row) => row.slice(expectedInputSize));
-    return { X, y, delimiter: delim };
+    return {
+      X,
+      y,
+      rawText: [],
+      inputSizeNew: expectedInputSize,
+      delimiter: parsed.meta.delimiter,
+    };
   };
 
   const fr = new FileReader();
@@ -160,17 +220,27 @@ function handleCSVFile(file) {
   fr.onload = () => {
     try {
       const text = fr.result;
-      const { X, y, delimiter } = parse(text);
+      const { X, y, rawText, inputSizeNew, delimiter } = parse(text);
 
       dataset.X = X;
       dataset.y = y;
+      dataset.rawText = rawText;
+
+      if (inputConfig.mode === "text") {
+        inputSize = inputSizeNew;
+        syncInputLayerToConfig({ rebuild: false });
+        ensureIOInArch();
+        syncInputModeControls();
+      }
 
       renderTestInputs();
 
       setInfo(
         `CSV "${file.name}" ${t("csvLoaded")}: ${X.length} ${t(
           "csvExamples",
-        )}, ${inputSize} ${t("csvFeatures")} (${t("csvDelimiter")} "${
+        )}, ${inputSize} ${
+          inputConfig.mode === "text" ? t("textFeatures") : t("csvFeatures")
+        } (${t("csvDelimiter")} "${
           delimiter === "\t" ? "TAB" : delimiter
         }")`,
       );

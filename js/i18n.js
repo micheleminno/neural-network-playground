@@ -6,6 +6,11 @@ const I18N = {
     hiddenLayer: "Layer nascosto",
     neurons: "Neuroni",
     inputSize: "Dimensione input",
+    textFeatures: "feature testuali",
+    textToPredict: "Testo",
+    textPredictPlaceholder: "Scrivi il testo da classificare...",
+    textEncodingSummary: "{used} di {total} feature attive",
+    textEmpty: "Inserisci un testo da classificare.",
     activation: "Attivazione",
     bias: "Bias",
     network: "Nuova rete",
@@ -28,6 +33,12 @@ const I18N = {
     csvNoDataset: "Nessun dataset caricato",
     csvReadError: "Impossibile leggere il file CSV.",
     csvParseError: "Errore CSV: ",
+    csvParserUnavailable: "Il parser CSV non è disponibile.",
+    textCsvColumnMismatch:
+      "In modalità testo servono {expected} colonne: testo + {outputs} output, ma il CSV ne contiene {actual}.",
+    textCsvEmptyText: "Testo vuoto alla riga",
+    textConfigMismatch:
+      "L'alfabeto importato non corrisponde alla dimensione input della rete.",
     presetXorLoaded: "Caricato preset XOR (4 esempi)",
     presetLinearLoaded: "Caricato dataset lineare (200 esempi)",
     trainNoDataset: "Carica o scegli un preset/CSV prima di allenare.",
@@ -46,13 +57,14 @@ const I18N = {
     csvPopoverTitle: "Formato CSV richiesto",
     csvPopoverHtml: `
       <div>
-        <b>• Senza intestazioni</b><br>
-        • Separatore: virgola (<code>,</code>)<br>
-        • Tutto numerico (niente NaN)<br>
-        • Prima gli input, poi gli output della rete<br>
-        • Il numero di colonne deve corrispondere all'architettura<br>
-        • Esempio:<br>
-        <code>0,0,0<br>0,1,1<br>1,0,1<br>1,1,0</code>
+        <b>Numerico</b><br>
+        • Input prima, output dopo<br>
+        • Intestazione facoltativa<br>
+        • Esempio: <code>0,1,1</code><br><br>
+        <b>Testo</b><br>
+        • Prima colonna = testo, poi gli output<br>
+        • Intestazione facoltativa<br>
+        • Esempio: <code>text,label<br>"lezione utile",1</code>
       </div>`,
   },
   en: {
@@ -61,6 +73,11 @@ const I18N = {
     hiddenLayer: "Hidden layer",
     neurons: "Neurons",
     inputSize: "Input size",
+    textFeatures: "text features",
+    textToPredict: "Text",
+    textPredictPlaceholder: "Type the text to classify...",
+    textEncodingSummary: "{used} of {total} active features",
+    textEmpty: "Enter some text to classify.",
     activation: "Activation",
     bias: "Bias",
     network: "New network",
@@ -83,6 +100,12 @@ const I18N = {
     csvNoDataset: "No dataset loaded",
     csvReadError: "Can't read CSV file.",
     csvParseError: "CSV error: ",
+    csvParserUnavailable: "The CSV parser is not available.",
+    textCsvColumnMismatch:
+      "Text mode requires {expected} columns: text + {outputs} outputs, but the CSV contains {actual}.",
+    textCsvEmptyText: "Empty text at row",
+    textConfigMismatch:
+      "The imported alphabet does not match the network input size.",
     presetXorLoaded: "XOR preset loaded (4 examples)",
     presetLinearLoaded: "Linear dataset loaded (200 examples)",
     trainNoDataset: "Load or choose a preset/CSV before training.",
@@ -101,13 +124,14 @@ const I18N = {
     csvPopoverTitle: "Required CSV format",
     csvPopoverHtml: `
       <div>
-        <b>• No headers</b><br>
-        • Separator: comma (<code>,</code>)<br>
-        • All numeric values (no NaN)<br>
-        • Network inputs first, then network outputs<br>
-        • The number of columns must match the architecture<br>
-        • Example:<br>
-        <code>0,0,0<br>0,1,1<br>1,0,1<br>1,1,0</code>
+        <b>Numeric</b><br>
+        • Inputs first, outputs last<br>
+        • Optional header row<br>
+        • Example: <code>0,1,1</code><br><br>
+        <b>Text</b><br>
+        • First column = text, followed by outputs<br>
+        • Optional header row<br>
+        • Example: <code>text,label<br>"useful lesson",1</code>
       </div>`,
   },
 };
@@ -167,6 +191,12 @@ const I18N_HTML = {
     hiddenLayer: "Layer nascosto",
     neurons: "Neuroni",
     inputSize: "Dimensione input",
+    inputType: "Tipo di input",
+    numericInput: "Numerico",
+    textInput: "Testo",
+    alphabet: "Alfabeto",
+    lowercase: "Minuscolo",
+    textPredictPlaceholder: "Scrivi il testo da classificare...",
     activation: "Attivazione",
     bias: "Bias",
     legendPositive: "Verde = peso positivo",
@@ -190,6 +220,7 @@ const I18N_HTML = {
     predict: "Predici",
     outputLabel: "Output",
     dataset: "Dataset",
+    supervisedData: "Dati per apprendimento supervisionato",
     load: "Carica",
     csvDropText: "Trascina CSV qui",
     noDataset: "Nessun dataset caricato",
@@ -210,6 +241,12 @@ const I18N_HTML = {
     hiddenLayer: "Hidden layer",
     neurons: "Neurons",
     inputSize: "Input size",
+    inputType: "Input type",
+    numericInput: "Numeric",
+    textInput: "Text",
+    alphabet: "Alphabet",
+    lowercase: "Lowercase",
+    textPredictPlaceholder: "Type the text to classify...",
     activation: "Activation",
     bias: "Bias",
     legendPositive: "Green = positive weight",
@@ -233,6 +270,7 @@ const I18N_HTML = {
     predict: "Predict",
     outputLabel: "Output",
     dataset: "Dataset",
+    supervisedData: "Supervised learning data",
     load: "Load",
     csvDropText: "Drop CSV here",
     noDataset: "No dataset loaded",

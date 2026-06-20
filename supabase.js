@@ -55,6 +55,7 @@ async function saveNetwork() {
 
     architecture: {
       layers: arch,
+      inputConfig: serializeInputConfig(),
     },
 
     weights: net.layers.map((layer) => ({
@@ -67,6 +68,7 @@ async function saveNetwork() {
     dataset: {
       X: dataset.X,
       y: dataset.y,
+      rawText: dataset.rawText,
     },
 
     loss: Number($("#lossNow")?.textContent || 0),
@@ -248,6 +250,12 @@ async function loadNetworkById(id) {
 
   inputSize = arch.find((l) => l.type === "input")?.neurons || 1;
   outputSize = arch.find((l) => l.type === "output")?.neurons || 1;
+  applyInputConfig(network.architecture.inputConfig, inputSize);
+
+  if (inputConfig.mode === "text" && textFeatureCount() !== inputSize) {
+    alert(t("textConfigMismatch"));
+    return;
+  }
 
   console.log("ARCH RAW", network.architecture.layers);
   console.log("ARCH MAPPED", arch);
@@ -274,6 +282,10 @@ async function loadNetworkById(id) {
   if (network.dataset) {
     dataset.X = network.dataset.X || [];
     dataset.y = network.dataset.y || [];
+    dataset.rawText = network.dataset.rawText || [];
+    if (inputConfig.mode === "text" && dataset.rawText.length) {
+      updateTextDatasetEncoding();
+    }
   }
 
   if ($("#lossNow")) {
@@ -288,6 +300,7 @@ async function loadNetworkById(id) {
   renderArchitecture();
   renderTestInputs();
   renderNNVis();
+  syncInputModeControls();
   updateJSON();
 
   console.log("Network loaded:", network.name);
@@ -305,6 +318,7 @@ async function updateNetwork(id) {
 
     architecture: {
       layers: arch,
+      inputConfig: serializeInputConfig(),
     },
 
     weights: net.layers.map((layer) => ({
@@ -317,6 +331,7 @@ async function updateNetwork(id) {
     dataset: {
       X: dataset.X,
       y: dataset.y,
+      rawText: dataset.rawText,
     },
 
     loss: Number($("#lossNow")?.textContent || 0),
@@ -385,4 +400,3 @@ async function deleteNetworkById(id) {
 
   await populateNetworksSelect();
 }
-

@@ -12,7 +12,7 @@ const tutorialCopy = {
       {
         selector: "#architectureCard",
         title: "Start with the network recipe",
-        body: "This column is the model architecture. Students can see that a neural network is built from layers, neurons, activation functions and bias.",
+        body: "This column is the model architecture. Inputs can be numeric or text encoded as character frequencies; layers, neurons, activation functions and bias remain visible.",
         action:
           "For a first classroom demo, keep the default 2 inputs, 4 hidden neurons and 1 sigmoid output.",
         placement: "right",
@@ -96,7 +96,7 @@ const tutorialCopy = {
       {
         selector: "#architectureCard",
         title: "Parti dalla ricetta della rete",
-        body: "Questa colonna descrive l'architettura del modello. Gli studenti vedono che una rete neurale nasce da layer, neuroni, funzioni di attivazione e bias.",
+        body: "Questa colonna descrive l'architettura del modello. Gli input possono essere numerici oppure testi codificati come frequenze di caratteri; layer, neuroni, attivazioni e bias restano visibili.",
         action:
           "Per la prima dimostrazione in classe, tieni la rete di default: 2 input, 4 neuroni nascosti e 1 output sigmoid.",
         placement: "right",

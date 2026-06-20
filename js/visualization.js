@@ -16,7 +16,11 @@ function renderNNVis() {
   const xPad = 80;
   const yPad = 30;
   const colW = (W - 2 * xPad) / (layerCount - 1 || 1);
-  const nodeR = 13;
+  const largestLayer = Math.max(...sizes);
+  const availableNodeGap = (H - 2 * yPad) / (largestLayer + 1);
+  const nodeR = Math.max(1.5, Math.min(13, availableNodeGap * 0.36));
+  const nodeLabelSize = nodeR < 3 ? 0 : Math.max(5, Math.min(11, nodeR));
+  const nodeStrokeWidth = Math.max(0.6, Math.min(1.6, nodeR * 0.4));
   const BIAS_ROW_Y = 40;
 
   const pos = [];
@@ -192,8 +196,12 @@ function renderNNVis() {
         }
       }
 
+      const textInputLabels =
+        inputConfig.mode === "text" ? [...textAlphabetCharacters(), "?"] : [];
       const label = isInput
-        ? "x" + (ni + 1)
+        ? inputConfig.mode === "text"
+          ? textInputLabels[ni] || "?"
+          : "x" + (ni + 1)
         : isOutput
           ? "y" + (ni + 1)
           : "h" + (ni + 1);
@@ -209,9 +217,9 @@ function renderNNVis() {
       nodes += `<g class="nn-node"
   data-activation="${vRaw ?? ""}">
         <circle cx="${p.x}" cy="${p.y}" r="${nodeR}"
-          style="fill:${fill} !important; stroke:rgba(255,255,255,0.95); stroke-width:1.6"/>
-        <text x="${p.x}" y="${p.y + 3}" text-anchor="middle"
-          style="fill:#e5e7eb;font-weight:600">${label}</text>
+          style="fill:${fill} !important; stroke:rgba(255,255,255,0.95); stroke-width:${nodeStrokeWidth}"/>
+        <text x="${p.x}" y="${p.y + Math.min(3, nodeR * 0.3)}" text-anchor="middle"
+          style="fill:#e5e7eb;font-weight:600;font-size:${nodeLabelSize}px">${escapeHTML(label)}</text>
         ${badge}
       </g>`;
     }
@@ -320,4 +328,3 @@ function buildNetwork() {
   renderNNVis();
   updateJSON();
 }
-

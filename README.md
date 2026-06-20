@@ -32,6 +32,7 @@ the language while the tutorial is open updates the current step immediately.
 
 Build dense feed-forward networks and configure:
 
+- Numeric inputs or text encoded as character frequencies
 - Input and output dimensions
 - Any number of hidden layers
 - Neurons in each layer
@@ -67,9 +68,26 @@ For a network with 2 inputs and 1 output:
 CSV requirements:
 
 - Numeric values only
-- No header row
+- Optional header row
 - A consistent number of columns on every row
 - Exactly `input count + output count` columns
+
+### Text datasets
+
+Switch the input type to **Text** to classify strings with a Bag of Characters
+encoder. NeuroBuilder derives an alphabet from the imported text and converts
+each example into normalized character frequencies plus an unknown-character
+feature. The same alphabet and normalization settings are reused by Predict and
+stored with the network.
+
+Text CSV files use the first column for text and the remaining columns for
+numeric targets. Header rows are optional and quoted text may contain commas:
+
+```csv
+text,label
+"this lesson was useful",1
+"the explanation was confusing",0
+```
 
 ![Network visualization and dataset controls](docs/screenshots/network-dataset.jpg)
 
@@ -78,7 +96,8 @@ CSV requirements:
 Training runs directly in the browser. Users can adjust learning rate, epochs
 and batch size, monitor progress, stop training and inspect loss and accuracy.
 The prediction panel accepts one value for each input and visualizes the model's
-response.
+response. In Text mode it provides a textarea and shows how many character
+features are active before prediction.
 
 ![Training and prediction controls](docs/screenshots/training-prediction.jpg)
 
@@ -113,6 +132,7 @@ downloaded.
 - HTML5 and CSS3
 - Vanilla JavaScript
 - Bootstrap 5 and Bootstrap Icons
+- Papa Parse
 - Chart.js
 - SVG network visualization
 - Supabase Auth and PostgreSQL storage

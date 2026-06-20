@@ -3,7 +3,16 @@ let net = new Network();
 let arch = [];
 let inputSize = 2;
 let outputSize = 1;
-let dataset = { X: [], y: [] };
+let dataset = { X: [], y: [], rawText: [] };
+let inputConfig = {
+  mode: "numeric",
+  numericSize: 2,
+  text: {
+    alphabet: "abcdefghijklmnopqrstuvwxyz ",
+    lowercase: true,
+    encoding: "frequency",
+  },
+};
 let chart;
 let stopFlag = false;
 let lastNodeColors = null;
@@ -59,4 +68,3 @@ function computeNodeColorsForInput(xvec) {
     lastNodeColors.byLayer[k + 1] = vals.map((v) => (v - min) / den);
   });
 }
-

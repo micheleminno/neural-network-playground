@@ -202,7 +202,17 @@ function renderPredictionOutputs(values = []) {
 }
 
 function predictOnce() {
-  const vals = $$("#testInputs [data-ti]").map((i) => Number(i.value));
+  const textValue = document.getElementById("textPredictInput")?.value || "";
+  const vals =
+    inputConfig.mode === "text"
+      ? encodeTextInput(textValue)
+      : $$("#testInputs [data-ti]").map((i) => Number(i.value));
+
+  if (inputConfig.mode === "text" && !textValue.trim()) {
+    alert(t("textEmpty"));
+    return;
+  }
+
   if (vals.length !== inputSize) {
     alert(t("inputMismatch"));
     return;
@@ -214,6 +224,10 @@ function predictOnce() {
   }
 
   const out = net.forward([vals]);
+
+  if (inputConfig.mode === "text") {
+    updateTextEncodingPreview(textValue, vals);
+  }
 
   computeNodeColorsForInput(vals);
 
