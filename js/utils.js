@@ -27,6 +27,7 @@ function setLang(lang) {
   renderTestInputs();
   renderNNVis();
   updateJSON();
+  updateNetworkTitle();
 
   if (typeof refreshActiveTutorialLanguage === "function") {
     refreshActiveTutorialLanguage();
