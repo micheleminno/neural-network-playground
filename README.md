@@ -139,6 +139,9 @@ Supabase and Google Cloud. The current Google OAuth redirect is
 
 [Michele Minno](https://github.com/micheleminno)
 
-## License
+## Copyright
 
-This project is released under the [MIT License](LICENSE).
+Copyright © 2026 Michele Minno
+
+NeuroBuilder is licensed under the GNU GPL v3.0.
+See the [LICENSE](LICENSE) file for details.

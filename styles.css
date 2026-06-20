@@ -143,10 +143,16 @@ body {
   width: min(1120px, 100%);
   margin: 24px auto 0;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
   color: #94a3b8;
   font-size: 0.85rem;
+}
+
+.footer-copyright {
+  flex-basis: 100%;
+  text-align: center;
 }
 
 /* --- Public legal pages --- */
