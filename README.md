@@ -47,10 +47,12 @@ The network diagram updates as the architecture changes. Connections show the
 sign and magnitude of each weight, while node colors represent activations.
 Hovering over the visualization reveals numeric values.
 
-NeuroBuilder includes two presets:
+NeuroBuilder includes three presets:
 
 - **XOR:** automatically configures 2 inputs and 1 output
 - **Linear separation:** classifies points using `x + y > 1`
+- **English sentiment:** configures text input and classifies English sentences as
+  negative (`0`) or positive (`1`)
 
 Custom supervised datasets can be imported as CSV files. Configure the network
 before importing: the architecture determines how columns are interpreted.

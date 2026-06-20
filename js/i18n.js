@@ -41,6 +41,8 @@ const I18N = {
       "L'alfabeto importato non corrisponde alla dimensione input della rete.",
     presetXorLoaded: "Caricato preset XOR (4 esempi)",
     presetLinearLoaded: "Caricato dataset lineare (200 esempi)",
+    presetSentimentLoaded:
+      "Caricato sentiment inglese (40 frasi: 0 negativo, 1 positivo)",
     trainNoDataset: "Carica o scegli un preset/CSV prima di allenare.",
     inputMismatch: "Dimensione input non coerente con la rete.",
     roundedOutput: "Valore arrotondato",
@@ -108,6 +110,8 @@ const I18N = {
       "The imported alphabet does not match the network input size.",
     presetXorLoaded: "XOR preset loaded (4 examples)",
     presetLinearLoaded: "Linear dataset loaded (200 examples)",
+    presetSentimentLoaded:
+      "English sentiment loaded (40 sentences: 0 negative, 1 positive)",
     trainNoDataset: "Load or choose a preset/CSV before training.",
     inputMismatch: "Input size doesn't match the network.",
     roundedOutput: "Rounded value",
@@ -230,6 +234,7 @@ const I18N_HTML = {
     copy: "Copy",
 
     linearPreset: "Lineare (x + y > 1)",
+    sentimentPreset: "Sentiment inglese (positivo / negativo)",
   },
 
   en: {
@@ -280,5 +285,6 @@ const I18N_HTML = {
     copy: "Copy",
 
     linearPreset: "Linear (x + y > 1)",
+    sentimentPreset: "English sentiment (positive / negative)",
   },
 };

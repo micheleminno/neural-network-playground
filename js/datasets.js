@@ -1,4 +1,47 @@
 // ========= Dataset Preset & CSV =========
+const ENGLISH_SENTIMENT_PRESET = [
+  ["I loved this lesson", 1],
+  ["This was clear and helpful", 1],
+  ["The explanation was excellent", 1],
+  ["I really enjoyed the activity", 1],
+  ["This is a great example", 1],
+  ["The course is useful and engaging", 1],
+  ["Everything was easy to understand", 1],
+  ["I am happy with the result", 1],
+  ["The exercise was fun", 1],
+  ["This approach works very well", 1],
+  ["The instructions were simple and precise", 1],
+  ["I learned a lot today", 1],
+  ["The teacher did a wonderful job", 1],
+  ["This tool is intuitive", 1],
+  ["The answer is correct", 1],
+  ["What a brilliant idea", 1],
+  ["The experience was positive", 1],
+  ["I would recommend this course", 1],
+  ["The example made the topic easier", 1],
+  ["I feel confident now", 1],
+  ["I hated this lesson", 0],
+  ["This was confusing and unhelpful", 0],
+  ["The explanation was terrible", 0],
+  ["I did not enjoy the activity", 0],
+  ["This is a bad example", 0],
+  ["The course is boring and frustrating", 0],
+  ["Everything was difficult to understand", 0],
+  ["I am unhappy with the result", 0],
+  ["The exercise was annoying", 0],
+  ["This approach does not work", 0],
+  ["The instructions were vague and incorrect", 0],
+  ["I learned nothing today", 0],
+  ["The teacher did a poor job", 0],
+  ["This tool is complicated", 0],
+  ["The answer is wrong", 0],
+  ["What an awful idea", 0],
+  ["The experience was negative", 0],
+  ["I would not recommend this course", 0],
+  ["The example made the topic harder", 0],
+  ["I still feel completely lost", 0],
+];
+
 function loadPreset(name) {
   if (name === "xor") {
     applyInputConfig({ ...serializeInputConfig(), mode: "numeric", numericSize: 2 }, 2);
@@ -38,6 +81,35 @@ function loadPreset(name) {
     const csvInfo = $("#csvInfo");
     if (csvInfo) {
       csvInfo.textContent = t("presetLinearLoaded");
+      csvInfo.dataset.auto = "loaded";
+    }
+  } else if (name === "sentiment-en") {
+    applyInputConfig(
+      {
+        ...serializeInputConfig(),
+        mode: "text",
+        text: {
+          ...serializeInputConfig().text,
+          alphabet: "abcdefghijklmnopqrstuvwxyz ",
+          lowercase: true,
+        },
+      },
+      inputSize,
+    );
+
+    const rawText = ENGLISH_SENTIMENT_PRESET.map(([text]) => text);
+    inputConfig.text.alphabet = deriveTextAlphabet(rawText);
+    dataset.rawText = rawText;
+    dataset.X = rawText.map(encodeTextInput);
+    dataset.y = ENGLISH_SENTIMENT_PRESET.map(([, label]) => [label]);
+    inputSize = textFeatureCount();
+    outputSize = 1;
+    ensureIOInArch();
+    syncInputModeControls();
+
+    const csvInfo = $("#csvInfo");
+    if (csvInfo) {
+      csvInfo.textContent = t("presetSentimentLoaded");
       csvInfo.dataset.auto = "loaded";
     }
   }
