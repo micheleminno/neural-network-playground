@@ -599,9 +599,15 @@
               <span data-i18n="predict">Predici</span>
             </button>
 
-            <div class="mt-2">
-              <span data-i18n="outputLabel">Output</span>:
-              <span id="predictOut">-</span>
+            <div class="prediction-results mt-3">
+              <div class="prediction-results-title" data-i18n="outputLabel">
+                Output
+              </div>
+              <div
+                id="predictOutputs"
+                class="prediction-output-list"
+                aria-live="polite"
+              ></div>
             </div>
           </div>
         </div>

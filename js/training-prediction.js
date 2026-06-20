@@ -177,6 +177,30 @@ function updateTrainingProgress(epoch, totalEpochs, batch, totalBatches) {
 }
 
 // ========= Predict =========
+function renderPredictionOutputs(values = []) {
+  const container = document.getElementById("predictOutputs");
+  if (!container) return;
+
+  const count = Math.max(outputSize, values.length);
+  container.innerHTML = "";
+
+  for (let i = 0; i < count; i++) {
+    const value = values[i];
+    const formattedValue = Number.isFinite(value)
+      ? Number(value.toFixed(5)).toString()
+      : "-";
+    const roundedValue = Number.isFinite(value) ? Math.round(value) : "-";
+    const box = document.createElement("div");
+    box.className = "prediction-output-box";
+    box.innerHTML = `
+      <span class="prediction-output-label">y${i + 1}</span>
+      <output class="prediction-output-value">${formattedValue}</output>
+      <output class="prediction-output-rounded" title="${t("roundedOutput")}">${roundedValue}</output>
+    `;
+    container.appendChild(box);
+  }
+}
+
 function predictOnce() {
   const vals = $$("#testInputs [data-ti]").map((i) => Number(i.value));
   if (vals.length !== inputSize) {
@@ -193,12 +217,7 @@ function predictOnce() {
 
   computeNodeColorsForInput(vals);
 
-  const predictOut = $("#predictOut");
-  if (predictOut) {
-    predictOut.textContent = JSON.stringify(
-      out[0].map((v) => Number(v.toFixed(5))),
-    );
-  }
+  renderPredictionOutputs(out[0]);
 
   renderNNVis();
 }
@@ -214,4 +233,3 @@ function updateNetworkTitle() {
     title.innerHTML = `<i class="bi bi-eye"></i> ${t("network")}`;
   }
 }
-

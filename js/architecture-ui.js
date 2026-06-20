@@ -16,6 +16,10 @@ function renderTestInputs() {
       <input type="number" step="any" class="form-control" data-ti="${i}" value="${val}">`;
     container.appendChild(col);
   }
+
+  if (typeof renderPredictionOutputs === "function") {
+    renderPredictionOutputs();
+  }
 }
 
 // ========= Architettura =========
@@ -268,4 +272,3 @@ function addLayer(type) {
   renderArchitecture();
   updateJSON();
 }
-
