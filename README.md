@@ -97,7 +97,7 @@ text,label
 "the explanation was confusing",0
 ```
 
-![Network visualization and dataset controls](docs/screenshots/network-dataset.jpg)
+![Integrated text prediction and network visualization](docs/screenshots/network-dataset.jpg)
 
 ## Training and prediction
 
@@ -108,7 +108,7 @@ response. It is docked to the left of the network visualization so inputs and
 results remain visible beside the model. In Text mode it provides a textarea
 and shows how many character features are active before prediction.
 
-![Training and prediction controls](docs/screenshots/training-prediction.jpg)
+![Dataset and training controls](docs/screenshots/training-prediction.jpg)
 
 ## Accounts and cloud storage
 
@@ -131,8 +131,9 @@ Networks can be imported from JSON or exported in three modes:
 - **Weights only:** trained weights and bias values
 - **Full network:** architecture, weights and dataset
 
-The live JSON preview can be formatted or compacted, copied to the clipboard or
-downloaded.
+The file controls remain at the top of the workspace, while the full-width live
+JSON preview sits below Dataset and Training. It can be formatted or compacted,
+copied to the clipboard or downloaded.
 
 ![Network files and JSON preview](docs/screenshots/files-json.jpg)
 
@@ -162,7 +163,7 @@ Supabase and Google Cloud. The current Google OAuth redirect is
 
 ## Full application
 
-[View the full-page application screenshot](docs/screenshots/full-app.jpg)
+![Full NeuroBuilder application](docs/screenshots/full-app.jpg)
 
 ## Author
 
