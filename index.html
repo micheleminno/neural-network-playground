@@ -278,7 +278,7 @@
 
     <div id="appShell" class="container py-3 d-none">
       <!-- HEADER -->
-      <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="app-header d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0">
           <i class="bi bi-diagram-3"></i>
           NeuroBuilder
@@ -300,16 +300,16 @@
         </div>
       </div>
 
-      <div class="row g-3 mb-3">
+      <div class="app-layout-row row g-3 mb-3">
         <!-- ARCHITECTURE -->
-        <div class="col-lg-4">
+        <div class="app-layout-col col-lg-4">
           <div class="nb-card p-3 mb-3" id="architectureCard">
             <h6>
               <i class="bi bi-diagram-3"></i>
               <span data-i18n="architecture">Architecture</span>
             </h6>
 
-            <div class="mb-3">
+            <div class="mb-3" id="savedNetworksPanel">
               <label class="form-label fw-semibold"> Saved Networks </label>
 
               <div class="dropdown w-100" id="savedNetworksDropdown">
@@ -327,7 +327,7 @@
               <input type="hidden" id="savedNetworks" value="" />
             </div>
 
-            <div class="input-mode-panel mb-3">
+            <div class="input-mode-panel mb-3" id="inputModePanel">
               <label class="form-label fw-semibold" data-i18n="inputType">
                 Input type
               </label>
@@ -406,19 +406,24 @@
         </div>
 
         <!-- NETWORK -->
-        <div class="col-lg-8">
+        <div class="app-layout-col col-lg-8">
           <div class="nb-card p-3 mb-3" id="networkVisCard">
             <h6 id="networkTitle">
               <i class="bi bi-eye"></i>
               Network visualization
             </h6>
 
-            <svg
-              id="nnVis"
-              viewBox="0 0 800 360"
-              width="100%"
-              height="360"
-            ></svg>
+            <div id="networkWorkspace" class="network-workspace">
+              <aside id="predictionDock" class="prediction-dock"></aside>
+              <div class="network-canvas">
+                <svg
+                  id="nnVis"
+                  viewBox="0 0 800 360"
+                  width="100%"
+                  height="360"
+                ></svg>
+              </div>
+            </div>
             <div id="nnLegend" class="mt-3 small">
               <div class="d-flex align-items-center gap-2 mb-2">
                 <div
@@ -660,9 +665,9 @@
         </div>
       </div>
 
-      <div class="row g-3">
+      <div class="app-layout-row row g-3">
         <!-- DATASET -->
-        <div class="col-lg-6">
+        <div class="app-layout-col col-lg-6">
           <div class="nb-card p-3 mb-3" id="datasetCard">
             <h6>
               <i class="bi bi-table"></i>
@@ -706,8 +711,8 @@
         </div>
 
         <!-- PREDICTION -->
-        <div class="col-lg-6">
-          <div class="nb-card p-3 mb-3" id="predictionCard">
+        <div class="app-layout-col col-lg-6" id="predictionLayoutSource">
+          <div class="embedded-prediction" id="predictionCard">
             <h6>
               <i class="bi bi-lightning"></i>
               <span data-i18n="prediction">Prediction</span>
@@ -733,51 +738,53 @@
         </div>
       </div>
 
-      <div class="row g-3">
-        <div class="col-lg-4">
+      <div class="app-layout-row row g-3">
+        <div class="app-layout-col col-lg-4">
           <div class="nb-card p-3 mb-3" id="networkFilesCard">
             <h6>
               <i class="bi bi-folder2-open"></i>
               Network Files
             </h6>
 
-            <div class="d-flex gap-2 mb-4">
-              <button id="btnSaveNetwork" class="btn btn-success flex-fill">
-                <i class="bi bi-cloud-plus"></i>
-                Save As New
+            <div id="networkFilesControls" class="network-files-controls">
+              <div class="d-flex gap-2 network-save-actions">
+                <button id="btnSaveNetwork" class="btn btn-success flex-fill">
+                  <i class="bi bi-cloud-plus"></i>
+                  Save As New
+                </button>
+
+                <button
+                  id="btnUpdateNetwork"
+                  class="btn btn-outline-success flex-fill"
+                  disabled
+                >
+                  <i class="bi bi-cloud-check"></i>
+                  Update Current
+                </button>
+              </div>
+
+              <button id="btnImportJSON" class="btn btn-secondary">
+                Import Network as JSON file
               </button>
 
-              <button
-                id="btnUpdateNetwork"
-                class="btn btn-outline-success flex-fill"
-                disabled
-              >
-                <i class="bi bi-cloud-check"></i>
-                Update Current
-              </button>
-            </div>
+              <div class="d-flex gap-2 network-export-actions">
+                <select id="exportMode" class="form-select">
+                  <option value="full" selected>Architecture + weights</option>
+                  <option value="architecture">Architecture only</option>
+                  <option value="weights">Weights only</option>
+                </select>
 
-            <button id="btnImportJSON" class="btn btn-secondary w-100 mb-4">
-              Import Network as JSON file
-            </button>
-
-            <div class="d-flex gap-2">
-              <select id="exportMode" class="form-select">
-                <option value="full" selected>Architecture + weights</option>
-                <option value="architecture">Architecture only</option>
-                <option value="weights">Weights only</option>
-              </select>
-
-              <button id="btnExport" class="btn btn-primary">
-                <i class="bi bi-download"></i>
-                Export as JSON file
-              </button>
+                <button id="btnExport" class="btn btn-primary">
+                  <i class="bi bi-download"></i>
+                  Export as JSON file
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="col-lg-8 d-flex">
-          <div class="nb-card p-3 w-100 d-flex flex-column">
+        <div class="app-layout-col col-lg-8 d-flex">
+          <div class="nb-card p-3 w-100 d-flex flex-column" id="jsonCard">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h6 class="mb-0">
                 <i class="bi bi-code-slash"></i>

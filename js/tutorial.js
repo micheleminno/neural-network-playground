@@ -10,12 +10,19 @@ const tutorialCopy = {
     actionLabel: "Try this",
     steps: [
       {
+        selector: "#networkFilesCard",
+        title: "Open, save or exchange a network",
+        body: "All network file actions are collected here. You can reopen one of your cloud networks, update it, save a new copy, or import and export JSON files.",
+        action: "For now, leave the selector empty and build a new classroom example.",
+        placement: "bottom",
+      },
+      {
         selector: "#architectureCard",
         title: "Start with the network recipe",
-        body: "This column is the model architecture. Inputs can be numeric or text encoded as character frequencies; layers, neurons, activation functions and bias remain visible.",
+        body: "The architecture now reads from left to right: input, hidden layers and output. Inputs can be numeric or text encoded as character frequencies.",
         action:
-          "For this first classroom demo, leave the hidden layer and sigmoid output as they are. The preset will configure the text input automatically.",
-        placement: "right",
+          "Leave the hidden layer and sigmoid output as they are. The sentiment preset will configure the text input automatically.",
+        placement: "bottom",
       },
       {
         selector: "#datasetCard",
@@ -35,21 +42,21 @@ const tutorialCopy = {
         title: "Train and watch learning happen",
         body: "Training changes weights and bias. Normal mode runs automatically; Step-by-step shows one example, each forward layer, the loss and each backward weight update directly on the network.",
         action: "Choose Step-by-step, load an example and use Next step to follow the calculation from left to right and back again.",
-        placement: "top",
+        placement: "left",
       },
       {
         selector: "#networkVisCard",
         title: "Read the network visually",
         body: "Green links push activations up, red links push them down. Thicker links are stronger. Neuron color shows activation.",
-        action: "Hover over a connection to reveal its numeric weight.",
-        placement: "left",
+        action: "Hover over a connection to reveal its numeric weight. During Step-by-step, follow the animated direction across the diagram.",
+        placement: "bottom",
       },
       {
         selector: "#predictionCard",
         title: "Ask the trained model a question",
-        body: "Prediction turns the trained network into an experiment. Write a new English sentence and compare the precise output with its rounded class: 0 is negative and 1 is positive.",
+        body: "Predict is now part of the network visualization. The text box sits to the left of the input nodes, so the question and the network response remain visible together.",
         action: 'Try the sentence: "This lesson was clear and useful".',
-        placement: "left",
+        placement: "right",
         primaryLabel: "Use example sentence",
         onPrimary: () => {
           const input = document.getElementById("textPredictInput");
@@ -61,20 +68,11 @@ const tutorialCopy = {
         },
       },
       {
-        selector: "#networkFilesCard",
-        title: "Save the classroom artifact",
-        body: "Saved networks are stored in the cloud under the teacher account, so each teacher sees only their own models.",
-        action:
-          "When the result is useful, save it with a name students can recognize.",
-        placement: "right",
-      },
-      {
-        selector: "#savedNetworksDropdown",
-        title: "Reuse and compare",
-        body: "The saved networks menu lets a teacher come back later, compare architectures, or prepare examples before class.",
-        action:
-          "Load old networks from here, then modify and save new versions.",
-        placement: "right",
+        selector: "#jsonCard",
+        title: "Inspect the network as data",
+        body: "The JSON view exposes architecture, input configuration and weights. It connects the visual model with a format students can inspect, copy and export.",
+        action: "Compare a layer in the architecture with its corresponding values in JSON.",
+        placement: "top",
       },
       {
         selector: "#btnStartTutorial",
@@ -96,12 +94,19 @@ const tutorialCopy = {
     actionLabel: "Prova ora",
     steps: [
       {
+        selector: "#networkFilesCard",
+        title: "Apri, salva o scambia una rete",
+        body: "Tutte le operazioni sui file sono raccolte qui. Puoi riaprire una rete dal cloud, aggiornarla, salvarne una nuova copia oppure importare ed esportare file JSON.",
+        action: "Per ora lascia vuoto il selettore e costruisci un nuovo esempio didattico.",
+        placement: "bottom",
+      },
+      {
         selector: "#architectureCard",
         title: "Parti dalla ricetta della rete",
-        body: "Questa colonna descrive l'architettura del modello. Gli input possono essere numerici oppure testi codificati come frequenze di caratteri; layer, neuroni, attivazioni e bias restano visibili.",
+        body: "L'architettura ora si legge da sinistra a destra: input, layer nascosti e output. Gli input possono essere numerici oppure testi codificati come frequenze di caratteri.",
         action:
-          "Per questa prima dimostrazione, lascia invariati il layer nascosto e l'output sigmoid. Il preset configurerà automaticamente l'input testuale.",
-        placement: "right",
+          "Lascia invariati il layer nascosto e l'output sigmoid. Il preset sentiment configurerà automaticamente l'input testuale.",
+        placement: "bottom",
       },
       {
         selector: "#datasetCard",
@@ -121,21 +126,21 @@ const tutorialCopy = {
         title: "Allena e osserva l'apprendimento",
         body: "L'allenamento modifica pesi e bias. La modalità Normale procede automaticamente; Step-by-step mostra sulla rete un esempio, ogni layer del forward, la loss e ogni aggiornamento dei pesi durante la backpropagation.",
         action: "Scegli Step-by-step, carica un esempio e usa Passo successivo per seguire il calcolo da sinistra a destra e poi al contrario.",
-        placement: "top",
+        placement: "left",
       },
       {
         selector: "#networkVisCard",
         title: "Leggi la rete in modo visuale",
         body: "I collegamenti verdi aumentano l'attivazione, quelli rossi la riducono. Le linee piu' spesse sono piu' forti. Il colore dei neuroni mostra l'attivazione.",
-        action: "Passa sopra un collegamento per vedere il peso numerico.",
-        placement: "left",
+        action: "Passa sopra un collegamento per vedere il peso numerico. In Step-by-step segui la direzione animata lungo il diagramma.",
+        placement: "bottom",
       },
       {
         selector: "#predictionCard",
         title: "Fai una domanda al modello",
-        body: "La predizione trasforma la rete allenata in un esperimento. Scrivi una nuova frase inglese e confronta l'output preciso con la classe arrotondata: 0 significa negativo e 1 positivo.",
+        body: "Predict ora fa parte della visualizzazione. Il box di testo si trova a sinistra dei nodi di input, così domanda e risposta della rete restano visibili insieme.",
         action: 'Prova la frase: "This lesson was clear and useful".',
-        placement: "left",
+        placement: "right",
         primaryLabel: "Usa la frase di esempio",
         onPrimary: () => {
           const input = document.getElementById("textPredictInput");
@@ -147,20 +152,11 @@ const tutorialCopy = {
         },
       },
       {
-        selector: "#networkFilesCard",
-        title: "Salva il risultato della lezione",
-        body: "Le reti salvate finiscono nel cloud sotto l'account del docente: ogni docente vede solo i propri modelli.",
-        action:
-          "Quando il risultato e' utile, salvalo con un nome riconoscibile per gli studenti.",
-        placement: "right",
-      },
-      {
-        selector: "#savedNetworksDropdown",
-        title: "Riusa e confronta",
-        body: "Il menu delle reti salvate permette di tornare su un esempio, confrontare architetture o preparare modelli prima della lezione.",
-        action:
-          "Carica da qui una rete salvata, poi modificala e salvala come nuova versione.",
-        placement: "right",
+        selector: "#jsonCard",
+        title: "Osserva la rete come dati",
+        body: "La vista JSON espone architettura, configurazione degli input e pesi. Collega il modello visuale a un formato che gli studenti possono leggere, copiare ed esportare.",
+        action: "Confronta un layer dell'architettura con i valori corrispondenti nel JSON.",
+        placement: "top",
       },
       {
         selector: "#btnStartTutorial",
@@ -186,7 +182,7 @@ function tutorialSteps() {
 
 function tutorialStorageKey() {
   const userId = currentSession?.user?.id || "anonymous";
-  return `neurobuilder-tutorial-v3-seen:${userId}`;
+  return `neurobuilder-tutorial-v4-seen:${userId}`;
 }
 
 function tutorialEls() {

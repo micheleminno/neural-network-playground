@@ -812,3 +812,259 @@ body {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
+
+/* --- Revised application workspace --- */
+#appShell:not(.d-none) {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.app-layout-row,
+.app-layout-col {
+  display: contents !important;
+}
+
+.app-header {
+  grid-column: 1 / -1;
+  order: 0;
+}
+
+#networkFilesCard,
+#architectureCard,
+#networkVisCard,
+#datasetCard,
+#trainingCard,
+#jsonCard {
+  min-width: 0;
+  margin-bottom: 0 !important;
+}
+
+#networkFilesCard {
+  grid-column: 1 / -1;
+  order: 10;
+}
+
+#architectureCard {
+  grid-column: 1 / -1;
+  order: 20;
+}
+
+#networkVisCard {
+  grid-column: 1 / -1;
+  order: 30;
+}
+
+#datasetCard {
+  grid-column: 1 / span 6;
+  order: 40;
+}
+
+#trainingCard {
+  grid-column: 7 / span 6;
+  order: 41;
+}
+
+#jsonCard {
+  grid-column: 1 / -1;
+  order: 50;
+}
+
+.network-files-controls {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.network-open-control {
+  grid-column: span 5;
+  min-width: 0;
+}
+
+.network-save-actions {
+  grid-column: span 7;
+}
+
+#btnImportJSON {
+  grid-column: span 4;
+  min-height: 40px;
+}
+
+.network-export-actions {
+  grid-column: span 8;
+  min-width: 0;
+}
+
+.network-export-actions .form-select {
+  min-width: 0;
+}
+
+#architecture {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.architecture-layer-card {
+  min-width: 0;
+  height: 100%;
+}
+
+.architecture-layer-input {
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.architecture-layer-hidden {
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.architecture-layer-output {
+  border-color: rgba(74, 222, 128, 0.35);
+}
+
+#architectureCard > .mt-3 {
+  display: flex;
+  justify-content: center;
+}
+
+#btnAddHidden {
+  width: auto !important;
+  min-width: 210px;
+}
+
+#inputModePanel {
+  margin: 0 0 12px !important;
+  padding: 10px;
+}
+
+.network-workspace {
+  display: grid;
+  grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.prediction-dock {
+  min-width: 0;
+  padding-right: 16px;
+  border-right: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.embedded-prediction {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.network-canvas {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.network-canvas #nnVis {
+  display: block;
+  max-width: 100%;
+}
+
+#testInputs {
+  display: grid;
+  gap: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 3px;
+}
+
+#testInputs > .col-6 {
+  width: auto;
+}
+
+.embedded-prediction #btnPredict {
+  align-self: flex-start;
+}
+
+.embedded-prediction .prediction-results {
+  margin-top: auto !important;
+  padding-top: 14px;
+}
+
+#nnLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+
+#nnLegend > div {
+  margin-bottom: 0 !important;
+}
+
+#jsonArea {
+  min-height: 360px;
+}
+
+@media (max-width: 991.98px) {
+  #datasetCard,
+  #trainingCard {
+    grid-column: 1 / -1;
+  }
+
+  .network-workspace {
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 767.98px) {
+  #appShell:not(.d-none) {
+    gap: 12px;
+  }
+
+  .app-header {
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  .app-header > div {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .network-open-control,
+  .network-save-actions,
+  #btnImportJSON,
+  .network-export-actions {
+    grid-column: 1 / -1;
+  }
+
+  .network-save-actions,
+  .network-export-actions {
+    flex-wrap: wrap;
+  }
+
+  .network-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prediction-dock {
+    padding: 0 0 14px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  }
+
+  #testInputs {
+    max-height: none;
+  }
+
+  #architecture {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #btnAddHidden {
+    width: 100% !important;
+  }
+
+  #jsonArea {
+    min-height: 280px;
+  }
+}

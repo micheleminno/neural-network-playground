@@ -1,4 +1,20 @@
 // ========= Binding =========
+function prepareAppLayout() {
+  const prediction = document.getElementById("predictionCard");
+  const predictionDock = document.getElementById("predictionDock");
+  if (prediction && predictionDock && prediction.parentElement !== predictionDock) {
+    predictionDock.appendChild(prediction);
+  }
+
+  const savedNetworks = document.getElementById("savedNetworksPanel");
+  const networkFiles = document.getElementById("networkFilesControls");
+  if (savedNetworks && networkFiles && savedNetworks.parentElement !== networkFiles) {
+    savedNetworks.classList.remove("mb-3");
+    savedNetworks.classList.add("network-open-control");
+    networkFiles.prepend(savedNetworks);
+  }
+}
+
 function bindUIControls() {
   const on = (id, ev, handler) => {
     const el = document.getElementById(id);
@@ -169,6 +185,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.documentElement.lang = "it";
   }
 
+  prepareAppLayout();
   sanityCheckButtons();
   attachArchDnD();
   attachCsvDnD();

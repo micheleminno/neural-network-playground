@@ -18,12 +18,12 @@ subject and an optional phone number.
 
 After signing in, the guided tutorial introduces the complete workflow:
 
-1. Configure the network architecture.
-2. Select a preset or import a dataset.
-3. Train the network and observe loss and accuracy.
-4. Inspect weights, bias and neuron activations.
-5. Test the trained model with new inputs.
-6. Save the network or export it as JSON.
+1. Open, save, import or export a network.
+2. Configure the horizontal input, hidden and output architecture.
+3. Select a preset or import a dataset.
+4. Train normally or follow the calculation step by step.
+5. Inspect the visualization and test the model from its integrated Predict panel.
+6. Inspect the complete network as JSON.
 
 The application and tutorial are available in Italian and English. Changing
 the language while the tutorial is open updates the current step immediately.
@@ -104,8 +104,9 @@ text,label
 Training runs directly in the browser. Users can adjust learning rate, epochs
 and batch size, monitor progress, stop training and inspect loss and accuracy.
 The prediction panel accepts one value for each input and visualizes the model's
-response. In Text mode it provides a textarea and shows how many character
-features are active before prediction.
+response. It is docked to the left of the network visualization so inputs and
+results remain visible beside the model. In Text mode it provides a textarea
+and shows how many character features are active before prediction.
 
 ![Training and prediction controls](docs/screenshots/training-prediction.jpg)
 

@@ -51,6 +51,10 @@ function renderArchitecture() {
   const archEl = $("#architecture");
   if (!archEl) return;
 
+  const inputModePanel = document.getElementById("inputModePanel");
+  if (inputModePanel && archEl.contains(inputModePanel)) {
+    inputModePanel.remove();
+  }
   archEl.innerHTML = "";
 
   if (!arch.length) {
@@ -82,7 +86,7 @@ function renderArchitecture() {
           : t("hiddenLayer");
 
     const card = document.createElement("div");
-    card.className = "layer-card mb-2";
+    card.className = `layer-card architecture-layer-card architecture-layer-${layerDef.type}`;
 
     card.innerHTML = `
       <div class="d-flex align-items-center justify-content-between mb-2">
@@ -198,6 +202,10 @@ function renderArchitecture() {
 
       </div>
     `;
+
+    if (isInput && inputModePanel) {
+      card.querySelector(".row")?.before(inputModePanel);
+    }
 
     const neuronInput = card.querySelector("[data-neurons]");
 
