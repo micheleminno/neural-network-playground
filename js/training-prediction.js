@@ -75,6 +75,7 @@ function ensureChart() {
 }
 
 async function trainLoop() {
+  resetStepTraining({ render: false });
   const lr = Number(document.getElementById("lr")?.value ?? 0.1);
   const epochs = Number(document.getElementById("epochs")?.value ?? 50);
   const rand = rng(42);
@@ -123,6 +124,7 @@ async function trainLoop() {
       }
 
       updateTrainingProgress(ep, epochs, batchIndex + 1, batches.length);
+      if (stopFlag) break;
     }
 
     const fullPred = net.forward(X);

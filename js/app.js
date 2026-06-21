@@ -39,6 +39,15 @@ function bindUIControls() {
     stopFlag = true;
   });
 
+  on("trainingModeStandard", "change", (e) => {
+    if (e.target.checked) setTrainingMode("standard");
+  });
+  on("trainingModeStep", "change", (e) => {
+    if (e.target.checked) setTrainingMode("step");
+  });
+  on("btnStepReset", "click", () => resetStepTraining());
+  on("btnStepNext", "click", () => nextStepTraining());
+
   on("btnPredict", "click", () => {
     if (inputConfig.mode === "numeric") {
       const ti = document.querySelectorAll("#testInputs [data-ti]");
@@ -127,6 +136,7 @@ function sanityCheckButtons() {
   const ids = [
     "btnTrain",
     "btnStop",
+    "btnStepNext",
     "btnPredict",
     "btnAddHidden",
     "btnExport",
@@ -163,6 +173,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   attachArchDnD();
   attachCsvDnD();
   observeCsvInputs();
+  let networkResizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(networkResizeTimer);
+    networkResizeTimer = setTimeout(() => renderNNVis(), 100);
+  });
 
   arch = [
     {
@@ -191,6 +206,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderArchitecture();
 
   bindUIControls();
+  updateStepTrainingControls();
   wireInputModeControls();
   initTutorialControls();
   wireCsvInputs();

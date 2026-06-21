@@ -20,6 +20,23 @@ let rebuildSeedCounter = 1;
 let currentNetworkName = "";
 let currentNetworkId = null;
 let jsonCompact = false;
+let stepTrainingState = {
+  active: false,
+  phase: "idle",
+  sampleCursor: -1,
+  sampleIndex: -1,
+  input: null,
+  rawInput: "",
+  target: null,
+  output: null,
+  loss: null,
+  activations: [],
+  forwardLayer: -1,
+  backwardLayer: -1,
+  backwardGradient: null,
+  trace: null,
+  completedUpdates: 0,
+};
 
 // ========= Colors & Node Coloring =========
 const clamp01 = (v) => Math.max(0, Math.min(1, v));

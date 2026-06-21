@@ -1,32 +1,96 @@
 // ========= Visualization =========
+function formatDebugValues(values, maxItems = 6) {
+  if (!Array.isArray(values)) return "-";
+  const shown = values.slice(0, maxItems).map((value) =>
+    Number.isFinite(value) ? Number(value.toFixed(3)).toString() : "-",
+  );
+  return `[${shown.join(", ")}${values.length > maxItems ? ", …" : ""}]`;
+}
+
+function debugExampleLabel(maxLength = 68) {
+  if (!stepTrainingState.active) return "";
+  if (stepTrainingState.rawInput) {
+    const text = stepTrainingState.rawInput;
+    return text.length > maxLength
+      ? `${text.slice(0, Math.max(1, maxLength - 3))}…`
+      : text;
+  }
+  return formatDebugValues(stepTrainingState.input);
+}
+
+function renderStepDebugPanel(width, compact = false) {
+  if (!stepTrainingState.active) return "";
+
+  const target = formatDebugValues(stepTrainingState.target, 3);
+  const output = formatDebugValues(stepTrainingState.output, 3);
+  const loss = formatStepNumber(stepTrainingState.loss);
+  const delta = stepTrainingState.trace
+    ? formatStepNumber(stepTrainingState.trace.meanAbsDelta, 6)
+    : "-";
+
+  if (compact) {
+    return `
+      <g class="step-debug-panel">
+        <rect x="8" y="8" width="${width - 16}" height="122" rx="6"
+          fill="#07111f" stroke="rgba(56,189,248,.55)" stroke-width="1.2" />
+        <text x="18" y="29" class="step-debug-phase">${escapeHTML(stepPhaseLabel())}</text>
+        <text x="18" y="51" class="step-debug-example"><tspan class="step-debug-key">${escapeHTML(t("stepExample"))}:</tspan> ${escapeHTML(debugExampleLabel(42))}</text>
+        <text x="18" y="73" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepDesired"))}:</tspan> ${escapeHTML(target)}</text>
+        <text x="18" y="95" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepCurrent"))}:</tspan> ${escapeHTML(output)}</text>
+        <text x="18" y="117" class="step-debug-metric"><tspan class="step-debug-key">Loss:</tspan> ${escapeHTML(loss)} <tspan dx="24" class="step-debug-key">|Δw|:</tspan> ${escapeHTML(delta)}</text>
+      </g>`;
+  }
+
+  return `
+    <g class="step-debug-panel">
+      <rect x="18" y="12" width="764" height="76" rx="6"
+        fill="#07111f" stroke="rgba(56,189,248,.55)" stroke-width="1.2" />
+      <text x="34" y="34" class="step-debug-phase">${escapeHTML(stepPhaseLabel())}</text>
+      <text x="34" y="56" class="step-debug-example">
+        <tspan class="step-debug-key">${escapeHTML(t("stepExample"))}:</tspan>
+        ${escapeHTML(debugExampleLabel())}
+      </text>
+      <text x="34" y="78" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepDesired"))}:</tspan> ${escapeHTML(target)}</text>
+      <text x="270" y="78" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepCurrent"))}:</tspan> ${escapeHTML(output)}</text>
+      <text x="548" y="78" class="step-debug-metric"><tspan class="step-debug-key">Loss:</tspan> ${escapeHTML(loss)}</text>
+      <text x="674" y="78" class="step-debug-metric"><tspan class="step-debug-key">|Δw|:</tspan> ${escapeHTML(delta)}</text>
+    </g>`;
+}
+
 function renderNNVis() {
   const svg = $("#nnVis");
   if (!svg) return;
 
-  const W = 800;
-  const H = 360;
+  const compact = window.innerWidth < 600;
+  const W = compact ? 360 : 800;
+  const debugActive = stepTrainingState.active;
+  const H = debugActive ? (compact ? 500 : 440) : 360;
   const sizes = [inputSize, ...net.layers.map((L) => L.out)];
   const layerCount = sizes.length;
+
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("height", H);
 
   if (layerCount < 1) {
     svg.innerHTML = "";
     return;
   }
 
-  const xPad = 80;
-  const yPad = 30;
+  const xPad = compact ? 38 : 80;
+  const yPad = debugActive ? (compact ? 142 : 100) : 30;
   const colW = (W - 2 * xPad) / (layerCount - 1 || 1);
   const largestLayer = Math.max(...sizes);
-  const availableNodeGap = (H - 2 * yPad) / (largestLayer + 1);
+  const networkHeight = H - yPad - 30;
+  const availableNodeGap = networkHeight / (largestLayer + 1);
   const nodeR = Math.max(1.5, Math.min(13, availableNodeGap * 0.36));
   const nodeLabelSize = nodeR < 3 ? 0 : Math.max(5, Math.min(11, nodeR));
   const nodeStrokeWidth = Math.max(0.6, Math.min(1.6, nodeR * 0.4));
-  const BIAS_ROW_Y = 40;
+  const BIAS_ROW_Y = debugActive ? (compact ? 150 : 112) : 40;
 
   const pos = [];
   for (let li = 0; li < layerCount; li++) {
     const n = sizes[li];
-    const totalH = H - 2 * yPad;
+    const totalH = networkHeight;
     const gap = totalH / (n + 1);
     const x = xPad + li * colW;
     for (let ni = 0; ni < n; ni++) {
@@ -53,9 +117,16 @@ function renderNNVis() {
       <feGaussianBlur stdDeviation="1.2" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
+    <marker id="forwardArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#38bdf8" />
+    </marker>
+    <marker id="backwardArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#fbbf24" />
+    </marker>
   </defs>`;
 
   let edges = "";
+  let directionEdges = "";
   let biasNodes = "";
 
   net.layers.forEach((Lyr, li) => {
@@ -71,6 +142,20 @@ function renderNNVis() {
         if (!from || !to) continue;
 
         const w = Lyr.W[i][j];
+        const trace =
+          stepTrainingState.phase === "backward" &&
+          stepTrainingState.backwardLayer === li
+            ? stepTrainingState.trace
+            : null;
+        const delta = trace?.weightDeltas?.[i]?.[j];
+        const previousWeight = trace?.weightsBefore?.[i]?.[j];
+        const forwardActive =
+          stepTrainingState.phase === "forward" &&
+          stepTrainingState.forwardLayer === li;
+        const backwardActive = !!trace;
+        const directionalStep =
+          stepTrainingState.phase === "forward" ||
+          stepTrainingState.phase === "backward";
         const sw = 1 + 5 * (Math.abs(w) / maxAbs);
         const stroke = w >= 0 ? "#22c55e" : "#ef4444";
         const cx = (from.x + to.x) / 2;
@@ -78,7 +163,9 @@ function renderNNVis() {
 
         edges += `
 <g class="edge-group"
-   data-weight="${w.toFixed(4)}">
+   data-weight="${w.toFixed(4)}"
+   data-previous-weight="${Number.isFinite(previousWeight) ? previousWeight.toFixed(4) : ""}"
+   data-weight-delta="${Number.isFinite(delta) ? delta.toFixed(6) : ""}">
 
   <path
     class="edge-hitbox"
@@ -94,10 +181,20 @@ function renderNNVis() {
     stroke-width="${sw}"
     stroke-linecap="round"
     fill="none"
-    opacity="0.95"
+    opacity="${directionalStep && !forwardActive && !backwardActive ? "0.24" : "0.95"}"
     filter="url(#edgeGlow)"
   />
 </g>`;
+
+        if (forwardActive) {
+          directionEdges += `<path class="step-flow step-flow-forward"
+            d="M ${from.x},${from.y} Q ${cx},${cy} ${to.x},${to.y}"
+            marker-end="url(#forwardArrow)" />`;
+        } else if (backwardActive) {
+          directionEdges += `<path class="step-flow step-flow-backward"
+            d="M ${to.x},${to.y} Q ${cx},${cy} ${from.x},${from.y}"
+            marker-end="url(#backwardArrow)" />`;
+        }
       }
     }
 
@@ -141,6 +238,20 @@ function renderNNVis() {
         if (!to) continue;
 
         const b = Lyr.b[0][j] ?? 0;
+        const biasTrace =
+          stepTrainingState.phase === "backward" &&
+          stepTrainingState.backwardLayer === li
+            ? stepTrainingState.trace
+            : null;
+        const biasDelta = biasTrace?.biasDeltas?.[j];
+        const previousBias = biasTrace?.biasBefore?.[j];
+        const forwardActive =
+          stepTrainingState.phase === "forward" &&
+          stepTrainingState.forwardLayer === li;
+        const backwardActive = !!biasTrace;
+        const directionalStep =
+          stepTrainingState.phase === "forward" ||
+          stepTrainingState.phase === "backward";
         const sw = 1 + 5 * (Math.abs(b) / maxAbs);
         const stroke = b >= 0 ? "#22c55e" : "#ef4444";
 
@@ -149,7 +260,9 @@ function renderNNVis() {
 
         edges += `
           <g class="edge-group"
-            data-weight="${b.toFixed(4)}">
+            data-weight="${b.toFixed(4)}"
+            data-previous-weight="${Number.isFinite(previousBias) ? previousBias.toFixed(4) : ""}"
+            data-weight-delta="${Number.isFinite(biasDelta) ? biasDelta.toFixed(6) : ""}">
 
             <path
               class="edge-hitbox"
@@ -165,11 +278,21 @@ function renderNNVis() {
               stroke-width="${sw}"
               stroke-linecap="round"
               fill="none"
-              opacity="0.7"
+              opacity="${directionalStep && !forwardActive && !backwardActive ? "0.2" : "0.7"}"
               stroke-dasharray="4 4"
               filter="url(#edgeGlow)"
             />
           </g>`;
+
+        if (forwardActive) {
+          directionEdges += `<path class="step-flow step-flow-forward"
+            d="M ${biasX},${biasY} Q ${cx},${cy} ${to.x},${to.y}"
+            marker-end="url(#forwardArrow)" />`;
+        } else if (backwardActive) {
+          directionEdges += `<path class="step-flow step-flow-backward"
+            d="M ${to.x},${to.y} Q ${cx},${cy} ${biasX},${biasY}"
+            marker-end="url(#backwardArrow)" />`;
+        }
       }
     }
   });
@@ -213,6 +336,13 @@ function renderNNVis() {
                 2,
               )}</text>`
           : "";
+      const desiredBadge =
+        isOutput && stepTrainingState.active && stepTrainingState.target?.[ni] != null
+          ? `<text x="${p.x}" y="${p.y + nodeR + 15}" text-anchor="middle"
+              class="step-output-target">${escapeHTML(t("stepTargetShort"))}: ${formatStepNumber(
+                stepTrainingState.target[ni],
+              )}</text>`
+          : "";
 
       nodes += `<g class="nn-node"
   data-activation="${vRaw ?? ""}">
@@ -221,16 +351,26 @@ function renderNNVis() {
         <text x="${p.x}" y="${p.y + Math.min(3, nodeR * 0.3)}" text-anchor="middle"
           style="fill:#e5e7eb;font-weight:600;font-size:${nodeLabelSize}px">${escapeHTML(label)}</text>
         ${badge}
+        ${desiredBadge}
       </g>`;
     }
   }
 
-  svg.innerHTML = defs + `<g>${edges}</g><g>${nodes}</g><g>${biasNodes}</g>`;
+  svg.innerHTML =
+    defs +
+    renderStepDebugPanel(W, compact) +
+    `<g>${edges}</g><g>${directionEdges}</g><g>${nodes}</g><g>${biasNodes}</g>`;
   const tooltip = document.getElementById("edgeTooltip");
 
   svg.querySelectorAll(".edge-group").forEach((g) => {
     g.addEventListener("mousemove", (e) => {
       const weight = g.dataset.weight;
+      const previousWeight = g.dataset.previousWeight;
+      const weightDelta = g.dataset.weightDelta;
+      const change =
+        previousWeight && weightDelta
+          ? `<div class="edge-tooltip-change">${previousWeight} → ${weight}<br>Δ ${weightDelta}</div>`
+          : "";
 
       tooltip.innerHTML = `
         <div style="
@@ -250,6 +390,7 @@ function renderNNVis() {
         ">
           ${weight}
         </div>
+        ${change}
       `;
 
       tooltip.style.left = e.clientX + 16 + "px";
@@ -289,6 +430,10 @@ function renderNNVis() {
 // ========= Build Network =========
 function buildNetwork() {
   console.log("BUILD ARCH", arch);
+
+  if (typeof resetStepTraining === "function") {
+    resetStepTraining({ render: false });
+  }
 
   net = new Network();
 

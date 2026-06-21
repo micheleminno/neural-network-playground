@@ -47,6 +47,12 @@ The network diagram updates as the architecture changes. Connections show the
 sign and magnitude of each weight, while node colors represent activations.
 Hovering over the visualization reveals numeric values.
 
+Training can run normally or in **Step-by-step** mode. The guided mode loads one
+example at a time and shows its desired output, the current prediction and the
+loss inside the network visualization. Forward propagation advances one layer
+per click; backpropagation then updates one layer per click from right to left,
+highlighting the affected connections and their weight changes.
+
 NeuroBuilder includes three presets:
 
 - **XOR:** automatically configures 2 inputs and 1 output

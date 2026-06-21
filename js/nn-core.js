@@ -131,6 +131,10 @@ class DenseLayer {
   }
 
   backward(dA, lr, isLastLayer = false) {
+    return this.backwardWithTrace(dA, lr, isLastLayer).dX;
+  }
+
+  backwardWithTrace(dA, lr, isLastLayer = false) {
     const act = Activations[this.activation];
     const r = this.A.length;
     const c = this.A[0].length;
@@ -157,6 +161,10 @@ class DenseLayer {
 
     const Wt = transpose(this.W);
     const dX = dot(dZ, Wt);
+    const weightsBefore = this.W.map((row) => row.slice());
+    const biasBefore = this.b ? this.b[0].slice() : null;
+    const weightDeltas = zeros(this.W.length, this.W[0].length);
+    const biasDeltas = this.useBias ? Array(c).fill(0) : null;
 
     const CLIP = 1.0;
 
@@ -164,7 +172,9 @@ class DenseLayer {
       for (let j = 0; j < this.W[0].length; j++) {
         let g = dW[i][j] / r;
         g = clamp(g, -CLIP, CLIP);
-        this.W[i][j] -= lr * g;
+        const delta = -lr * g;
+        this.W[i][j] += delta;
+        weightDeltas[i][j] = delta;
       }
     }
 
@@ -172,11 +182,31 @@ class DenseLayer {
       for (let j = 0; j < this.b[0].length; j++) {
         let g = dB[0][j] / r;
         g = clamp(g, -CLIP, CLIP);
-        this.b[0][j] -= lr * g;
+        const delta = -lr * g;
+        this.b[0][j] += delta;
+        biasDeltas[j] = delta;
       }
     }
 
-    return dX;
+    const flatDeltas = weightDeltas.flat();
+    const meanAbsDelta = flatDeltas.length
+      ? flatDeltas.reduce((sum, value) => sum + Math.abs(value), 0) /
+        flatDeltas.length
+      : 0;
+
+    return {
+      dX,
+      dZ,
+      dW,
+      dB,
+      weightsBefore,
+      weightsAfter: this.W.map((row) => row.slice()),
+      weightDeltas,
+      biasBefore,
+      biasAfter: this.b ? this.b[0].slice() : null,
+      biasDeltas,
+      meanAbsDelta,
+    };
   }
 }
 
@@ -203,4 +233,3 @@ class Network {
     }
   }
 }
-

@@ -297,6 +297,7 @@ function handleCSVFile(file) {
       dataset.X = X;
       dataset.y = y;
       dataset.rawText = rawText;
+      resetStepTraining({ render: false });
 
       if (inputConfig.mode === "text") {
         inputSize = inputSizeNew;

@@ -678,6 +678,82 @@ body {
   height: 180px;
 }
 
+.training-mode-control {
+  flex-shrink: 0;
+}
+
+.step-training-status {
+  min-height: 22px;
+  color: #bae6fd;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.step-debug-panel text {
+  fill: #e2e8f0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+}
+
+.step-debug-phase {
+  fill: #7dd3fc !important;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.step-debug-example,
+.step-debug-metric {
+  font-size: 12px;
+}
+
+.step-debug-key {
+  fill: #94a3b8;
+  font-weight: 700;
+}
+
+.step-output-target {
+  fill: #fbbf24 !important;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.step-flow {
+  fill: none;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-dasharray: 8 6;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+  animation: step-flow-dash 0.8s linear infinite;
+}
+
+.step-flow-forward {
+  stroke: #38bdf8;
+}
+
+.step-flow-backward {
+  stroke: #fbbf24;
+}
+
+.edge-tooltip-change {
+  margin-top: 8px;
+  color: #fde68a;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@keyframes step-flow-dash {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-flow {
+    animation: none;
+  }
+}
+
 /* --- Prediction outputs --- */
 .prediction-results-title {
   margin-bottom: 8px;

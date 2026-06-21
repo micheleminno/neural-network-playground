@@ -42,6 +42,10 @@ function setLang(lang) {
     syncInputModeControls();
   }
 
+  if (typeof updateStepTrainingControls === "function") {
+    updateStepTrainingControls();
+  }
+
   if (typeof refreshActiveTutorialLanguage === "function") {
     refreshActiveTutorialLanguage();
   }

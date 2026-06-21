@@ -33,8 +33,8 @@ const tutorialCopy = {
       {
         selector: "#trainingCard",
         title: "Train and watch learning happen",
-        body: "Training changes weights and bias. The loss chart is the story: if it goes down, the network is learning from the examples.",
-        action: "Click Train after the sentiment preset is loaded, then watch loss decrease and accuracy increase.",
+        body: "Training changes weights and bias. Normal mode runs automatically; Step-by-step shows one example, each forward layer, the loss and each backward weight update directly on the network.",
+        action: "Choose Step-by-step, load an example and use Next step to follow the calculation from left to right and back again.",
         placement: "top",
       },
       {
@@ -119,8 +119,8 @@ const tutorialCopy = {
       {
         selector: "#trainingCard",
         title: "Allena e osserva l'apprendimento",
-        body: "L'allenamento modifica pesi e bias. Il grafico della loss racconta cosa sta succedendo: se scende, la rete sta imparando dagli esempi.",
-        action: "Dopo aver caricato il sentiment, clicca Train e osserva la loss scendere e l'accuracy salire.",
+        body: "L'allenamento modifica pesi e bias. La modalità Normale procede automaticamente; Step-by-step mostra sulla rete un esempio, ogni layer del forward, la loss e ogni aggiornamento dei pesi durante la backpropagation.",
+        action: "Scegli Step-by-step, carica un esempio e usa Passo successivo per seguire il calcolo da sinistra a destra e poi al contrario.",
         placement: "top",
       },
       {
