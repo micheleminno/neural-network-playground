@@ -47,9 +47,113 @@ function renderTestInputs() {
 }
 
 // ========= Architettura =========
+const ACTIVATION_PLOT_CONFIG = {
+  relu: {
+    xMin: -3,
+    xMax: 3,
+    yMin: -0.4,
+    yMax: 3.2,
+    formula: "max(0, x)",
+  },
+  sigmoid: {
+    xMin: -6,
+    xMax: 6,
+    yMin: -0.1,
+    yMax: 1.1,
+    formula: "1 / (1 + e^-x)",
+  },
+  tanh: {
+    xMin: -3,
+    xMax: 3,
+    yMin: -1.2,
+    yMax: 1.2,
+    formula: "tanh(x)",
+  },
+  linear: {
+    xMin: -2,
+    xMax: 2,
+    yMin: -2.2,
+    yMax: 2.2,
+    formula: "x",
+  },
+};
+
+function activationPlotValue(name, x) {
+  if (name === "relu") return Math.max(0, x);
+  if (name === "sigmoid") return 1 / (1 + Math.exp(-x));
+  if (name === "tanh") return Math.tanh(x);
+  return x;
+}
+
+function createActivationPlot(name) {
+  const config = ACTIVATION_PLOT_CONFIG[name] || ACTIVATION_PLOT_CONFIG.linear;
+  const width = 180;
+  const height = 82;
+  const padding = { top: 9, right: 12, bottom: 15, left: 18 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const mapX = (x) =>
+    padding.left + ((x - config.xMin) / (config.xMax - config.xMin)) * plotWidth;
+  const mapY = (y) =>
+    padding.top + (1 - (y - config.yMin) / (config.yMax - config.yMin)) * plotHeight;
+  const svgNs = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNs, "svg");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("class", "activation-plot");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `${t("activation")}: ${name}`);
+
+  const addLine = (x1, y1, x2, y2, className) => {
+    const line = document.createElementNS(svgNs, "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    line.setAttribute("class", className);
+    svg.appendChild(line);
+  };
+
+  if (config.yMin <= 0 && config.yMax >= 0) {
+    addLine(padding.left, mapY(0), width - padding.right, mapY(0), "activation-axis");
+  }
+  if (config.xMin <= 0 && config.xMax >= 0) {
+    addLine(mapX(0), padding.top, mapX(0), height - padding.bottom, "activation-axis");
+  }
+
+  const points = [];
+  for (let i = 0; i <= 72; i++) {
+    const x = config.xMin + (i / 72) * (config.xMax - config.xMin);
+    const y = activationPlotValue(name, x);
+    points.push(`${i ? "L" : "M"}${mapX(x).toFixed(2)},${mapY(y).toFixed(2)}`);
+  }
+  const path = document.createElementNS(svgNs, "path");
+  path.setAttribute("d", points.join(" "));
+  path.setAttribute("class", "activation-curve");
+  svg.appendChild(path);
+
+  const addLabel = (text, x, y, className) => {
+    const label = document.createElementNS(svgNs, "text");
+    label.textContent = text;
+    label.setAttribute("x", x);
+    label.setAttribute("y", y);
+    label.setAttribute("class", className);
+    svg.appendChild(label);
+  };
+  addLabel("f(x)", 4, 11, "activation-axis-label");
+  addLabel("x", width - 10, mapY(0) - 4, "activation-axis-label");
+  addLabel(config.formula, width / 2, height - 2, "activation-formula");
+
+  return svg;
+}
+
 function renderArchitecture() {
   const archEl = $("#architecture");
   if (!archEl) return;
+
+  const addHiddenControl = document.getElementById("addHiddenControl");
+  if (addHiddenControl && archEl.contains(addHiddenControl)) {
+    addHiddenControl.remove();
+  }
 
   const inputModePanel = document.getElementById("inputModePanel");
   if (inputModePanel && archEl.contains(inputModePanel)) {
@@ -63,6 +167,7 @@ function renderArchitecture() {
         ${t("emptyArchitecture")}
       </div>
     `;
+    if (addHiddenControl) archEl.appendChild(addHiddenControl);
     return;
   }
 
@@ -180,6 +285,11 @@ function renderArchitecture() {
                   </option>
                 </select>
 
+                <div
+                  class="activation-plot-host"
+                  data-activation-plot="${idx}"
+                ></div>
+
               </div>
 
               <div class="col-6 form-check form-switch ms-3">
@@ -205,6 +315,11 @@ function renderArchitecture() {
 
     if (isInput && inputModePanel) {
       card.querySelector(".row")?.before(inputModePanel);
+    }
+
+    const activationPlotHost = card.querySelector("[data-activation-plot]");
+    if (activationPlotHost) {
+      activationPlotHost.appendChild(createActivationPlot(layerDef.activation));
     }
 
     const neuronInput = card.querySelector("[data-neurons]");
@@ -266,8 +381,15 @@ function renderArchitecture() {
       });
     }
 
+    if (isOutput && addHiddenControl) {
+      archEl.appendChild(addHiddenControl);
+    }
     archEl.appendChild(card);
   });
+
+  if (addHiddenControl && !archEl.contains(addHiddenControl)) {
+    archEl.appendChild(addHiddenControl);
+  }
 }
 
 function attachArchDnD() {

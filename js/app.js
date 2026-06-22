@@ -97,6 +97,10 @@ function bindUIControls() {
     const mode = document.getElementById("exportMode")?.value || "full";
     exportJSONFile(mode);
   });
+  on("exportMode", "change", () => {
+    jsonExpandedPaths.clear();
+    updateJSON();
+  });
   on("jsonCompact", "change", (e) => {
     jsonCompact = e.target.checked;
     updateJSON();
@@ -106,8 +110,6 @@ function bindUIControls() {
     if (jsonCollapsed) jsonExpandedPaths.clear();
     updateJSON();
   });
-  on("btnDownloadJSON", "click", () => downloadWeights());
-
   on("btnCopyJSON", "click", async () => {
     await navigator.clipboard.writeText(
       JSON.stringify(getJSONPreviewData(), null, 2),
@@ -161,7 +163,6 @@ function sanityCheckButtons() {
     "btnPredict",
     "btnAddHidden",
     "btnExport",
-    "btnDownloadJSON",
     "btnCopyJSON",
     "btnLangToggle",
     "btnLogout",
@@ -235,6 +236,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   attachPopoverGlobalClosers();
   applyI18n();
   initCsvInfoSafe();
+  updateJSON();
   await initAuthUI();
   updateNetworkTitle();
 });

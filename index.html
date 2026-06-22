@@ -392,14 +392,14 @@
 
             <div id="architecture"></div>
 
-            <div class="mt-3">
+            <div id="addHiddenControl" class="add-hidden-slot">
               <button
                 id="btnAddHidden"
-                class="btn btn-primary w-100"
+                class="btn btn-outline-primary"
                 type="button"
               >
                 <i class="bi bi-plus-circle"></i>
-                Add Hidden Layer
+                <span data-i18n="addHiddenLayer">Add Hidden Layer</span>
               </button>
             </div>
           </div>
@@ -503,41 +503,48 @@
 
           <!-- TRAINING -->
           <div class="nb-card p-3 mb-3" id="trainingCard">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div class="training-header mb-3">
               <h6 class="mb-0">
                 <i class="bi bi-cpu"></i>
                 <span data-i18n="training">Training</span>
               </h6>
 
-              <div class="btn-group training-mode-control" role="group" aria-label="Training mode">
-                <input
-                  type="radio"
-                  class="btn-check"
-                  name="trainingMode"
-                  id="trainingModeStandard"
-                  checked
-                />
-                <label
-                  class="btn btn-sm btn-outline-light"
-                  for="trainingModeStandard"
-                  data-i18n="standardTraining"
-                >
-                  Normal
-                </label>
+              <div class="training-toolbar">
+                <div id="standardTrainingActions" class="d-flex gap-2">
+                  <button class="btn btn-primary btn-sm" id="btnTrain">Train</button>
+                  <button class="btn btn-danger btn-sm" id="btnStop" disabled>Stop</button>
+                </div>
 
-                <input
-                  type="radio"
-                  class="btn-check"
-                  name="trainingMode"
-                  id="trainingModeStep"
-                />
-                <label
-                  class="btn btn-sm btn-outline-info"
-                  for="trainingModeStep"
-                  data-i18n="stepTraining"
-                >
-                  Step-by-step
-                </label>
+                <div class="btn-group training-mode-control" role="group" aria-label="Training mode">
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="trainingMode"
+                    id="trainingModeStandard"
+                    checked
+                  />
+                  <label
+                    class="btn btn-sm btn-outline-light"
+                    for="trainingModeStandard"
+                    data-i18n="standardTraining"
+                  >
+                    Normal
+                  </label>
+
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="trainingMode"
+                    id="trainingModeStep"
+                  />
+                  <label
+                    class="btn btn-sm btn-outline-info"
+                    for="trainingModeStep"
+                    data-i18n="stepTraining"
+                  >
+                    Step-by-step
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -592,8 +599,15 @@
               </div>
             </div>
 
-            <div class="row mt-3">
-              <div class="col-4"></div>
+            <div class="row align-items-center mt-3">
+              <div class="col-4">
+                <div class="loss-chart-legend">
+                  <svg viewBox="0 0 48 16" aria-hidden="true">
+                    <path d="M2 3 C13 4, 19 11, 30 10 S41 7, 46 12"></path>
+                  </svg>
+                  <span data-i18n="loss">Loss</span>
+                </div>
+              </div>
 
               <div class="col-4">
                 <div id="epochProgressText" class="small text-center mb-1">
@@ -622,12 +636,6 @@
                   ></div>
                 </div>
               </div>
-            </div>
-
-            <div id="standardTrainingActions" class="mt-5 d-flex gap-2">
-              <button class="btn btn-primary" id="btnTrain">Train</button>
-
-              <button class="btn btn-danger" id="btnStop" disabled>Stop</button>
             </div>
 
             <div id="stepTrainingActions" class="mt-4 d-none">
@@ -796,83 +804,87 @@
                 </button>
               </div>
 
-              <button id="btnImportJSON" class="btn btn-secondary">
-                Import Network as JSON file
-              </button>
+              <div class="network-file-workspace">
+                <div class="network-file-actions">
+                  <button id="btnImportJSON" class="btn btn-secondary">
+                    <i class="bi bi-upload"></i>
+                    <span data-i18n="importAction">Import</span>
+                  </button>
 
-              <div class="d-flex gap-2 network-export-actions">
-                <select id="exportMode" class="form-select">
-                  <option value="full" selected>Architecture + weights</option>
-                  <option value="architecture">Architecture only</option>
-                  <option value="weights">Weights only</option>
-                </select>
-
-                <button id="btnExport" class="btn btn-primary">
-                  <i class="bi bi-download"></i>
-                  Export as JSON file
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="app-layout-col col-lg-8 d-flex">
-          <div class="nb-card p-3 w-100 d-flex flex-column" id="jsonCard">
-            <div class="json-preview-header mb-2">
-              <h6 class="mb-0">
-                <i class="bi bi-code-slash"></i>
-                JSON Preview
-              </h6>
-
-              <div class="json-preview-options">
-                <div class="form-check form-switch mb-0">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="jsonCompact"
-                  />
-
-                  <label
-                    class="form-check-label small"
-                    for="jsonCompact"
-                    data-i18n="compact"
-                  >Compact</label>
+                  <select id="exportMode" class="form-select">
+                    <option value="full" selected data-i18n="exportFull">
+                      Full network
+                    </option>
+                    <option value="architecture" data-i18n="exportArchitecture">
+                      Architecture
+                    </option>
+                    <option value="weights" data-i18n="exportWeights">
+                      Weights
+                    </option>
+                  </select>
                 </div>
 
-                <div class="form-check form-switch mb-0">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="jsonCollapsed"
-                  />
+                <section class="network-json-preview" id="jsonCard">
+                  <div class="json-preview-header mb-2">
+                    <h6 class="mb-0">
+                      <i class="bi bi-code-slash"></i>
+                      <span data-i18n="jsonPreview">JSON Preview</span>
+                    </h6>
 
-                  <label
-                    class="form-check-label small"
-                    for="jsonCollapsed"
-                    data-i18n="collapse"
-                  >Collapse</label>
-                </div>
+                    <div class="json-preview-options">
+                      <div class="form-check form-switch mb-0">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="jsonCompact"
+                        />
+
+                        <label
+                          class="form-check-label small"
+                          for="jsonCompact"
+                          data-i18n="compact"
+                        >Compact</label>
+                      </div>
+
+                      <div class="form-check form-switch mb-0">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="jsonCollapsed"
+                        />
+
+                        <label
+                          class="form-check-label small"
+                          for="jsonCollapsed"
+                          data-i18n="collapse"
+                        >Collapse</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <textarea
+                    id="jsonArea"
+                    class="form-control mb-2 font-monospace"
+                    readonly
+                  ></textarea>
+                  <div
+                    id="jsonTree"
+                    class="json-tree form-control mb-2 font-monospace d-none"
+                    role="tree"
+                    data-i18n-aria="jsonTreeAria"
+                    aria-label="Collapsible JSON preview"
+                  ></div>
+                  <div class="json-preview-actions">
+                    <button class="btn btn-secondary" id="btnCopyJSON">
+                      <span data-i18n="copy">Copy</span>
+                    </button>
+                    <button id="btnExport" class="btn btn-primary">
+                      <i class="bi bi-download"></i>
+                      <span data-i18n="export">Export</span>
+                    </button>
+                  </div>
+                </section>
               </div>
-            </div>
-
-            <textarea
-              id="jsonArea"
-              class="form-control mb-2 font-monospace flex-grow-1"
-              readonly
-            ></textarea>
-            <div
-              id="jsonTree"
-              class="json-tree form-control mb-2 font-monospace flex-grow-1 d-none"
-              role="tree"
-              data-i18n-aria="jsonTreeAria"
-              aria-label="Collapsible JSON preview"
-            ></div>
-            <div class="d-flex gap-2">
-              <button class="btn btn-secondary" id="btnCopyJSON">Copy</button>
-
-              <button class="btn btn-secondary" id="btnDownloadJSON">
-                Download
-              </button>
             </div>
           </div>
         </div>

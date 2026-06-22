@@ -678,14 +678,42 @@ body {
   height: 180px;
 }
 
+.loss-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e5e7eb;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.loss-chart-legend svg {
+  width: 48px;
+  height: 16px;
+  overflow: visible;
+}
+
+.loss-chart-legend path {
+  fill: none;
+  stroke: #3b82f6;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .metric-value,
 .metric-label {
   display: inline-flex;
   align-items: center;
+  line-height: 1.35;
+}
+
+.metric-value {
+  gap: 7px;
 }
 
 .metric-label {
-  gap: 5px;
+  gap: 8px;
 }
 
 .metric-help {
@@ -720,6 +748,23 @@ body {
 
 .training-mode-control {
   flex-shrink: 0;
+}
+
+.training-header,
+.training-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.training-header {
+  justify-content: space-between;
+  gap: 12px 18px;
+}
+
+.training-toolbar {
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .step-training-status {
@@ -905,11 +950,6 @@ body {
   order: 41;
 }
 
-#jsonCard {
-  grid-column: 1 / -1;
-  order: 50;
-}
-
 .json-preview-options {
   display: flex;
   flex-wrap: wrap;
@@ -923,7 +963,7 @@ body {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px 18px;
+  gap: 12px 20px;
 }
 
 .network-files-controls {
@@ -942,24 +982,54 @@ body {
   grid-column: span 7;
 }
 
-#btnImportJSON {
-  grid-column: span 4;
-  align-self: center;
+.network-file-workspace {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+
+.network-file-actions {
+  display: grid;
+  width: 190px;
+  gap: 12px;
+}
+
+.network-file-actions #btnImportJSON {
+  width: max-content;
   min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 }
 
-.network-export-actions {
-  grid-column: span 8;
-  min-width: 0;
-  align-items: stretch;
-  padding: 8px;
-  border: 1px solid rgba(56, 189, 248, 0.55);
-  border-radius: 6px;
-  background: rgba(14, 165, 233, 0.16);
+.network-file-actions .form-select {
+  width: 190px;
 }
 
-.network-export-actions .form-select {
+.network-json-preview {
   min-width: 0;
+}
+
+.network-json-preview #jsonArea,
+.network-json-preview .json-tree {
+  min-height: 210px;
+  max-height: 320px;
+}
+
+.json-preview-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.json-preview-actions .btn,
+#btnAddHidden {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 }
 
 .dataset-preview {
@@ -971,6 +1041,7 @@ body {
 
 .dataset-preview-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -996,7 +1067,7 @@ body {
 .dataset-preview-table th,
 .dataset-preview-table td {
   min-width: 72px;
-  padding: 8px 10px;
+  padding: 8px 12px;
   white-space: nowrap;
   vertical-align: middle;
 }
@@ -1033,10 +1104,60 @@ body {
 .architecture-layer-card {
   min-width: 0;
   height: 100%;
+  padding: 14px;
+}
+
+.architecture-layer-card .form-label {
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
+
+.architecture-layer-card .form-check {
+  margin-top: 4px;
 }
 
 .architecture-layer-input {
   border-color: rgba(251, 191, 36, 0.35);
+}
+
+.activation-plot-host {
+  width: 100%;
+  margin-top: 8px;
+  padding: 4px 6px 2px;
+  border: 1px solid rgba(96, 165, 250, 0.22);
+  border-radius: 5px;
+  background: rgba(2, 6, 23, 0.28);
+}
+
+.activation-plot {
+  display: block;
+  width: 100%;
+  height: 82px;
+}
+
+.activation-axis {
+  stroke: rgba(203, 213, 225, 0.45);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.activation-curve {
+  fill: none;
+  stroke: #38bdf8;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.activation-axis-label,
+.activation-formula {
+  fill: #94a3b8;
+  font-size: 8px;
+}
+
+.activation-formula {
+  text-anchor: middle;
 }
 
 .architecture-layer-hidden {
@@ -1047,14 +1168,24 @@ body {
   border-color: rgba(74, 222, 128, 0.35);
 }
 
-#architectureCard > .mt-3 {
-  display: flex;
-  justify-content: center;
+.add-hidden-slot {
+  min-width: 0;
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  border: 1px dashed rgba(96, 165, 250, 0.55);
+  border-radius: 6px;
+  background: rgba(37, 99, 235, 0.07);
+}
+
+.add-hidden-slot:hover {
+  border-color: rgba(96, 165, 250, 0.85);
+  background: rgba(37, 99, 235, 0.12);
 }
 
 #btnAddHidden {
-  width: auto !important;
-  min-width: 210px;
+  width: max-content;
 }
 
 #inputModePanel {
@@ -1209,14 +1340,26 @@ body {
 
   .network-open-control,
   .network-save-actions,
-  #btnImportJSON,
-  .network-export-actions {
+  .network-file-workspace {
     grid-column: 1 / -1;
   }
 
-  .network-save-actions,
-  .network-export-actions {
+  .network-save-actions {
     flex-wrap: wrap;
+  }
+
+  .network-file-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .network-file-actions {
+    width: 100%;
+    grid-template-columns: max-content minmax(170px, 230px);
+    align-items: center;
+  }
+
+  .network-file-actions .form-select {
+    width: 100%;
   }
 
   .network-workspace {
@@ -1237,12 +1380,18 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .add-hidden-slot {
+    min-height: 110px;
+  }
+
   #btnAddHidden {
-    width: 100% !important;
+    width: auto;
   }
 
   #jsonArea,
-  .json-tree {
+  .json-tree,
+  .network-json-preview #jsonArea,
+  .network-json-preview .json-tree {
     min-height: 280px;
   }
 }

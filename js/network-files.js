@@ -1,20 +1,65 @@
 // ========= JSON Export/Import & sync =========
-function getJSONPreviewData() {
+function serializeArchitectureForExport() {
   return {
-    architecture: {
-      layers: arch,
-      inputConfig: serializeInputConfig(),
-    },
+    inputConfig: serializeInputConfig(),
+    layers: arch.map((l) => ({
+      type: l.type,
+      neurons: l.neurons,
+      activation: l.activation,
+      bias: l.bias,
+    })),
+  };
+}
 
-    weights: net.layers.map((l) => ({
+function serializeWeightsForExport() {
+  return net.layers.map((l) => ({
       in: l.in,
       out: l.out,
       activation: l.activation,
       useBias: l.useBias,
       W: l.W,
       b: l.b,
-    })),
+    }));
+}
+
+function getExportPayload(mode = "full") {
+  if (mode === "architecture") {
+    return {
+      data: { architecture: serializeArchitectureForExport() },
+      filename: "neurobuilder-architecture.json",
+    };
+  }
+
+  if (mode === "weights") {
+    return {
+      data: {
+        inputConfig: serializeInputConfig(),
+        layers: serializeWeightsForExport(),
+      },
+      filename: "neurobuilder-weights.json",
+    };
+  }
+
+  return {
+    data: {
+      architecture: serializeArchitectureForExport(),
+      weights: serializeWeightsForExport(),
+      dataset: {
+        X: dataset.X,
+        y: dataset.y,
+        rawText: dataset.rawText,
+      },
+    },
+    filename: "neurobuilder-full-network.json",
   };
+}
+
+function getSelectedExportMode() {
+  return document.getElementById("exportMode")?.value || "full";
+}
+
+function getJSONPreviewData() {
+  return getExportPayload(getSelectedExportMode()).data;
 }
 
 function summarizeJSONValue(value) {
@@ -298,125 +343,15 @@ function handleJSONImportFile(file, inputEl) {
 }
 
 function exportJSONFile(mode = "full") {
-  let j;
-  let filename;
+  const { data, filename } = getExportPayload(mode);
 
-  if (mode === "architecture") {
-    j = {
-      architecture: {
-        inputConfig: serializeInputConfig(),
-        layers: arch.map((l) => ({
-          type: l.type,
-          neurons: l.neurons,
-          activation: l.activation,
-          bias: l.bias,
-        })),
-      },
-    };
-
-    filename = "neurobuilder-architecture.json";
-  } else if (mode === "weights") {
-    j = {
-      inputConfig: serializeInputConfig(),
-      layers: net.layers.map((l) => ({
-        in: l.in,
-        out: l.out,
-        activation: l.activation,
-        useBias: l.useBias,
-        W: l.W,
-        b: l.b,
-      })),
-    };
-
-    filename = "neurobuilder-weights.json";
-  } else {
-    j = {
-      architecture: {
-        inputConfig: serializeInputConfig(),
-        layers: arch.map((l) => ({
-          type: l.type,
-          neurons: l.neurons,
-          activation: l.activation,
-          bias: l.bias,
-        })),
-      },
-
-      weights: net.layers.map((l) => ({
-        in: l.in,
-        out: l.out,
-        activation: l.activation,
-        useBias: l.useBias,
-        W: l.W,
-        b: l.b,
-      })),
-
-      dataset: {
-        X: dataset.X,
-        y: dataset.y,
-        rawText: dataset.rawText,
-      },
-    };
-
-    filename = "neurobuilder-full-network.json";
-  }
-
-  const blob = new Blob([JSON.stringify(j, null, 2)], {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: "application/json",
   });
 
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function exportArchitecture() {
-  const j = {
-    architecture: {
-      inputConfig: serializeInputConfig(),
-      layers: arch.map((l) => ({
-        type: l.type,
-        neurons: l.neurons,
-        activation: l.activation,
-        bias: l.bias,
-      })),
-    },
-  };
-
-  const blob = new Blob([JSON.stringify(j, null, 2)], {
-    type: "application/json",
-  });
-
-  const a = document.createElement("a");
-
-  a.href = URL.createObjectURL(blob);
-  a.download = "neurobuilder-arch.json";
-
-  a.click();
-
-  URL.revokeObjectURL(a.href);
-}
-
-function downloadWeights() {
-  const j = {
-    inputConfig: serializeInputConfig(),
-    layers: net.layers.map((l) => ({
-      in: l.in,
-      out: l.out,
-      activation: l.activation,
-      useBias: l.useBias,
-      W: l.W,
-      b: l.b,
-    })),
-  };
-
-  const blob = new Blob([JSON.stringify(j, null, 2)], {
-    type: "application/json",
-  });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "neurobuilder-weights.json";
   a.click();
   URL.revokeObjectURL(a.href);
 }

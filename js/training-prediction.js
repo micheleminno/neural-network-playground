@@ -70,7 +70,7 @@ function ensureChart() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { color: "#e5e7eb" } },
+        legend: { display: false },
         tooltip: {
           backgroundColor: "rgba(15,23,42,0.95)",
           titleColor: "#e5e7eb",

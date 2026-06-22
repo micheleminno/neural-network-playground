@@ -131,9 +131,10 @@ Networks can be imported from JSON or exported in three modes:
 - **Weights only:** trained weights and bias values
 - **Full network:** architecture, weights and dataset
 
-The file controls remain at the top of the workspace, while the full-width live
-JSON preview sits below Dataset and Training. It can be formatted or compacted,
-copied to the clipboard or downloaded.
+The file controls and JSON preview share one workspace at the top of the app.
+The preview updates immediately when choosing the full network, architecture or
+weights export mode. It can be formatted, compacted or explored as a collapsible
+tree before being copied or exported.
 
 ![Network files and JSON preview](docs/screenshots/files-json.jpg)
 

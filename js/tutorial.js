@@ -70,8 +70,8 @@ const tutorialCopy = {
       {
         selector: "#jsonCard",
         title: "Inspect the network as data",
-        body: "The JSON view exposes architecture, input configuration and weights. It connects the visual model with a format students can inspect, copy and export.",
-        action: "Compare a layer in the architecture with its corresponding values in JSON.",
+        body: "The JSON preview is integrated with Network Files and follows the selected export mode: full network, architecture or weights. Objects and lists can also be expanded one branch at a time.",
+        action: "Change the export mode and compare the preview before exporting.",
         placement: "top",
       },
       {
@@ -154,8 +154,8 @@ const tutorialCopy = {
       {
         selector: "#jsonCard",
         title: "Osserva la rete come dati",
-        body: "La vista JSON espone architettura, configurazione degli input e pesi. Collega il modello visuale a un formato che gli studenti possono leggere, copiare ed esportare.",
-        action: "Confronta un layer dell'architettura con i valori corrispondenti nel JSON.",
+        body: "L'anteprima JSON è integrata in Network Files e segue la modalità di export scelta: rete completa, architettura o pesi. Oggetti e liste possono essere espansi un ramo alla volta.",
+        action: "Cambia la modalità di export e confronta l'anteprima prima di esportare.",
         placement: "top",
       },
       {
