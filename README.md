@@ -71,7 +71,8 @@ Input columns must come first, followed by output columns.
 
 After a preset or CSV is loaded, the Dataset panel displays a scrollable table
 preview. Numeric datasets show `x` and `y` columns, while text datasets preserve
-the original sentence beside its target values.
+the original sentence beside its target values. The preview loads 12 rows at a
+time and automatically appends the next rows when the table reaches the bottom.
 
 For a network with 2 inputs and 1 output:
 

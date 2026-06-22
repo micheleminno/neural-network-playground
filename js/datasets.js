@@ -42,13 +42,75 @@ const ENGLISH_SENTIMENT_PRESET = [
   ["I still feel completely lost", 0],
 ];
 
-const DATASET_PREVIEW_LIMIT = 12;
+const DATASET_PREVIEW_PAGE_SIZE = 12;
+let datasetPreviewShown = 0;
 
 function formatDatasetPreviewValue(value) {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return String(value ?? "");
   }
   return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(6)));
+}
+
+function updateDatasetPreviewCount(total) {
+  const count = document.getElementById("datasetPreviewCount");
+  if (!count) return;
+  count.textContent = t("datasetPreviewCount")
+    .replace("{shown}", datasetPreviewShown)
+    .replace("{total}", total);
+}
+
+function appendDatasetPreviewRows() {
+  const body = document.getElementById("datasetPreviewBody");
+  if (!body) return;
+
+  const total = Math.min(dataset.X.length, dataset.y.length);
+  const nextShown = Math.min(
+    total,
+    datasetPreviewShown + DATASET_PREVIEW_PAGE_SIZE,
+  );
+
+  for (let rowIndex = datasetPreviewShown; rowIndex < nextShown; rowIndex++) {
+    const row = document.createElement("tr");
+    const values =
+      inputConfig.mode === "text" && dataset.rawText?.length
+        ? [dataset.rawText[rowIndex], ...dataset.y[rowIndex]]
+        : [...dataset.X[rowIndex], ...dataset.y[rowIndex]];
+
+    const indexCell = document.createElement("td");
+    indexCell.className = "dataset-preview-index";
+    indexCell.textContent = String(rowIndex + 1);
+    row.appendChild(indexCell);
+
+    values.forEach((value, valueIndex) => {
+      const cell = document.createElement("td");
+      cell.textContent = formatDatasetPreviewValue(value);
+      if (inputConfig.mode === "text" && valueIndex === 0) {
+        cell.className = "dataset-preview-text";
+        cell.title = String(value ?? "");
+      }
+      row.appendChild(cell);
+    });
+    body.appendChild(row);
+  }
+
+  datasetPreviewShown = nextShown;
+  updateDatasetPreviewCount(total);
+}
+
+function wireDatasetPreviewScroll() {
+  const scroll = document.querySelector(".dataset-preview-scroll");
+  if (!scroll || scroll._wiredDatasetPreview) return;
+
+  scroll._wiredDatasetPreview = true;
+  scroll.addEventListener("scroll", () => {
+    const nearBottom =
+      scroll.scrollTop + scroll.clientHeight >= scroll.scrollHeight - 24;
+    const total = Math.min(dataset.X.length, dataset.y.length);
+    if (nearBottom && datasetPreviewShown < total) {
+      appendDatasetPreviewRows();
+    }
+  });
 }
 
 function renderDatasetPreview() {
@@ -60,6 +122,7 @@ function renderDatasetPreview() {
 
   head.replaceChildren();
   body.replaceChildren();
+  datasetPreviewShown = 0;
 
   const total = Math.min(dataset.X.length, dataset.y.length);
   preview.classList.toggle("d-none", total === 0);
@@ -91,34 +154,10 @@ function renderDatasetPreview() {
   });
   head.appendChild(headerRow);
 
-  const shown = Math.min(total, DATASET_PREVIEW_LIMIT);
-  for (let rowIndex = 0; rowIndex < shown; rowIndex++) {
-    const row = document.createElement("tr");
-    const values =
-      inputConfig.mode === "text" && dataset.rawText?.length
-        ? [dataset.rawText[rowIndex], ...dataset.y[rowIndex]]
-        : [...dataset.X[rowIndex], ...dataset.y[rowIndex]];
-
-    const indexCell = document.createElement("td");
-    indexCell.className = "dataset-preview-index";
-    indexCell.textContent = String(rowIndex + 1);
-    row.appendChild(indexCell);
-
-    values.forEach((value, valueIndex) => {
-      const cell = document.createElement("td");
-      cell.textContent = formatDatasetPreviewValue(value);
-      if (inputConfig.mode === "text" && valueIndex === 0) {
-        cell.className = "dataset-preview-text";
-        cell.title = String(value ?? "");
-      }
-      row.appendChild(cell);
-    });
-    body.appendChild(row);
-  }
-
-  count.textContent = t("datasetPreviewCount")
-    .replace("{shown}", shown)
-    .replace("{total}", total);
+  const scroll = preview.querySelector(".dataset-preview-scroll");
+  if (scroll) scroll.scrollTop = 0;
+  wireDatasetPreviewScroll();
+  appendDatasetPreviewRows();
 }
 
 function loadPreset(name) {
