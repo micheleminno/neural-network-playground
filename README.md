@@ -37,7 +37,12 @@ Build dense feed-forward networks and configure:
 - Any number of hidden layers
 - Neurons in each layer
 - ReLU, sigmoid, tanh and linear activation functions
+- Live miniature plots of the selected activation function
 - Bias for hidden and output layers
+
+The architecture is arranged from left to right. The **Add Hidden Layer** slot
+stays immediately before the output layer, showing exactly where the new layer
+will be inserted.
 
 ![Network architecture controls](docs/screenshots/architecture.jpg)
 
@@ -63,6 +68,10 @@ NeuroBuilder includes three presets:
 Custom supervised datasets can be imported as CSV files. Configure the network
 before importing: the architecture determines how columns are interpreted.
 Input columns must come first, followed by output columns.
+
+After a preset or CSV is loaded, the Dataset panel displays a scrollable table
+preview. Numeric datasets show `x` and `y` columns, while text datasets preserve
+the original sentence beside its target values.
 
 For a network with 2 inputs and 1 output:
 
@@ -103,6 +112,8 @@ text,label
 
 Training runs directly in the browser. Users can adjust learning rate, epochs
 and batch size, monitor progress, stop training and inspect loss and accuracy.
+The loss chart labels epochs on its horizontal axis, while contextual help
+explains how to interpret both loss and accuracy.
 The prediction panel accepts one value for each input and visualizes the model's
 response. It is docked to the left of the network visualization so inputs and
 results remain visible beside the model. In Text mode it provides a textarea
