@@ -944,6 +944,7 @@ body {
 
 #btnImportJSON {
   grid-column: span 4;
+  align-self: center;
   min-height: 40px;
 }
 
