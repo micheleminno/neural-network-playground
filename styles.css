@@ -985,12 +985,23 @@ body {
 }
 
 .network-open-control {
-  grid-column: span 5;
+  grid-column: span 4;
   min-width: 0;
 }
 
 .network-save-actions {
-  grid-column: span 7;
+  grid-column: span 8;
+  display: grid !important;
+  grid-template-columns: 160px 160px minmax(24px, 1fr) 160px;
+  gap: 12px !important;
+}
+
+.network-save-actions #btnImportJSON {
+  grid-column: 4;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 }
 
 .network-export-workspace {
@@ -999,13 +1010,6 @@ body {
   border: 1px solid rgba(56, 189, 248, 0.5);
   border-radius: 6px;
   background: rgba(14, 165, 233, 0.13);
-}
-
-.network-save-actions #btnImportJSON {
-  min-height: 40px;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
 }
 
 .network-json-preview {
@@ -1321,6 +1325,14 @@ body {
   .network-workspace {
     grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
   }
+
+  .network-save-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .network-save-actions #btnImportJSON {
+    grid-column: 3;
+  }
 }
 
 @media (max-width: 767.98px) {
@@ -1345,7 +1357,7 @@ body {
   }
 
   .network-save-actions {
-    flex-wrap: wrap;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .json-preview-title-group .form-select {
