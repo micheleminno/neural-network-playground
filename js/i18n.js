@@ -43,6 +43,18 @@ const I18N = {
     presetLinearLoaded: "Caricato dataset lineare (200 esempi)",
     presetSentimentLoaded:
       "Caricato sentiment inglese (40 frasi: 0 negativo, 1 positivo)",
+    datasetPreviewCount: "Prime {shown} di {total} righe",
+    chartEpochs: "Epoche",
+    lossHelp:
+      "La loss misura quanto le predizioni differiscono dagli output desiderati. Più è bassa, meglio la rete sta imparando.",
+    accuracyHelp:
+      "L'accuracy è la percentuale di esempi classificati correttamente. Più è alta, migliore è il risultato.",
+    jsonItem: "elemento",
+    jsonItems: "elementi",
+    jsonProperty: "proprietà",
+    jsonProperties: "proprietà",
+    jsonExpandNode: "Espandi elemento",
+    jsonCollapseNode: "Comprimi elemento",
     trainNoDataset: "Carica o scegli un preset/CSV prima di allenare.",
     standardTraining: "Normale",
     stepTraining: "Step-by-step",
@@ -129,6 +141,18 @@ const I18N = {
     presetLinearLoaded: "Linear dataset loaded (200 examples)",
     presetSentimentLoaded:
       "English sentiment loaded (40 sentences: 0 negative, 1 positive)",
+    datasetPreviewCount: "First {shown} of {total} rows",
+    chartEpochs: "Epochs",
+    lossHelp:
+      "Loss measures how far predictions are from the desired outputs. Lower values mean the network is learning better.",
+    accuracyHelp:
+      "Accuracy is the percentage of examples classified correctly. Higher values mean better results.",
+    jsonItem: "item",
+    jsonItems: "items",
+    jsonProperty: "property",
+    jsonProperties: "properties",
+    jsonExpandNode: "Expand item",
+    jsonCollapseNode: "Collapse item",
     trainNoDataset: "Load or choose a preset/CSV before training.",
     standardTraining: "Normal",
     stepTraining: "Step-by-step",
@@ -218,11 +242,19 @@ function applyI18n() {
   }
 
   initCsvInfoSafe();
+  renderDatasetPreview();
+  updateTrainingLanguage();
 }
 
 const I18N_HTML = {
   it: {
     palette: "Palette",
+    datasetPreview: "Anteprima dataset",
+    compact: "Compatto",
+    collapse: "Collapse",
+    lossHelpAria: "Spiega la loss",
+    accuracyHelpAria: "Spiega l'accuracy",
+    jsonTreeAria: "Anteprima JSON espandibile",
     dragHere: "Trascina i blocchi qui sotto 👉",
     input: "Input",
     output: "Output",
@@ -277,6 +309,12 @@ const I18N_HTML = {
 
   en: {
     palette: "Palette",
+    datasetPreview: "Dataset preview",
+    compact: "Compact",
+    collapse: "Collapse",
+    lossHelpAria: "Explain loss",
+    accuracyHelpAria: "Explain accuracy",
+    jsonTreeAria: "Collapsible JSON preview",
     dragHere: "Drag the blocks below 👉",
 
     input: "Input",

@@ -42,6 +42,85 @@ const ENGLISH_SENTIMENT_PRESET = [
   ["I still feel completely lost", 0],
 ];
 
+const DATASET_PREVIEW_LIMIT = 12;
+
+function formatDatasetPreviewValue(value) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return String(value ?? "");
+  }
+  return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(6)));
+}
+
+function renderDatasetPreview() {
+  const preview = document.getElementById("datasetPreview");
+  const head = document.getElementById("datasetPreviewHead");
+  const body = document.getElementById("datasetPreviewBody");
+  const count = document.getElementById("datasetPreviewCount");
+  if (!preview || !head || !body || !count) return;
+
+  head.replaceChildren();
+  body.replaceChildren();
+
+  const total = Math.min(dataset.X.length, dataset.y.length);
+  preview.classList.toggle("d-none", total === 0);
+  if (!total) {
+    count.textContent = "";
+    return;
+  }
+
+  const headerRow = document.createElement("tr");
+  const headers = ["#"];
+  if (inputConfig.mode === "text" && dataset.rawText?.length) {
+    headers.push(t("textToPredict"));
+  } else {
+    const inputs = dataset.X[0]?.length || inputSize;
+    for (let i = 0; i < inputs; i++) headers.push(`x${i + 1}`);
+  }
+  const outputs = dataset.y[0]?.length || outputSize;
+  for (let i = 0; i < outputs; i++) headers.push(`y${i + 1}`);
+
+  headers.forEach((label, index) => {
+    const cell = document.createElement("th");
+    cell.scope = "col";
+    cell.textContent = label;
+    if (index === 0) cell.className = "dataset-preview-index";
+    if (inputConfig.mode === "text" && index === 1) {
+      cell.classList.add("dataset-preview-text");
+    }
+    headerRow.appendChild(cell);
+  });
+  head.appendChild(headerRow);
+
+  const shown = Math.min(total, DATASET_PREVIEW_LIMIT);
+  for (let rowIndex = 0; rowIndex < shown; rowIndex++) {
+    const row = document.createElement("tr");
+    const values =
+      inputConfig.mode === "text" && dataset.rawText?.length
+        ? [dataset.rawText[rowIndex], ...dataset.y[rowIndex]]
+        : [...dataset.X[rowIndex], ...dataset.y[rowIndex]];
+
+    const indexCell = document.createElement("td");
+    indexCell.className = "dataset-preview-index";
+    indexCell.textContent = String(rowIndex + 1);
+    row.appendChild(indexCell);
+
+    values.forEach((value, valueIndex) => {
+      const cell = document.createElement("td");
+      cell.textContent = formatDatasetPreviewValue(value);
+      if (inputConfig.mode === "text" && valueIndex === 0) {
+        cell.className = "dataset-preview-text";
+        cell.title = String(value ?? "");
+      }
+      row.appendChild(cell);
+    });
+    body.appendChild(row);
+  }
+
+  count.textContent = t("datasetPreviewCount")
+    .replace("{shown}", shown)
+    .replace("{total}", total);
+}
+
 function loadPreset(name) {
   if (name === "xor") {
     applyInputConfig({ ...serializeInputConfig(), mode: "numeric", numericSize: 2 }, 2);
@@ -114,6 +193,7 @@ function loadPreset(name) {
     }
   }
   renderTestInputs();
+  renderDatasetPreview();
 }
 
 function ensureIOInArch() {
@@ -307,6 +387,7 @@ function handleCSVFile(file) {
       }
 
       renderTestInputs();
+      renderDatasetPreview();
 
       setInfo(
         `CSV "${file.name}" ${t("csvLoaded")}: ${X.length} ${t(

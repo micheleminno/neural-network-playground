@@ -23,6 +23,27 @@ function accuracyBinary(pred, y) {
   return ok / pred.length;
 }
 
+function initMetricTooltips() {
+  if (!window.bootstrap?.Tooltip) return;
+
+  document.querySelectorAll("[data-metric-help]").forEach((button) => {
+    const instance = bootstrap.Tooltip.getInstance(button);
+    if (instance) instance.dispose();
+    button.setAttribute("title", t(button.dataset.metricHelp));
+    new bootstrap.Tooltip(button, {
+      placement: "top",
+      customClass: "metric-tooltip",
+    });
+  });
+}
+
+function updateTrainingLanguage() {
+  initMetricTooltips();
+  if (!chart) return;
+  chart.options.scales.x.title.text = t("chartEpochs");
+  chart.update("none");
+}
+
 function ensureChart() {
   if (chart) return chart;
 
@@ -62,6 +83,12 @@ function ensureChart() {
         x: {
           grid: { color: "rgba(255,255,255,0.15)" },
           ticks: { color: "#f1f5f9" },
+          title: {
+            display: true,
+            text: t("chartEpochs"),
+            color: "#cbd5e1",
+            padding: { top: 8 },
+          },
         },
         y: {
           grid: { color: "rgba(255,255,255,0.15)" },

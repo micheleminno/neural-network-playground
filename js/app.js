@@ -101,11 +101,16 @@ function bindUIControls() {
     jsonCompact = e.target.checked;
     updateJSON();
   });
+  on("jsonCollapsed", "change", (e) => {
+    jsonCollapsed = e.target.checked;
+    if (jsonCollapsed) jsonExpandedPaths.clear();
+    updateJSON();
+  });
   on("btnDownloadJSON", "click", () => downloadWeights());
 
   on("btnCopyJSON", "click", async () => {
     await navigator.clipboard.writeText(
-      document.getElementById("jsonArea")?.value || "",
+      JSON.stringify(getJSONPreviewData(), null, 2),
     );
     const b = document.getElementById("btnCopyJSON");
     if (!b) return;

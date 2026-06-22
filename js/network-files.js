@@ -1,6 +1,6 @@
 // ========= JSON Export/Import & sync =========
-function updateJSON() {
-  const j = {
+function getJSONPreviewData() {
+  return {
     architecture: {
       layers: arch,
       inputConfig: serializeInputConfig(),
@@ -15,11 +15,146 @@ function updateJSON() {
       b: l.b,
     })),
   };
+}
+
+function summarizeJSONValue(value) {
+  if (Array.isArray(value)) {
+    const label = t(value.length === 1 ? "jsonItem" : "jsonItems");
+    return `[... ${value.length} ${label}]`;
+  }
+  if (value && typeof value === "object") {
+    const count = Object.keys(value).length;
+    const label = t(count === 1 ? "jsonProperty" : "jsonProperties");
+    return `{... ${count} ${label}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function isJSONBranch(value) {
+  return Boolean(value && typeof value === "object");
+}
+
+function jsonPathKey(path) {
+  return JSON.stringify(path);
+}
+
+function appendJSONTreeRow(container, value, key, path, depth, isLast) {
+  const row = document.createElement("div");
+  row.className = "json-tree-row";
+  row.style.setProperty("--json-depth", depth);
+  row.setAttribute("role", "treeitem");
+
+  const keyLabel = document.createElement("span");
+  keyLabel.className = "json-tree-key";
+  keyLabel.textContent =
+    typeof key === "number" ? `[${key}]` : `${JSON.stringify(key)}`;
+
+  if (!isJSONBranch(value)) {
+    row.appendChild(keyLabel);
+    row.append(":");
+    const primitive = document.createElement("span");
+    primitive.className = "json-tree-primitive";
+    primitive.textContent = `${JSON.stringify(value)}${isLast ? "" : ","}`;
+    row.appendChild(primitive);
+    container.appendChild(row);
+    return;
+  }
+
+  const pathKey = jsonPathKey(path);
+  const expanded = jsonExpandedPaths.has(pathKey);
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "json-tree-toggle";
+  toggle.textContent = expanded ? "−" : "+";
+  toggle.setAttribute("aria-expanded", String(expanded));
+  toggle.setAttribute("aria-label", t(expanded ? "jsonCollapseNode" : "jsonExpandNode"));
+  toggle.addEventListener("click", () => {
+    if (expanded) jsonExpandedPaths.delete(pathKey);
+    else jsonExpandedPaths.add(pathKey);
+    renderJSONTree(getJSONPreviewData());
+  });
+
+  row.append(toggle, keyLabel);
+  row.append(":");
+
+  if (!expanded) {
+    const summary = document.createElement("span");
+    summary.className = "json-tree-summary";
+    summary.textContent = `${summarizeJSONValue(value)}${isLast ? "" : ","}`;
+    row.appendChild(summary);
+    container.appendChild(row);
+    return;
+  }
+
+  row.append(` ${Array.isArray(value) ? "[" : "{"}`);
+  container.appendChild(row);
+
+  const entries = Array.isArray(value)
+    ? value.map((child, index) => [index, child])
+    : Object.entries(value);
+  entries.forEach(([childKey, child], index) => {
+    appendJSONTreeRow(
+      container,
+      child,
+      childKey,
+      [...path, childKey],
+      depth + 1,
+      index === entries.length - 1,
+    );
+  });
+
+  const closing = document.createElement("div");
+  closing.className = "json-tree-row";
+  closing.style.setProperty("--json-depth", depth);
+  closing.textContent = `${Array.isArray(value) ? "]" : "}"}${isLast ? "" : ","}`;
+  container.appendChild(closing);
+}
+
+function renderJSONTree(value) {
+  const tree = document.getElementById("jsonTree");
+  if (!tree) return;
+  tree.replaceChildren();
+
+  const opening = document.createElement("div");
+  opening.className = "json-tree-row";
+  opening.textContent = "{";
+  tree.appendChild(opening);
+
+  const entries = Object.entries(value);
+  entries.forEach(([key, child], index) => {
+    appendJSONTreeRow(
+      tree,
+      child,
+      key,
+      [key],
+      1,
+      index === entries.length - 1,
+    );
+  });
+
+  const closing = document.createElement("div");
+  closing.className = "json-tree-row";
+  closing.textContent = "}";
+  tree.appendChild(closing);
+}
+
+function updateJSON() {
+  const j = getJSONPreviewData();
 
   const jsonArea = $("#jsonArea");
-  if (!jsonArea) return;
+  const jsonTree = $("#jsonTree");
+  const compactControl = $("#jsonCompact");
+  if (!jsonArea || !jsonTree) return;
 
-  jsonArea.value = jsonCompact ? JSON.stringify(j) : JSON.stringify(j, null, 2);
+  jsonArea.classList.toggle("d-none", jsonCollapsed);
+  jsonTree.classList.toggle("d-none", !jsonCollapsed);
+  if (compactControl) compactControl.disabled = jsonCollapsed;
+
+  if (jsonCollapsed) {
+    renderJSONTree(j);
+  } else {
+    jsonArea.value = jsonCompact ? JSON.stringify(j) : JSON.stringify(j, null, 2);
+  }
 }
 
 function handleJSONImportFile(file, inputEl) {
@@ -67,6 +202,7 @@ function handleJSONImportFile(file, inputEl) {
           throw new Error(t("textConfigMismatch"));
         }
         dataset = { X: [], y: [], rawText: [] };
+        renderDatasetPreview();
 
         buildNetwork();
 
@@ -133,6 +269,8 @@ function handleJSONImportFile(file, inputEl) {
         } else {
           dataset = { X: [], y: [], rawText: [] };
         }
+
+        renderDatasetPreview();
 
         renderArchitecture();
         renderTestInputs();

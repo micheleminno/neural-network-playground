@@ -650,13 +650,31 @@
               </div>
 
               <div class="d-flex justify-content-between small mt-2">
-                <span>
-                  <span data-i18n="loss">Loss</span>:
+                <span class="metric-value">
+                  <span class="metric-label">
+                    <span data-i18n="loss">Loss</span>
+                    <button
+                      type="button"
+                      class="metric-help"
+                      data-metric-help="lossHelp"
+                      data-i18n-aria="lossHelpAria"
+                      aria-label="Explain loss"
+                    >?</button>
+                  </span>:
                   <span id="lossNow">-</span>
                 </span>
 
-                <span>
-                  <span data-i18n="accuracy">Accuracy</span>:
+                <span class="metric-value">
+                  <span class="metric-label">
+                    <span data-i18n="accuracy">Accuracy</span>
+                    <button
+                      type="button"
+                      class="metric-help"
+                      data-metric-help="accuracyHelp"
+                      data-i18n-aria="accuracyHelpAria"
+                      aria-label="Explain accuracy"
+                    >?</button>
+                  </span>:
                   <span id="accNow">-</span>
                 </span>
               </div>
@@ -706,6 +724,21 @@
 
             <div id="csvInfo" class="small-muted">
               <span data-i18n="noDataset"> Nessun dataset caricato </span>
+            </div>
+
+            <div id="datasetPreview" class="dataset-preview d-none mt-3">
+              <div class="dataset-preview-header">
+                <span class="fw-semibold" data-i18n="datasetPreview">
+                  Dataset preview
+                </span>
+                <span id="datasetPreviewCount" class="small-muted"></span>
+              </div>
+              <div class="dataset-preview-scroll">
+                <table class="table table-sm mb-0 dataset-preview-table">
+                  <thead id="datasetPreviewHead"></thead>
+                  <tbody id="datasetPreviewBody"></tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -785,22 +818,40 @@
 
         <div class="app-layout-col col-lg-8 d-flex">
           <div class="nb-card p-3 w-100 d-flex flex-column" id="jsonCard">
-            <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="json-preview-header mb-2">
               <h6 class="mb-0">
                 <i class="bi bi-code-slash"></i>
                 JSON Preview
               </h6>
 
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="jsonCompact"
-                />
+              <div class="json-preview-options">
+                <div class="form-check form-switch mb-0">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="jsonCompact"
+                  />
 
-                <label class="form-check-label small" for="jsonCompact">
-                  Compact
-                </label>
+                  <label
+                    class="form-check-label small"
+                    for="jsonCompact"
+                    data-i18n="compact"
+                  >Compact</label>
+                </div>
+
+                <div class="form-check form-switch mb-0">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="jsonCollapsed"
+                  />
+
+                  <label
+                    class="form-check-label small"
+                    for="jsonCollapsed"
+                    data-i18n="collapse"
+                  >Collapse</label>
+                </div>
               </div>
             </div>
 
@@ -809,6 +860,13 @@
               class="form-control mb-2 font-monospace flex-grow-1"
               readonly
             ></textarea>
+            <div
+              id="jsonTree"
+              class="json-tree form-control mb-2 font-monospace flex-grow-1 d-none"
+              role="tree"
+              data-i18n-aria="jsonTreeAria"
+              aria-label="Collapsible JSON preview"
+            ></div>
             <div class="d-flex gap-2">
               <button class="btn btn-secondary" id="btnCopyJSON">Copy</button>
 

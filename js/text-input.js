@@ -114,6 +114,7 @@ function syncInputModeControls() {
 
 function resetDatasetForInputChange() {
   dataset = { X: [], y: [], rawText: [] };
+  renderDatasetPreview();
   const preset = document.getElementById("presetDataset");
   if (preset) preset.value = "";
   const info = document.getElementById("csvInfo");
