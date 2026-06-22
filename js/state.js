@@ -20,7 +20,7 @@ let rebuildSeedCounter = 1;
 let currentNetworkName = "";
 let currentNetworkId = null;
 let jsonCompact = false;
-let jsonCollapsed = false;
+let jsonCollapsed = true;
 const jsonExpandedPaths = new Set();
 let stepTrainingState = {
   active: false,

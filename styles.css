@@ -966,6 +966,17 @@ body {
   gap: 12px 20px;
 }
 
+.json-preview-title-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.json-preview-title-group .form-select {
+  width: 190px;
+}
+
 .network-files-controls {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -982,30 +993,19 @@ body {
   grid-column: span 7;
 }
 
-.network-file-workspace {
+.network-export-workspace {
   grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  align-items: start;
-  gap: 16px;
+  padding: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 6px;
+  background: rgba(14, 165, 233, 0.13);
 }
 
-.network-file-actions {
-  display: grid;
-  width: 190px;
-  gap: 12px;
-}
-
-.network-file-actions #btnImportJSON {
-  width: max-content;
+.network-save-actions #btnImportJSON {
   min-height: 40px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-}
-
-.network-file-actions .form-select {
-  width: 190px;
 }
 
 .network-json-preview {
@@ -1340,7 +1340,7 @@ body {
 
   .network-open-control,
   .network-save-actions,
-  .network-file-workspace {
+  .network-export-workspace {
     grid-column: 1 / -1;
   }
 
@@ -1348,18 +1348,8 @@ body {
     flex-wrap: wrap;
   }
 
-  .network-file-workspace {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .network-file-actions {
-    width: 100%;
-    grid-template-columns: max-content minmax(170px, 230px);
-    align-items: center;
-  }
-
-  .network-file-actions .form-select {
-    width: 100%;
+  .json-preview-title-group .form-select {
+    width: min(190px, 100%);
   }
 
   .network-workspace {

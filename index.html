@@ -310,8 +310,6 @@
             </h6>
 
             <div class="mb-3" id="savedNetworksPanel">
-              <label class="form-label fw-semibold"> Saved Networks </label>
-
               <div class="dropdown w-100" id="savedNetworksDropdown">
                 <button
                   class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center"
@@ -802,34 +800,34 @@
                   <i class="bi bi-cloud-check"></i>
                   Update Current
                 </button>
+
+                <button id="btnImportJSON" class="btn btn-secondary flex-shrink-0">
+                  <i class="bi bi-upload"></i>
+                  <span data-i18n="importAction">Import</span>
+                </button>
               </div>
 
-              <div class="network-file-workspace">
-                <div class="network-file-actions">
-                  <button id="btnImportJSON" class="btn btn-secondary">
-                    <i class="bi bi-upload"></i>
-                    <span data-i18n="importAction">Import</span>
-                  </button>
-
-                  <select id="exportMode" class="form-select">
-                    <option value="full" selected data-i18n="exportFull">
-                      Full network
-                    </option>
-                    <option value="architecture" data-i18n="exportArchitecture">
-                      Architecture
-                    </option>
-                    <option value="weights" data-i18n="exportWeights">
-                      Weights
-                    </option>
-                  </select>
-                </div>
-
+              <div class="network-export-workspace">
                 <section class="network-json-preview" id="jsonCard">
                   <div class="json-preview-header mb-2">
-                    <h6 class="mb-0">
-                      <i class="bi bi-code-slash"></i>
-                      <span data-i18n="jsonPreview">JSON Preview</span>
-                    </h6>
+                    <div class="json-preview-title-group">
+                      <h6 class="mb-0">
+                        <i class="bi bi-code-slash"></i>
+                        <span data-i18n="jsonPreview">JSON network preview</span>
+                      </h6>
+
+                      <select id="exportMode" class="form-select form-select-sm">
+                        <option value="full" selected data-i18n="exportFull">
+                          Full network
+                        </option>
+                        <option value="architecture" data-i18n="exportArchitecture">
+                          Architecture
+                        </option>
+                        <option value="weights" data-i18n="exportWeights">
+                          Weights
+                        </option>
+                      </select>
+                    </div>
 
                     <div class="json-preview-options">
                       <div class="form-check form-switch mb-0">
@@ -851,6 +849,7 @@
                           class="form-check-input"
                           type="checkbox"
                           id="jsonCollapsed"
+                          checked
                         />
 
                         <label
