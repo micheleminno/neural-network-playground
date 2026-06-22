@@ -18,7 +18,7 @@ function debugExampleLabel(maxLength = 68) {
   return formatDebugValues(stepTrainingState.input);
 }
 
-function renderStepDebugPanel(width, compact = false) {
+function renderStepDebugPanel(width, compact = false, offsetY = 0) {
   if (!stepTrainingState.active) return "";
 
   const target = formatDebugValues(stepTrainingState.target, 3);
@@ -31,29 +31,29 @@ function renderStepDebugPanel(width, compact = false) {
   if (compact) {
     return `
       <g class="step-debug-panel">
-        <rect x="8" y="8" width="${width - 16}" height="122" rx="6"
+        <rect x="8" y="${offsetY}" width="${width - 16}" height="122" rx="6"
           fill="#07111f" stroke="rgba(56,189,248,.55)" stroke-width="1.2" />
-        <text x="18" y="29" class="step-debug-phase">${escapeHTML(stepPhaseLabel())}</text>
-        <text x="18" y="51" class="step-debug-example"><tspan class="step-debug-key">${escapeHTML(t("stepExample"))}:</tspan> ${escapeHTML(debugExampleLabel(42))}</text>
-        <text x="18" y="73" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepDesired"))}:</tspan> ${escapeHTML(target)}</text>
-        <text x="18" y="95" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepCurrent"))}:</tspan> ${escapeHTML(output)}</text>
-        <text x="18" y="117" class="step-debug-metric"><tspan class="step-debug-key">Loss:</tspan> ${escapeHTML(loss)} <tspan dx="24" class="step-debug-key">|Δw|:</tspan> ${escapeHTML(delta)}</text>
+        <text x="18" y="${offsetY + 21}" class="step-debug-phase">${escapeHTML(stepPhaseLabel())}</text>
+        <text x="18" y="${offsetY + 43}" class="step-debug-example"><tspan class="step-debug-key">${escapeHTML(t("stepExample"))}:</tspan> ${escapeHTML(debugExampleLabel(42))}</text>
+        <text x="18" y="${offsetY + 65}" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepDesired"))}:</tspan> ${escapeHTML(target)}</text>
+        <text x="18" y="${offsetY + 87}" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepCurrent"))}:</tspan> ${escapeHTML(output)}</text>
+        <text x="18" y="${offsetY + 109}" class="step-debug-metric"><tspan class="step-debug-key">Loss:</tspan> ${escapeHTML(loss)} <tspan dx="24" class="step-debug-key">|Δw|:</tspan> ${escapeHTML(delta)}</text>
       </g>`;
   }
 
   return `
     <g class="step-debug-panel">
-      <rect x="18" y="12" width="764" height="76" rx="6"
+      <rect x="18" y="${offsetY}" width="764" height="76" rx="6"
         fill="#07111f" stroke="rgba(56,189,248,.55)" stroke-width="1.2" />
-      <text x="34" y="34" class="step-debug-phase">${escapeHTML(stepPhaseLabel())}</text>
-      <text x="34" y="56" class="step-debug-example">
+      <text x="34" y="${offsetY + 22}" class="step-debug-phase">${escapeHTML(stepPhaseLabel())}</text>
+      <text x="34" y="${offsetY + 44}" class="step-debug-example">
         <tspan class="step-debug-key">${escapeHTML(t("stepExample"))}:</tspan>
         ${escapeHTML(debugExampleLabel())}
       </text>
-      <text x="34" y="78" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepDesired"))}:</tspan> ${escapeHTML(target)}</text>
-      <text x="270" y="78" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepCurrent"))}:</tspan> ${escapeHTML(output)}</text>
-      <text x="548" y="78" class="step-debug-metric"><tspan class="step-debug-key">Loss:</tspan> ${escapeHTML(loss)}</text>
-      <text x="674" y="78" class="step-debug-metric"><tspan class="step-debug-key">|Δw|:</tspan> ${escapeHTML(delta)}</text>
+      <text x="34" y="${offsetY + 66}" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepDesired"))}:</tspan> ${escapeHTML(target)}</text>
+      <text x="270" y="${offsetY + 66}" class="step-debug-metric"><tspan class="step-debug-key">${escapeHTML(t("stepCurrent"))}:</tspan> ${escapeHTML(output)}</text>
+      <text x="548" y="${offsetY + 66}" class="step-debug-metric"><tspan class="step-debug-key">Loss:</tspan> ${escapeHTML(loss)}</text>
+      <text x="674" y="${offsetY + 66}" class="step-debug-metric"><tspan class="step-debug-key">|Δw|:</tspan> ${escapeHTML(delta)}</text>
     </g>`;
 }
 
@@ -77,15 +77,17 @@ function renderNNVis() {
   }
 
   const xPad = compact ? 38 : 80;
-  const yPad = debugActive ? (compact ? 142 : 100) : 30;
+  const yPad = 30;
   const colW = (W - 2 * xPad) / (layerCount - 1 || 1);
   const largestLayer = Math.max(...sizes);
-  const networkHeight = H - yPad - 30;
+  const debugPanelSpace = debugActive ? (compact ? 140 : 100) : 30;
+  const networkHeight = H - yPad - debugPanelSpace;
   const availableNodeGap = networkHeight / (largestLayer + 1);
   const nodeR = Math.max(1.5, Math.min(13, availableNodeGap * 0.36));
   const nodeLabelSize = nodeR < 3 ? 0 : Math.max(5, Math.min(11, nodeR));
   const nodeStrokeWidth = Math.max(0.6, Math.min(1.6, nodeR * 0.4));
-  const BIAS_ROW_Y = debugActive ? (compact ? 150 : 112) : 40;
+  const BIAS_ROW_Y = 40;
+  const debugPanelY = debugActive ? H - (compact ? 130 : 88) : 0;
 
   const pos = [];
   for (let li = 0; li < layerCount; li++) {
@@ -358,8 +360,8 @@ function renderNNVis() {
 
   svg.innerHTML =
     defs +
-    renderStepDebugPanel(W, compact) +
-    `<g>${edges}</g><g>${directionEdges}</g><g>${nodes}</g><g>${biasNodes}</g>`;
+    `<g>${edges}</g><g>${directionEdges}</g><g>${nodes}</g><g>${biasNodes}</g>` +
+    renderStepDebugPanel(W, compact, debugPanelY);
   const tooltip = document.getElementById("edgeTooltip");
 
   svg.querySelectorAll(".edge-group").forEach((g) => {
