@@ -142,8 +142,9 @@ Networks can be imported from JSON or exported in three modes:
 - **Weights only:** trained weights and bias values
 - **Full network:** architecture, weights and dataset
 
-Network Files keeps cloud selection, save, update and import actions in one top
-toolbar. A dedicated Export row contains the **JSON network preview**, which
+Network Files keeps cloud selection, save, update and import actions in one
+compact top toolbar, with equally sized actions and Import anchored at the far
+right. A dedicated Export row contains the **JSON network preview**, which
 updates immediately when choosing the full network, architecture or weights.
 The preview opens as a collapsed tree by default, supports branch-by-branch
 expansion, and can also be formatted or compacted before being copied or exported.
