@@ -853,12 +853,12 @@ body {
 
 .io-overlay-inputs > * {
   transform: translate(-100%, -50%);
-  margin-left: -10px;
+  margin-left: -28px;
 }
 
 .io-overlay-outputs > * {
   transform: translate(0, -50%);
-  margin-left: 10px;
+  margin-left: 28px;
 }
 
 .io-overlay-static {
