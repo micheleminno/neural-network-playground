@@ -880,7 +880,7 @@ body {
   border: 1px solid rgba(96, 165, 250, 0.45);
   border-radius: 6px;
   background: #ffffff;
-  color: #dc2626;
+  color: #000000;
   font-weight: 700;
   font-size: 0.85rem;
   text-align: center;
@@ -889,6 +889,13 @@ body {
 .io-output-group {
   display: flex;
   gap: 6px;
+  align-items: center;
+}
+
+.io-output-separator {
+  color: #666;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .io-output-box {

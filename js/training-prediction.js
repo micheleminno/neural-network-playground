@@ -223,6 +223,7 @@ function renderPredictionOutputs(values = []) {
     group.className = "io-output-group";
     group.innerHTML = `
       <output class="io-output-box io-output-value" aria-label="y${i + 1}">${formattedValue}</output>
+      <span class="io-output-separator">≈</span>
       <output class="io-output-box io-output-rounded" title="${t("roundedOutput")}">${roundedValue}</output>
     `;
     container.appendChild(group);
