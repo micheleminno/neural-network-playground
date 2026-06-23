@@ -867,6 +867,10 @@ body {
   pointer-events: auto;
 }
 
+.io-overlay-static.io-overlay-inputs {
+  order: -1;
+}
+
 .io-overlay-static > * {
   position: static;
   transform: none;
