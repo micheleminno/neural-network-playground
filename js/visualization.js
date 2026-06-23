@@ -1,4 +1,55 @@
 // ========= Visualization =========
+let lastIOLayout = null;
+let ioOverlayResizeObserver = null;
+
+function syncPredictionOverlay() {
+  const svg = $("#nnVis");
+  const canvas = svg?.closest(".network-canvas");
+  const inputsBox = $("#testInputs");
+  const outputsBox = $("#predictOutputs");
+  if (!svg || !canvas || !inputsBox || !outputsBox) return;
+
+  if (!ioOverlayResizeObserver && typeof ResizeObserver !== "undefined") {
+    ioOverlayResizeObserver = new ResizeObserver(() => syncPredictionOverlay());
+    ioOverlayResizeObserver.observe(canvas);
+  }
+
+  const isTextMode = inputConfig.mode === "text";
+  inputsBox.classList.toggle("io-overlay-static", isTextMode);
+  outputsBox.classList.toggle("io-overlay-static", isTextMode);
+  if (isTextMode || !lastIOLayout) return;
+
+  const svgRect = svg.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+  if (!svgRect.width || !svgRect.height) return;
+
+  // L'svg usa il preserveAspectRatio di default "xMidYMid meet": la scala è
+  // uniforme (il minimo tra i due rapporti) e il contenuto viene centrato
+  // nello spazio in eccesso sull'asse non limitante.
+  const scale = Math.min(
+    svgRect.width / lastIOLayout.W,
+    svgRect.height / lastIOLayout.H,
+  );
+  const offsetX =
+    svgRect.left - canvasRect.left + (svgRect.width - lastIOLayout.W * scale) / 2;
+  const offsetY =
+    svgRect.top - canvasRect.top + (svgRect.height - lastIOLayout.H * scale) / 2;
+
+  Array.from(inputsBox.children).forEach((el, i) => {
+    const node = lastIOLayout.inputs[i];
+    if (!node) return;
+    el.style.left = `${offsetX + node.x * scale}px`;
+    el.style.top = `${offsetY + node.y * scale}px`;
+  });
+
+  Array.from(outputsBox.children).forEach((el, i) => {
+    const node = lastIOLayout.outputs[i];
+    if (!node) return;
+    el.style.left = `${offsetX + node.x * scale}px`;
+    el.style.top = `${offsetY + node.y * scale}px`;
+  });
+}
+
 function formatDebugValues(values, maxItems = 6) {
   if (!Array.isArray(values)) return "-";
   const shown = values.slice(0, maxItems).map((value) =>
@@ -100,6 +151,13 @@ function renderNNVis() {
       pos.push({ li, ni, x, y });
     }
   }
+
+  lastIOLayout = {
+    W,
+    H,
+    inputs: pos.filter((p) => p.li === 0),
+    outputs: pos.filter((p) => p.li === layerCount - 1),
+  };
 
   const nodeIndex = (li, ni) =>
     sizes.slice(0, li).reduce((s, v) => s + v, 0) + ni;
@@ -427,6 +485,8 @@ function renderNNVis() {
       tooltip.style.transform = "translateY(4px)";
     });
   });
+
+  syncPredictionOverlay();
 }
 
 // ========= Build Network =========

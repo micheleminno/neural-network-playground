@@ -24,6 +24,9 @@ function renderTestInputs() {
     if (typeof renderPredictionOutputs === "function") {
       renderPredictionOutputs();
     }
+    if (typeof syncPredictionOverlay === "function") {
+      syncPredictionOverlay();
+    }
     return;
   }
 
@@ -33,16 +36,22 @@ function renderTestInputs() {
   container.innerHTML = "";
 
   for (let i = 0; i < inputSize; i++) {
-    const col = document.createElement("div");
-    col.className = "col-6";
     const val = Number.isFinite(prev[i]) ? prev[i] : 0;
-    col.innerHTML = `<label class="form-label">x${i + 1}</label>
-      <input type="number" step="any" class="form-control" data-ti="${i}" value="${val}">`;
-    container.appendChild(col);
+    const input = document.createElement("input");
+    input.type = "number";
+    input.step = "any";
+    input.className = "io-input-box";
+    input.dataset.ti = i;
+    input.value = val;
+    input.setAttribute("aria-label", `x${i + 1}`);
+    container.appendChild(input);
   }
 
   if (typeof renderPredictionOutputs === "function") {
     renderPredictionOutputs();
+  }
+  if (typeof syncPredictionOverlay === "function") {
+    syncPredictionOverlay();
   }
 }
 

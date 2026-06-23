@@ -1,11 +1,5 @@
 // ========= Binding =========
 function prepareAppLayout() {
-  const prediction = document.getElementById("predictionCard");
-  const predictionDock = document.getElementById("predictionDock");
-  if (prediction && predictionDock && prediction.parentElement !== predictionDock) {
-    predictionDock.appendChild(prediction);
-  }
-
   const savedNetworks = document.getElementById("savedNetworksPanel");
   const networkFiles = document.getElementById("networkFilesControls");
   if (savedNetworks && networkFiles && savedNetworks.parentElement !== networkFiles) {

@@ -219,14 +219,17 @@ function renderPredictionOutputs(values = []) {
       ? Number(value.toFixed(5)).toString()
       : "-";
     const roundedValue = Number.isFinite(value) ? Math.round(value) : "-";
-    const box = document.createElement("div");
-    box.className = "prediction-output-box";
-    box.innerHTML = `
-      <span class="prediction-output-label">y${i + 1}</span>
-      <output class="prediction-output-value">${formattedValue}</output>
-      <output class="prediction-output-rounded" title="${t("roundedOutput")}">${roundedValue}</output>
+    const group = document.createElement("div");
+    group.className = "io-output-group";
+    group.innerHTML = `
+      <output class="io-output-box io-output-value" aria-label="y${i + 1}">${formattedValue}</output>
+      <output class="io-output-box io-output-rounded" title="${t("roundedOutput")}">${roundedValue}</output>
     `;
-    container.appendChild(box);
+    container.appendChild(group);
+  }
+
+  if (typeof syncPredictionOverlay === "function") {
+    syncPredictionOverlay();
   }
 }
 

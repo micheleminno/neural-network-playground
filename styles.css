@@ -839,62 +839,71 @@ body {
   }
 }
 
-/* --- Prediction outputs --- */
-.prediction-results-title {
-  margin-bottom: 8px;
-  color: #cbd5e1;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
+/* --- Prediction input/output overlay (floats next to network nodes) --- */
+.io-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.prediction-output-list {
-  display: grid;
-  gap: 8px;
+.io-overlay > * {
+  position: absolute;
+  pointer-events: auto;
 }
 
-.prediction-output-box {
-  min-height: 56px;
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 52px;
-  align-items: center;
-  overflow: hidden;
-  border: 1px solid rgba(96, 165, 250, 0.38);
+.io-overlay-inputs > * {
+  transform: translate(-100%, -50%);
+  margin-left: -10px;
+}
+
+.io-overlay-outputs > * {
+  transform: translate(0, -50%);
+  margin-left: 10px;
+}
+
+.io-overlay-static {
+  position: static;
+  inset: auto;
+  pointer-events: auto;
+}
+
+.io-overlay-static > * {
+  position: static;
+  transform: none;
+  margin-left: 0;
+}
+
+.io-input-box {
+  width: 56px;
+  height: 30px;
+  padding: 0 6px;
+  border: 1px solid rgba(96, 165, 250, 0.45);
   border-radius: 6px;
-  background: rgba(15, 23, 42, 0.72);
+  background: #ffffff;
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-align: center;
 }
 
-.prediction-output-label {
-  align-self: stretch;
+.io-output-group {
+  display: flex;
+  gap: 6px;
+}
+
+.io-output-box {
+  min-width: 56px;
+  height: 30px;
   display: grid;
   place-items: center;
-  border-right: 1px solid rgba(96, 165, 250, 0.28);
-  background: rgba(37, 99, 235, 0.18);
-  color: #bfdbfe;
-  font-weight: 750;
-}
-
-.prediction-output-value {
-  min-width: 0;
-  padding: 10px 14px;
-  color: #f8fafc;
+  padding: 0 8px;
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  border-radius: 6px;
+  background: #ffffff;
+  color: #dc2626;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 1.05rem;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  overflow-wrap: anywhere;
-}
-
-.prediction-output-rounded {
-  align-self: stretch;
-  display: grid;
-  place-items: center;
-  border-left: 1px solid rgba(96, 165, 250, 0.28);
-  background: rgba(34, 197, 94, 0.14);
-  color: #bbf7d0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 700;
+  font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1198,25 +1207,11 @@ body {
 }
 
 .network-workspace {
-  display: grid;
-  grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
-  gap: 16px;
-  align-items: stretch;
-}
-
-.prediction-dock {
-  min-width: 0;
-  padding-right: 16px;
-  border-right: 1px solid rgba(148, 163, 184, 0.22);
-}
-
-.embedded-prediction {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
 .network-canvas {
+  position: relative;
   min-width: 0;
   display: flex;
   align-items: center;
@@ -1225,27 +1220,6 @@ body {
 .network-canvas #nnVis {
   display: block;
   max-width: 100%;
-}
-
-#testInputs {
-  display: grid;
-  gap: 10px;
-  max-height: 260px;
-  overflow-y: auto;
-  padding-right: 3px;
-}
-
-#testInputs > .col-6 {
-  width: auto;
-}
-
-.embedded-prediction #btnPredict {
-  align-self: flex-start;
-}
-
-.embedded-prediction .prediction-results {
-  margin-top: auto !important;
-  padding-top: 14px;
 }
 
 #nnLegend {
@@ -1322,10 +1296,6 @@ body {
     grid-column: 1 / -1;
   }
 
-  .network-workspace {
-    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
-  }
-
   .network-save-actions {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1364,18 +1334,12 @@ body {
     width: min(190px, 100%);
   }
 
-  .network-workspace {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .prediction-dock {
-    padding: 0 0 14px;
-    border-right: 0;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
-  }
-
-  #testInputs {
-    max-height: none;
+  .io-input-box,
+  .io-output-box {
+    width: 42px;
+    min-width: 42px;
+    height: 24px;
+    font-size: 0.7rem;
   }
 
   #architecture {

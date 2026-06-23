@@ -488,7 +488,6 @@
             </div>
 
             <div id="networkWorkspace" class="network-workspace mt-3">
-              <aside id="predictionDock" class="prediction-dock"></aside>
               <div class="network-canvas">
                 <svg
                   id="nnVis"
@@ -496,6 +495,17 @@
                   width="100%"
                   height="360"
                 ></svg>
+                <div id="testInputs" class="io-overlay io-overlay-inputs"></div>
+                <div
+                  id="predictOutputs"
+                  class="io-overlay io-overlay-outputs"
+                  aria-live="polite"
+                ></div>
+              </div>
+              <div class="predict-actions text-center mt-2">
+                <button class="btn btn-primary" id="btnPredict">
+                  <span data-i18n="predict">Predici</span>
+                </button>
               </div>
             </div>
           </div>
@@ -750,32 +760,6 @@
           </div>
         </div>
 
-        <!-- PREDICTION -->
-        <div class="app-layout-col col-lg-6" id="predictionLayoutSource">
-          <div class="embedded-prediction" id="predictionCard">
-            <h6>
-              <i class="bi bi-lightning"></i>
-              <span data-i18n="prediction">Prediction</span>
-            </h6>
-
-            <div id="testInputs"></div>
-
-            <button class="btn btn-primary mt-2" id="btnPredict">
-              <span data-i18n="predict">Predici</span>
-            </button>
-
-            <div class="prediction-results mt-3">
-              <div class="prediction-results-title" data-i18n="outputLabel">
-                Output
-              </div>
-              <div
-                id="predictOutputs"
-                class="prediction-output-list"
-                aria-live="polite"
-              ></div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="app-layout-row row g-3">

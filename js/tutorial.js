@@ -52,7 +52,7 @@ const tutorialCopy = {
         placement: "bottom",
       },
       {
-        selector: "#predictionCard",
+        selector: "#networkWorkspace",
         title: "Ask the trained model a question",
         body: "Predict is now part of the network visualization. The text box sits to the left of the input nodes, so the question and the network response remain visible together.",
         action: 'Try the sentence: "This lesson was clear and useful".',
@@ -136,7 +136,7 @@ const tutorialCopy = {
         placement: "bottom",
       },
       {
-        selector: "#predictionCard",
+        selector: "#networkWorkspace",
         title: "Fai una domanda al modello",
         body: "Predict ora fa parte della visualizzazione. Il box di testo si trova a sinistra dei nodi di input, così domanda e risposta della rete restano visibili insieme.",
         action: 'Prova la frase: "This lesson was clear and useful".',
