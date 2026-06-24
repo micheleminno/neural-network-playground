@@ -429,23 +429,8 @@ function renderNNVis() {
           : "";
 
       tooltip.innerHTML = `
-        <div style="
-          font-size:12px;
-          opacity:.7;
-          margin-bottom:4px;
-          text-transform:uppercase;
-          letter-spacing:.8px;
-        ">
-          ${t("weight")}
-        </div>
-
-        <div style="
-          font-size:24px;
-          font-weight:700;
-          line-height:1;
-        ">
-          ${weight}
-        </div>
+        <div class="tooltip-label">${t("weight")}</div>
+        <div class="tooltip-value">${weight}</div>
         ${change}
       `;
 
@@ -468,11 +453,22 @@ function renderNNVis() {
     if (value === undefined) return;
 
     node.addEventListener("mousemove", (e) => {
-      const zLine =
+      const zRow =
         zValue !== undefined && zValue !== ""
-          ? `<br><b>${t("weightedSum")}</b>: ${Number(zValue).toFixed(4)}`
+          ? `
+            <div class="tooltip-row">
+              <div class="tooltip-label">${t("weightedSum")}</div>
+              <div class="tooltip-value">${Number(zValue).toFixed(4)}</div>
+            </div>
+          `
           : "";
-      tooltip.innerHTML = `<b>${t("activation")}</b>: ${Number(value).toFixed(4)}${zLine}`;
+      tooltip.innerHTML = `
+        <div class="tooltip-row">
+          <div class="tooltip-label">${t("activation")}</div>
+          <div class="tooltip-value">${Number(value).toFixed(4)}</div>
+        </div>
+        ${zRow}
+      `;
 
       tooltip.style.left = e.clientX + 16 + "px";
       tooltip.style.top = e.clientY + 16 + "px";
