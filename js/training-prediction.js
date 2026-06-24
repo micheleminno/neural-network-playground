@@ -234,7 +234,7 @@ function renderPredictionOutputs(values = []) {
   }
 }
 
-function predictOnce() {
+function predictOnce(silent = false) {
   const textValue = document.getElementById("textPredictInput")?.value || "";
   const vals =
     inputConfig.mode === "text"
@@ -242,17 +242,17 @@ function predictOnce() {
       : $$("#testInputs [data-ti]").map((i) => Number(i.value));
 
   if (inputConfig.mode === "text" && !textValue.trim()) {
-    alert(t("textEmpty"));
+    if (!silent) alert(t("textEmpty"));
     return;
   }
 
-  if (vals.length !== inputSize) {
-    alert(t("inputMismatch"));
+  if (vals.length !== inputSize || vals.some((v) => !Number.isFinite(v))) {
+    if (!silent) alert(t("inputMismatch"));
     return;
   }
 
   if (!net.layers.length) {
-    alert("Rete non configurata");
+    if (!silent) alert("Rete non configurata");
     return;
   }
 

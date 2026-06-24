@@ -1,4 +1,6 @@
 // ========= Test Inputs UI =========
+const autoPredict = debounce(() => predictOnce(true), 250);
+
 function renderTestInputs() {
   const container = $("#testInputs");
   if (!container) return;
@@ -18,7 +20,10 @@ function renderTestInputs() {
     `;
     const textarea = document.getElementById("textPredictInput");
     textarea.value = previousText;
-    textarea.addEventListener("input", () => updateTextEncodingPreview(textarea.value));
+    textarea.addEventListener("input", () => {
+      updateTextEncodingPreview(textarea.value);
+      autoPredict();
+    });
     updateTextEncodingPreview(previousText);
 
     if (typeof renderPredictionOutputs === "function") {
@@ -44,6 +49,7 @@ function renderTestInputs() {
     input.dataset.ti = i;
     input.value = val;
     input.setAttribute("aria-label", `x${i + 1}`);
+    input.addEventListener("input", autoPredict);
     container.appendChild(input);
   }
 
