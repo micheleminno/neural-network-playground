@@ -414,6 +414,8 @@ function renderNNVis() {
           style="fill:#e5e7eb;font-weight:600;font-size:${nodeLabelSize}px">${escapeHTML(label)}</text>
         ${badge}
         ${desiredBadge}
+        <circle class="node-hitbox" cx="${p.x}" cy="${p.y}" r="${nodeR + 10}"
+          fill="transparent" stroke="none"/>
       </g>`;
     }
   }
