@@ -173,7 +173,7 @@ function renderNNVis() {
   });
 
   const defs = `<defs>
-    <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <filter id="edgeGlow" filterUnits="userSpaceOnUse" x="-50" y="-50" width="${W + 100}" height="${H + 100}">
       <feGaussianBlur stdDeviation="1.2" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
