@@ -365,6 +365,7 @@ function renderNNVis() {
       const isOutput = li === layerCount - 1;
       const vNorm = lastNodeColors?.byLayer?.[li]?.[ni];
       const vRaw = lastNodeColors?.raw?.[li]?.[ni];
+      const vZ = lastNodeColors?.z?.[li]?.[ni];
 
       let fill = "#0b1220";
       if (vNorm != null) {
@@ -405,7 +406,8 @@ function renderNNVis() {
           : "";
 
       nodes += `<g class="nn-node"
-  data-activation="${vRaw ?? ""}">
+  data-activation="${vRaw ?? ""}"
+  data-z="${!isInput && vZ != null ? vZ : ""}">
         <circle cx="${p.x}" cy="${p.y}" r="${nodeR}"
           style="fill:${fill} !important; stroke:rgba(255,255,255,0.95); stroke-width:${nodeStrokeWidth}"/>
         <text x="${p.x}" y="${p.y + Math.min(3, nodeR * 0.3)}" text-anchor="middle"
@@ -467,11 +469,16 @@ function renderNNVis() {
   });
   svg.querySelectorAll(".nn-node").forEach((node) => {
     const value = node.dataset.activation;
+    const zValue = node.dataset.z;
 
     if (value === undefined) return;
 
     node.addEventListener("mousemove", (e) => {
-      tooltip.innerHTML = `<b>${t("activation")}</b>: ${Number(value).toFixed(4)}`;
+      const zLine =
+        zValue !== undefined && zValue !== ""
+          ? `<br><b>${t("weightedSum")}</b>: ${Number(zValue).toFixed(4)}`
+          : "";
+      tooltip.innerHTML = `<b>${t("activation")}</b>: ${Number(value).toFixed(4)}${zLine}`;
 
       tooltip.style.left = e.clientX + 16 + "px";
       tooltip.style.top = e.clientY + 16 + "px";

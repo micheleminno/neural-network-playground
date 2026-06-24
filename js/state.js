@@ -50,7 +50,7 @@ const outputColor = (v) => `hsl(${Math.round(120 * clamp01(v))}, 85%, 50%)`;
 function computeNodeColorsForInput(xvec) {
   if (!xvec) return;
   net.forward([xvec]);
-  lastNodeColors = { byLayer: [], raw: [] };
+  lastNodeColors = { byLayer: [], raw: [], z: [] };
   // ===== INPUT LAYER =====
 
   lastNodeColors.raw[0] = xvec.slice();
@@ -66,6 +66,7 @@ function computeNodeColorsForInput(xvec) {
   net.layers.forEach((L, k) => {
     const vals = L.A && L.A[0] ? L.A[0].slice() : [];
     lastNodeColors.raw[k + 1] = vals.slice();
+    lastNodeColors.z[k + 1] = L.Z && L.Z[0] ? L.Z[0].slice() : [];
 
     if (vals.length === 0) {
       lastNodeColors.byLayer[k + 1] = [];
