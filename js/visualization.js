@@ -415,7 +415,7 @@ function renderNNVis() {
         ${badge}
         ${desiredBadge}
         <circle class="node-hitbox" cx="${p.x}" cy="${p.y}" r="${nodeR + 10}"
-          fill="transparent" stroke="none"/>
+          style="fill:transparent !important; stroke:none !important"/>
       </g>`;
     }
   }
