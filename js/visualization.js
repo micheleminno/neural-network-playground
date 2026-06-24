@@ -390,13 +390,6 @@ function renderNNVis() {
           ? "y" + (ni + 1)
           : "h" + (ni + 1);
 
-      const badge =
-        !isInput && vRaw != null
-          ? `<text x="${p.x}" y="${p.y - (nodeR + 7)}" text-anchor="middle"
-              style="fill:#e5e7eb;font-size:10px;font-weight:600">${vRaw.toFixed(
-                2,
-              )}</text>`
-          : "";
       const desiredBadge =
         isOutput && stepTrainingState.active && stepTrainingState.target?.[ni] != null
           ? `<text x="${p.x}" y="${p.y + nodeR + 15}" text-anchor="middle"
@@ -412,7 +405,6 @@ function renderNNVis() {
           style="fill:${fill} !important; stroke:rgba(255,255,255,0.95); stroke-width:${nodeStrokeWidth}"/>
         <text x="${p.x}" y="${p.y + Math.min(3, nodeR * 0.3)}" text-anchor="middle"
           style="fill:#e5e7eb;font-weight:600;font-size:${nodeLabelSize}px">${escapeHTML(label)}</text>
-        ${badge}
         ${desiredBadge}
         <circle class="node-hitbox" cx="${p.x}" cy="${p.y}" r="${nodeR + 10}"
           style="fill:transparent !important; stroke:none !important"/>
