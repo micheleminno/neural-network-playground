@@ -354,6 +354,7 @@ function renderArchitecture() {
       buildNetwork();
       renderArchitecture();
       updateJSON();
+      predictOnce(true);
     });
 
     const activationSelect = card.querySelector(".activation-select");
@@ -367,6 +368,7 @@ function renderArchitecture() {
         buildNetwork();
         renderArchitecture();
         updateJSON();
+        predictOnce(true);
       });
     }
 
@@ -381,6 +383,7 @@ function renderArchitecture() {
         buildNetwork();
         renderArchitecture();
         updateJSON();
+        predictOnce(true);
       });
     }
 
@@ -393,6 +396,7 @@ function renderArchitecture() {
         buildNetwork();
         renderArchitecture();
         updateJSON();
+        predictOnce(true);
       });
     }
 
@@ -451,4 +455,5 @@ function addLayer(type) {
   buildNetwork();
   renderArchitecture();
   updateJSON();
+  predictOnce(true);
 }

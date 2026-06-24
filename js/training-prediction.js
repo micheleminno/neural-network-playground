@@ -187,6 +187,7 @@ async function trainLoop() {
   $("#batchProgressText").textContent = "Completed";
 
   updateJSON();
+  predictOnce(true);
 }
 
 function updateTrainingProgress(epoch, totalEpochs, batch, totalBatches) {

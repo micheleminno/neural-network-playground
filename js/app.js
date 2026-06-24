@@ -58,14 +58,6 @@ function bindUIControls() {
   on("btnStepReset", "click", () => resetStepTraining());
   on("btnStepNext", "click", () => nextStepTraining());
 
-  on("btnPredict", "click", () => {
-    if (inputConfig.mode === "numeric") {
-      const ti = document.querySelectorAll("#testInputs [data-ti]");
-      if (ti.length !== inputSize) renderTestInputs();
-    }
-    predictOnce();
-  });
-
   on("btnSaveNetwork", "click", async () => {
     await saveNetwork();
 
@@ -154,7 +146,6 @@ function sanityCheckButtons() {
     "btnTrain",
     "btnStop",
     "btnStepNext",
-    "btnPredict",
     "btnAddHidden",
     "btnExport",
     "btnCopyJSON",
@@ -221,6 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   outputSize = 1;
   buildNetwork();
   renderArchitecture();
+  predictOnce(true);
 
   bindUIControls();
   updateStepTrainingControls();

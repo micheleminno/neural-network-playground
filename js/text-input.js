@@ -136,6 +136,7 @@ function syncInputLayerToConfig({ rebuild = true } = {}) {
     buildNetwork();
     renderArchitecture();
     updateJSON();
+    predictOnce(true);
   }
 }
 

@@ -302,6 +302,7 @@ async function loadNetworkById(id) {
   renderNNVis();
   syncInputModeControls();
   updateJSON();
+  predictOnce(true);
 
   console.log("Network loaded:", network.name);
 }

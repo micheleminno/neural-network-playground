@@ -261,6 +261,7 @@ function handleJSONImportFile(file, inputEl) {
         renderNNVis();
         syncInputModeControls();
         updateJSON();
+        predictOnce(true);
 
         alert(t("importWeightsOk"));
       }
@@ -322,6 +323,7 @@ function handleJSONImportFile(file, inputEl) {
         renderNNVis();
         syncInputModeControls();
         updateJSON();
+        predictOnce(true);
 
         alert(
           t("importArchOk") +
