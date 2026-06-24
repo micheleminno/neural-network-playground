@@ -10,6 +10,7 @@ function freshStepTrainingState(sampleCursor = -1) {
     output: null,
     loss: null,
     activations: [],
+    preActivations: [],
     forwardLayer: -1,
     backwardLayer: -1,
     backwardGradient: null,
@@ -95,10 +96,14 @@ function setStepNodeColors() {
     return;
   }
 
-  lastNodeColors = { byLayer: [], raw: [] };
+  lastNodeColors = { byLayer: [], raw: [], z: [] };
+  const preActivations = stepTrainingState.preActivations || [];
   activations.forEach((values, layerIndex) => {
     if (!values) return;
     lastNodeColors.raw[layerIndex] = values.slice();
+    if (preActivations[layerIndex]) {
+      lastNodeColors.z[layerIndex] = preActivations[layerIndex].slice();
+    }
 
     if (values.length === 1) {
       lastNodeColors.byLayer[layerIndex] = [clamp01(values[0])];
@@ -125,6 +130,7 @@ function loadNextStepExample() {
   stepTrainingState.rawInput = rawInput;
   stepTrainingState.target = dataset.y[nextIndex].slice();
   stepTrainingState.activations = [stepTrainingState.input.slice()];
+  stepTrainingState.preActivations = [];
   setStepNodeColors();
 }
 
@@ -139,6 +145,7 @@ function runNextForwardLayer() {
   stepTrainingState.backwardLayer = -1;
   stepTrainingState.trace = null;
   stepTrainingState.activations[layerIndex + 1] = activation.slice();
+  stepTrainingState.preActivations[layerIndex + 1] = layer.Z[0].slice();
 
   if (layerIndex === net.layers.length - 1) {
     stepTrainingState.output = activation.slice();
@@ -194,6 +201,10 @@ function completeStepExample() {
   stepTrainingState.activations = [
     stepTrainingState.input.slice(),
     ...net.layers.map((layer) => layer.A[0].slice()),
+  ];
+  stepTrainingState.preActivations = [
+    undefined,
+    ...net.layers.map((layer) => layer.Z[0].slice()),
   ];
   setStepNodeColors();
 
