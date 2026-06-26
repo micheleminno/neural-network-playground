@@ -50,6 +50,66 @@ function syncPredictionOverlay() {
   });
 }
 
+function buildActivationTooltipPlot(fnName, xVal, yVal) {
+  const config = ACTIVATION_PLOT_CONFIG[fnName] || ACTIVATION_PLOT_CONFIG.linear;
+  let xMin = Math.min(config.xMin, xVal);
+  let xMax = Math.max(config.xMax, xVal);
+  const xPad = (xMax - xMin) * 0.12 || 1;
+  xMin -= xPad;
+  xMax += xPad;
+
+  const steps = 60;
+  let yMin = Infinity;
+  let yMax = -Infinity;
+  for (let i = 0; i <= steps; i++) {
+    const x = xMin + (i / steps) * (xMax - xMin);
+    const y = activationPlotValue(fnName, x);
+    if (y < yMin) yMin = y;
+    if (y > yMax) yMax = y;
+  }
+  yMin = Math.min(yMin, yVal);
+  yMax = Math.max(yMax, yVal);
+  const yPad = (yMax - yMin) * 0.18 || 1;
+  yMin -= yPad;
+  yMax += yPad;
+
+  const width = 220;
+  const height = 100;
+  const padding = { top: 10, right: 10, bottom: 10, left: 10 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const mapX = (x) => padding.left + ((x - xMin) / (xMax - xMin)) * plotWidth;
+  const mapY = (y) => padding.top + (1 - (y - yMin) / (yMax - yMin)) * plotHeight;
+
+  let axes = "";
+  if (yMin <= 0 && yMax >= 0) {
+    axes += `<line x1="${padding.left}" y1="${mapY(0)}" x2="${width - padding.right}" y2="${mapY(0)}" class="activation-axis"/>`;
+  }
+  if (xMin <= 0 && xMax >= 0) {
+    axes += `<line x1="${mapX(0)}" y1="${padding.top}" x2="${mapX(0)}" y2="${height - padding.bottom}" class="activation-axis"/>`;
+  }
+
+  let path = "";
+  for (let i = 0; i <= steps; i++) {
+    const x = xMin + (i / steps) * (xMax - xMin);
+    const y = activationPlotValue(fnName, x);
+    path += `${i ? "L" : "M"}${mapX(x).toFixed(2)},${mapY(y).toFixed(2)}`;
+  }
+
+  const px = mapX(xVal);
+  const py = mapY(yVal);
+
+  return `
+    <svg viewBox="0 0 ${width} ${height}" class="tooltip-activation-plot">
+      ${axes}
+      <path d="${path}" class="activation-curve"/>
+      <line x1="${px}" y1="${py}" x2="${px}" y2="${height - padding.bottom}" class="tooltip-plot-guide"/>
+      <line x1="${px}" y1="${py}" x2="${padding.left}" y2="${py}" class="tooltip-plot-guide"/>
+      <circle cx="${px}" cy="${py}" r="4" class="tooltip-plot-point"/>
+    </svg>
+  `;
+}
+
 function formatDebugValues(values, maxItems = 6) {
   if (!Array.isArray(values)) return "-";
   const shown = values.slice(0, maxItems).map((value) =>
@@ -398,9 +458,12 @@ function renderNNVis() {
               )}</text>`
           : "";
 
+      const fnName = !isInput ? net.layers[li - 1]?.activation || "" : "";
+
       nodes += `<g class="nn-node"
   data-activation="${vRaw ?? ""}"
-  data-z="${!isInput && vZ != null ? vZ : ""}">
+  data-z="${!isInput && vZ != null ? vZ : ""}"
+  data-fn="${fnName}">
         <circle cx="${p.x}" cy="${p.y}" r="${nodeR}"
           style="fill:${fill} !important; stroke:rgba(255,255,255,0.95); stroke-width:${nodeStrokeWidth}"/>
         <text x="${p.x}" y="${p.y + Math.min(3, nodeR * 0.3)}" text-anchor="middle"
@@ -449,26 +512,29 @@ function renderNNVis() {
   svg.querySelectorAll(".nn-node").forEach((node) => {
     const value = node.dataset.activation;
     const zValue = node.dataset.z;
+    const fnName = node.dataset.fn;
 
     if (value === undefined) return;
 
     node.addEventListener("mousemove", (e) => {
-      const zRow =
-        zValue !== undefined && zValue !== ""
-          ? `
-            <div class="tooltip-row">
-              <div class="tooltip-label">${t("weightedSum")}</div>
-              <div class="tooltip-value">${Number(zValue).toFixed(4)}</div>
-            </div>
-          `
-          : "";
-      tooltip.innerHTML = `
-        <div class="tooltip-row">
-          <div class="tooltip-label">${t("activation")}</div>
-          <div class="tooltip-value">${Number(value).toFixed(4)}</div>
-        </div>
-        ${zRow}
-      `;
+      if (fnName && zValue !== undefined && zValue !== "") {
+        const xVal = Number(zValue);
+        const yVal = Number(value);
+        tooltip.innerHTML = `
+          ${buildActivationTooltipPlot(fnName, xVal, yVal)}
+          <div class="tooltip-plot-values">
+            <span>${t("weightedSum")}: ${xVal.toFixed(4)}</span>
+            <span>${t("activation")}: ${yVal.toFixed(4)}</span>
+          </div>
+        `;
+      } else {
+        tooltip.innerHTML = `
+          <div class="tooltip-row">
+            <div class="tooltip-label">${t("activation")}</div>
+            <div class="tooltip-value">${Number(value).toFixed(4)}</div>
+          </div>
+        `;
+      }
 
       tooltip.style.left = e.clientX + 16 + "px";
       tooltip.style.top = e.clientY + 16 + "px";
