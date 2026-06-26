@@ -336,9 +336,10 @@ function renderNNVis() {
       const biasY = BIAS_ROW_Y;
 
       const biasLabel = `b${targetLayerIndex}`;
+      const biasValues = Lyr.b[0].map((v) => Number(v).toFixed(4)).join(", ");
 
       biasNodes += `
-        <g class="nn-bias-node">
+        <g class="nn-bias-node" data-bias-values="${biasValues}">
           <circle
             cx="${biasX}"
             cy="${biasY}"
@@ -353,6 +354,8 @@ function renderNNVis() {
           >
             ${biasLabel}
           </text>
+          <circle class="node-hitbox" cx="${biasX}" cy="${biasY}" r="${nodeR + 10}"
+            style="fill:transparent !important; stroke:none !important"/>
         </g>`;
 
       for (let j = 0; j < Lyr.out; j++) {
@@ -566,6 +569,36 @@ function renderNNVis() {
     });
 
     node.addEventListener("mouseleave", () => {
+      tooltip.style.opacity = "0";
+      tooltip.style.transform = "translateY(4px)";
+    });
+  });
+
+  svg.querySelectorAll(".nn-bias-node").forEach((biasNode) => {
+    const values = (biasNode.dataset.biasValues || "").split(", ").filter(Boolean);
+
+    biasNode.addEventListener("mousemove", (e) => {
+      tooltip.innerHTML =
+        values.length > 1
+          ? `
+            <div class="tooltip-label">${t("bias")}</div>
+            <div class="tooltip-plot-values" style="flex-direction:column;gap:4px;">
+              ${values.map((v, i) => `<span>b${i + 1}: ${v}</span>`).join("")}
+            </div>
+          `
+          : `
+            <div class="tooltip-label">${t("bias")}</div>
+            <div class="tooltip-value">${values[0] ?? ""}</div>
+          `;
+
+      tooltip.style.left = e.clientX + 16 + "px";
+      tooltip.style.top = e.clientY + 16 + "px";
+
+      tooltip.style.opacity = "1";
+      tooltip.style.transform = "translateY(0)";
+    });
+
+    biasNode.addEventListener("mouseleave", () => {
       tooltip.style.opacity = "0";
       tooltip.style.transform = "translateY(4px)";
     });
