@@ -262,6 +262,7 @@ function renderNNVis() {
         if (!from || !to) continue;
 
         const w = Lyr.W[i][j];
+        const sourceValue = lastNodeColors?.raw?.[li]?.[i];
         const trace =
           stepTrainingState.phase === "backward" &&
           stepTrainingState.backwardLayer === li
@@ -284,6 +285,7 @@ function renderNNVis() {
         edges += `
 <g class="edge-group"
    data-weight="${w.toFixed(4)}"
+   data-source-value="${Number.isFinite(sourceValue) ? sourceValue.toFixed(4) : ""}"
    data-previous-weight="${Number.isFinite(previousWeight) ? previousWeight.toFixed(4) : ""}"
    data-weight-delta="${Number.isFinite(delta) ? delta.toFixed(6) : ""}">
 
@@ -484,6 +486,7 @@ function renderNNVis() {
   svg.querySelectorAll(".edge-group").forEach((g) => {
     g.addEventListener("mousemove", (e) => {
       const weight = g.dataset.weight;
+      const sourceValue = g.dataset.sourceValue;
       const previousWeight = g.dataset.previousWeight;
       const weightDelta = g.dataset.weightDelta;
       const change =
@@ -491,11 +494,30 @@ function renderNNVis() {
           ? `<div class="edge-tooltip-change">${previousWeight} → ${weight}<br>Δ ${weightDelta}</div>`
           : "";
 
-      tooltip.innerHTML = `
-        <div class="tooltip-label">${t("weight")}</div>
-        <div class="tooltip-value">${weight}</div>
-        ${change}
-      `;
+      const product =
+        sourceValue !== "" ? (Number(sourceValue) * Number(weight)).toFixed(4) : "";
+
+      tooltip.innerHTML =
+        sourceValue !== ""
+          ? `
+            <div class="tooltip-row">
+              <div class="tooltip-label">${t("valueLabel")}</div>
+              <div class="tooltip-value">${sourceValue}</div>
+            </div>
+            <div class="tooltip-row">
+              <div class="tooltip-label">${t("weight")}</div>
+              <div class="tooltip-value">${weight}</div>
+            </div>
+            <div class="tooltip-plot-values">
+              <span>${sourceValue} × ${weight} = ${product}</span>
+            </div>
+            ${change}
+          `
+          : `
+            <div class="tooltip-label">${t("weight")}</div>
+            <div class="tooltip-value">${weight}</div>
+            ${change}
+          `;
 
       tooltip.style.left = e.clientX + 16 + "px";
       tooltip.style.top = e.clientY + 16 + "px";
@@ -530,7 +552,7 @@ function renderNNVis() {
       } else {
         tooltip.innerHTML = `
           <div class="tooltip-row">
-            <div class="tooltip-label">${t("activation")}</div>
+            <div class="tooltip-label">${t("inputLabel")}</div>
             <div class="tooltip-value">${Number(value).toFixed(4)}</div>
           </div>
         `;
