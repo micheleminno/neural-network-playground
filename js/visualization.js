@@ -578,18 +578,16 @@ function renderNNVis() {
     const values = (biasNode.dataset.biasValues || "").split(", ").filter(Boolean);
 
     biasNode.addEventListener("mousemove", (e) => {
-      tooltip.innerHTML =
+      const countNote =
         values.length > 1
-          ? `
-            <div class="tooltip-label">${t("bias")}</div>
-            <div class="tooltip-plot-values" style="flex-direction:column;gap:4px;">
-              ${values.map((v, i) => `<span>b${i + 1}: ${v}</span>`).join("")}
-            </div>
-          `
-          : `
-            <div class="tooltip-label">${t("bias")}</div>
-            <div class="tooltip-value">${values[0] ?? ""}</div>
-          `;
+          ? `<div class="tooltip-plot-values"><span>${t("biasForEachNeuron").replace("{count}", values.length)}</span></div>`
+          : "";
+
+      tooltip.innerHTML = `
+        <div class="tooltip-label">${t("bias")}</div>
+        <div class="tooltip-value">${values[0] ?? ""}</div>
+        ${countNote}
+      `;
 
       tooltip.style.left = e.clientX + 16 + "px";
       tooltip.style.top = e.clientY + 16 + "px";
