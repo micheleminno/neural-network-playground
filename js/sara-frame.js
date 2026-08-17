@@ -96,8 +96,12 @@
     '.sara-frame-header{' +
       'background:#ffffff;color:var(--sara-navy);' +
       'padding:18px 28px 12px;border-bottom:2px solid var(--sara-navy);}' +
-    '.sara-frame-brand{display:inline-block;text-decoration:none;}' +
+    '.sara-frame-brand{display:inline-flex;align-items:center;gap:16px;text-decoration:none;color:inherit;}' +
     '.sara-frame-brand img{height:52px;width:auto;display:block;}' +
+    '.sara-frame-brand-txt{display:flex;flex-direction:column;line-height:1.15;' +
+      'border-left:2px solid var(--sara-line);padding-left:16px;}' +
+    '.sara-frame-brand-txt .m{font-weight:600;font-size:15px;color:var(--sara-navy);}' +
+    '.sara-frame-brand-txt .t{font-size:10.5px;letter-spacing:.9px;text-transform:uppercase;color:#6f8296;}' +
     '.sara-frame-nav{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;' +
       'gap:10px 26px;margin-top:12px;}' +
     '.sara-frame-nav a{color:var(--sara-navy);text-decoration:none;font-size:14px;font-weight:500;}' +
@@ -118,7 +122,7 @@
 
     '@media (max-width:640px){' +
       '.sara-frame-header{text-align:center;}' +
-      '.sara-frame-brand img{margin:0 auto;}' +
+      '.sara-frame-brand{justify-content:center;}' +
       '.sara-frame-nav{justify-content:center;}' +
     '}';
 
@@ -154,6 +158,10 @@
       '<header class="sara-frame-header">' +
         '<a class="sara-frame-brand" href="' + SARA.home + '">' +
           '<img src="' + SARA.logo + '" alt="SARA">' +
+          '<span class="sara-frame-brand-txt">' +
+            '<span class="m">' + MODULE.name + '</span>' +
+            '<span class="t">' + MODULE.tagline + '</span>' +
+          '</span>' +
         '</a>' +
         '<nav class="sara-frame-nav">' +
           navHtml() +
