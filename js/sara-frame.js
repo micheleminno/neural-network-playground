@@ -106,6 +106,9 @@
       'gap:10px 26px;margin-top:12px;}' +
     '.sara-frame-nav a{color:var(--sara-navy);text-decoration:none;font-size:14px;font-weight:500;}' +
     '.sara-frame-nav a:hover{text-decoration:underline;}' +
+    '.sara-frame-back{border:1.5px solid var(--sara-navy);border-radius:4px;padding:6px 13px !important;' +
+      'font-weight:600;}' +
+    '.sara-frame-back:hover{background:var(--sara-navy);color:#fff !important;text-decoration:none !important;}' +
 
     /* Footer — minimal, matching sara-systems.net (light, slim link row) */
     '.sara-frame-footer{' +
@@ -165,6 +168,7 @@
         '</a>' +
         '<nav class="sara-frame-nav">' +
           navHtml() +
+          '<a class="sara-frame-back" href="' + SARA.home + '">&larr; Back to SARA</a>' +
         '</nav>' +
       '</header>'
     );
