@@ -29,8 +29,8 @@
 (function () {
   "use strict";
 
-  var SARA_TOKEN = "CHANGE_ME_shared_token";               // must match the Contao link
-  var SARA_LOGIN_URL = "https://www.sara-systems.net/";    // SARA members / login page
+  var SARA_TOKEN = "nb-7Kx92pQ-labs"; // must match the Contao link
+  var SARA_LOGIN_URL = "https://www.sara-systems.net/"; // SARA members / login page
   var SARA_REGISTER_URL = "https://www.sara-systems.net/"; // SARA registration page
   var SESSION_KEY = "saraAccess";
   var ALLOW_REFERRER = false; // true = also grant if the referrer is a SARA page (weaker)
