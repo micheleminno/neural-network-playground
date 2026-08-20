@@ -77,7 +77,7 @@
 
     /* ---- Header ---- */
     "#sara-header{background:#ffffff;}",
-    "#sara-header .inside{max-width:1000px;margin:0 auto;padding:0 20px;}",
+    "#sara-header .inside{max-width:1200px;margin:0 auto;padding:0 20px;}",
 
     /* Logo: top-left, standalone block above the nav */
     "#sara-header #logo{display:block;padding:30px 0 20px;}",
