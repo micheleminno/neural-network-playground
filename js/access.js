@@ -67,17 +67,13 @@
   }
 
   function apply() {
-    var landing = document.getElementById("landingPage");
     var app = document.getElementById("appShell");
-    setHrefs(".js-sara-login", SARA_LOGIN_URL);
-    setHrefs(".js-sara-register", SARA_REGISTER_URL);
 
     if (hasAccess()) {
-      if (landing) landing.classList.add("d-none");
       if (app) app.classList.remove("d-none");
     } else {
-      if (app) app.classList.add("d-none");
-      if (landing) landing.classList.remove("d-none");
+      /* Landing page removed — redirect directly to SARA login */
+      window.location.replace(SARA_LOGIN_URL);
     }
   }
 
