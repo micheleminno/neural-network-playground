@@ -91,9 +91,9 @@
       "border-bottom:5px solid #a1ccdb;" +
     "}",
     "#sara-header .mainnavi ul li a{" +
-      "display:block;padding:10px 16px;" +
+      "display:block;padding:10px 18px;" +
       "text-decoration:none;color:#273476;" +
-      "font-size:14px;font-weight:500;white-space:nowrap;" +
+      "font-size:15px;font-weight:400;white-space:nowrap;" +
     "}",
     "#sara-header .mainnavi ul li a:hover{text-decoration:underline;}",
 
