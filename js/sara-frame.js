@@ -203,7 +203,7 @@
         navHtml() +
         '<a class="sara-frame-back" href="' +
         SARA.home +
-        '">&larr; Back to SARA</a>' +
+        '">&larr; Back to Learning Labs</a>' +
         "</nav>" +
         "</header>",
     );
