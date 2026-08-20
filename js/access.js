@@ -66,13 +66,30 @@
     for (var i = 0; i < els.length; i++) els[i].setAttribute("href", url);
   }
 
+  function cameFromSara() {
+    try {
+      var qs = new URLSearchParams(location.search);
+      if (qs.has("sara") || qs.get("embed") === "sara" || qs.has("sara_access")) return true;
+      if (sessionStorage.getItem("saraFrame") === "1") return true;
+      var ref = document.referrer ? new URL(document.referrer).hostname : "";
+      if (/(^|\.)sara-systems\.(net|eu)$/i.test(ref)) return true;
+    } catch (e) {}
+    return false;
+  }
+
   function apply() {
     var app = document.getElementById("appShell");
 
+    if (!cameFromSara()) {
+      /* Direct visit to GitHub Pages — show the app freely */
+      if (app) app.classList.remove("d-none");
+      return;
+    }
+
+    /* Arrived from SARA — enforce token */
     if (hasAccess()) {
       if (app) app.classList.remove("d-none");
     } else {
-      /* Landing page removed — redirect directly to SARA login */
       window.location.replace(SARA_LOGIN_URL);
     }
   }
